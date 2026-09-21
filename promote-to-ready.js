@@ -23,6 +23,9 @@ async function promoteToReady(postId) {
     if (post.status !== "draft") {
       return { ok: false, reason: `status is ${post.status}, not draft` };
     }
+    if (post.is_historical) {
+      return { ok: false, reason: "historical_locked", message: "履歴データのためready昇格は禁止されています" };
+    }
 
     const checks = [];
 

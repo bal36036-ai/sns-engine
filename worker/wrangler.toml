@@ -1,0 +1,10 @@
+name = "sns-material-storage"
+main = "sns-material-worker.js"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "SNS_MATERIAL_KV"
+id = "bbc7ea55e7c34f49a22268dbaad09030"
+
+# UPLOAD_SECRET(secret_text)は `wrangler secret put` で既に設定済み。
+# wrangler.toml に書かない限り、deployで既存の値は消えない(Cloudflare公式仕様)。

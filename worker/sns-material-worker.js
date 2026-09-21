@@ -23,21 +23,24 @@ export default {
       });
     }
 
-    if (request.method === "GET" && path.length > 1 && !path.includes(":meta")) {
+    // GET/HEADどちらも同じ配信ロジックを通す。HEADはBuffer等の外部サービスが
+    // 事前にContent-Type/Content-Lengthを確認するために使うため、GETと矛盾する
+    // 応答(誤ったフォールバック)を返さないようにする。
+    if ((request.method === "GET" || request.method === "HEAD") && path.length > 1 && !path.includes(":meta")) {
       const key = path.slice(1);
       const value = await env.SNS_MATERIAL_KV.get(key, "arrayBuffer");
       if (value === null) {
-        return new Response("Not found", { status: 404 });
+        return new Response(request.method === "HEAD" ? null : "Not found", { status: 404 });
       }
       const metaRaw = await env.SNS_MATERIAL_KV.get(`${key}:meta`);
       const meta = metaRaw ? JSON.parse(metaRaw) : { contentType: "application/octet-stream" };
-      return new Response(value, {
-        status: 200,
-        headers: {
-          "Content-Type": meta.contentType,
-          "Cache-Control": "public, max-age=31536000, immutable",
-        },
-      });
+      const headers = {
+        "Content-Type": meta.contentType,
+        "Content-Length": String(value.byteLength),
+        "Cache-Control": "public, max-age=31536000, immutable",
+      };
+      // HEADは本文を返さない(仕様どおり)。ヘッダーはGETと完全に一致させる。
+      return new Response(request.method === "HEAD" ? null : value, { status: 200, headers });
     }
 
     return new Response("sns-material-worker", { status: 200 });

@@ -79,19 +79,25 @@ async function processOne(client, post, { dryRun }) {
   const log = { id: post.id, target_sns: post.target_sns };
 
   // --- 安全ガード再確認(アプリ側でも二重にチェック。DBトリガーは書き込み時のみ発動するため) ---
-  // GitHub Actionsのscheduleは秒単位で厳密ではなく、Cronは15分間隔で実行される。
-  // そのため「scheduled_atを1秒でも過ぎたらexpired」にすると、Cronの実行タイミングのズレだけで
-  // 正常な投稿まで全てexpiredになってしまう(実機テストで発覚)。
-  // 「06:30以降の最初のCron実行で投稿する」という仕様を成立させるため、
-  // Cron間隔(15分)+バッファを見込んだ猶予(EXPIRE_GRACE_MINUTES)を設け、
-  // それを超えて大きく見逃された場合だけexpiredにする。
-  const EXPIRE_GRACE_MINUTES = 30;
+  // GitHub Actionsのscheduleは秒単位で厳密でないだけでなく、負荷等でCron自体が
+  // 予定どおり来ないこともある。そのため遅延幅を3段階に分けて扱う：
+  //   0〜60分遅れ   … 通常投稿として処理する(Cronの通常のブレの範囲)
+  //   60〜180分遅れ … 一旦止めてneeds_reviewへ(人の目での遅延投稿判断を挟む)
+  //   180分超       … expired(見逃されたとみなし、安全側で自動投稿しない)
+  // 「06:30以降の最初のCron実行で投稿する」という仕様を、GitHub Actions側の遅延まで考慮して成立させる。
+  const NORMAL_GRACE_MINUTES = 60;
+  const REVIEW_GRACE_MINUTES = 180;
   if (post.scheduled_at) {
     const scheduledMs = new Date(post.scheduled_at).getTime();
     const nowMs = Date.now();
-    if (nowMs - scheduledMs > EXPIRE_GRACE_MINUTES * 60 * 1000) {
-      await setStatus(client, post.id, "expired", { guard_reason: `予約日時が過去(${EXPIRE_GRACE_MINUTES}分の猶予を超過)` });
-      return { ...log, result: "stopped", reason: "予約日時が過去(猶予超過)", new_status: "expired" };
+    const lateMinutes = (nowMs - scheduledMs) / 60000;
+    if (lateMinutes > REVIEW_GRACE_MINUTES) {
+      await setStatus(client, post.id, "expired", { guard_reason: `予約日時から${Math.round(lateMinutes)}分経過(${REVIEW_GRACE_MINUTES}分の猶予を超過)` });
+      return { ...log, result: "stopped", reason: "予約日時が過去(猶予超過・expired)", new_status: "expired" };
+    }
+    if (lateMinutes > NORMAL_GRACE_MINUTES) {
+      await setStatus(client, post.id, "needs_review", { guard_reason: `予約日時から${Math.round(lateMinutes)}分経過(通常猶予${NORMAL_GRACE_MINUTES}分超・遅延投稿ポリシーにより要確認)` });
+      return { ...log, result: "stopped", reason: "遅延投稿(要確認)", new_status: "needs_review" };
     }
   }
   if (!post.is_publishable) {

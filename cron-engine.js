@@ -67,8 +67,16 @@ async function setStatus(client, id, status, extra = {}) {
   const values = [id, status];
   let i = 3;
   for (const [key, val] of Object.entries(extra)) {
-    fields.push(`${key} = $${i}`);
-    values.push(typeof val === "object" && val !== null ? JSON.stringify(val) : val);
+    if (key === "post_result" && val !== null && typeof val === "object") {
+      // post_resultは履歴を積み上げる列(dry-run確認・失敗記録・送信成功記録が同じ列を使う)。
+      // 丸ごと上書きすると過去の記録(failure_history等)が消えるため、
+      // 既存のJSONBへ浅いマージ(トップレベルキー単位で上書き・他は保持)で追加する。
+      fields.push(`post_result = COALESCE(post_result, '{}'::jsonb) || $${i}::jsonb`);
+      values.push(JSON.stringify(val));
+    } else {
+      fields.push(`${key} = $${i}`);
+      values.push(typeof val === "object" && val !== null ? JSON.stringify(val) : val);
+    }
     i++;
   }
   fields.push("claimed_at = NULL", "claimed_by = NULL");

@@ -7,7 +7,7 @@ const { getPool } = require("./db-client");
 // プロジェクト標準の投稿時間枠(日本時間)。根拠：投稿本文_媒体別_v1_20260911.md
 const SLOTS = { morning: "06:30", noon: "12:15", evening: "19:30" };
 
-async function decideSchedule(postId, { slotLabel, slotTime, reasonNote }) {
+async function decideSchedule(postId, { slotLabel, slotTime, reasonNote, dayOffset = 1 }) {
   const pool = getPool();
   try {
     const { rows } = await pool.query(`SELECT * FROM sns.posts WHERE id = $1;`, [postId]);
@@ -23,12 +23,15 @@ async function decideSchedule(postId, { slotLabel, slotTime, reasonNote }) {
     );
     const lastPostedAt = history[0] ? new Date(history[0].posted_at) : null;
 
-    // 当日中の連続投稿を避けるため、翌日以降の直近日を選ぶ
+    // 当日中の連続投稿・同一媒体の重複日を避けるため、指定日数後(既定は翌日)を選ぶ
     const now = new Date();
     const targetDate = new Date(now);
-    targetDate.setDate(targetDate.getDate() + 1);
+    targetDate.setDate(targetDate.getDate() + dayOffset);
     const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
     const scheduledAt = new Date(`${dateStr}T${slotTime}:00+09:00`);
+    if (scheduledAt <= now) {
+      throw new Error(`決定した日時(${scheduledAt.toISOString()})が過去または現在時刻以前です。dayOffsetを見直してください。`);
+    }
     const dow = ["日", "月", "火", "水", "木", "金", "土"][targetDate.getDay()];
 
     const reason = {

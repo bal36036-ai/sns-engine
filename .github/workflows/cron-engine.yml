@@ -1,0 +1,39 @@
+name: SNS Cron Engine
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      live:
+        description: "trueで本番登録(通常はfalse=dry-run)"
+        required: false
+        default: "false"
+
+jobs:
+  run-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm install
+
+      - name: Run cron engine (dry-run by default)
+        env:
+          SNS_DB_HOST: "aws-0-ap-northeast-1.pooler.supabase.com"
+          SNS_DB_PORT: "5432"
+          SNS_DB_USER: "sns_engine.dvysbebkzvvqyqtlgqcx"
+          SNS_DB_NAME: "postgres"
+          SNS_DB_SCHEMA: "sns"
+          SNS_ENGINE_DB_PASSWORD: ${{ secrets.SNS_ENGINE_DB_PASSWORD }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.live }}" = "true" ]; then
+            node cron-engine.js --live
+          else
+            node cron-engine.js
+          fi

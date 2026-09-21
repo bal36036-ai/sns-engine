@@ -26,6 +26,9 @@ async function promoteToReady(postId) {
     if (post.is_historical) {
       return { ok: false, reason: "historical_locked", message: "履歴データのためready昇格は禁止されています" };
     }
+    if (!AUTOMATED_SNS.includes(post.target_sns)) {
+      return { ok: false, reason: "channel_not_connected", message: `${post.target_sns}は自動投稿経路が未接続のためready昇格できません` };
+    }
 
     const checks = [];
 

@@ -22,7 +22,7 @@ jobs:
 
       - run: npm install
 
-      - name: Run cron engine (dry-run by default)
+      - name: Run cron engine
         env:
           SNS_DB_HOST: "aws-0-ap-northeast-1.pooler.supabase.com"
           SNS_DB_PORT: "5432"
@@ -32,8 +32,15 @@ jobs:
           SNS_ENGINE_DB_PASSWORD: ${{ secrets.SNS_ENGINE_DB_PASSWORD }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
         run: |
-          if [ "${{ github.event.inputs.live }}" = "true" ]; then
+          # scheduleトリガー(15分ごとの自動実行)だけがlive。
+          # workflow_dispatch(手動実行)は誤操作防止のため、明示的にlive=trueを指定しない限り常にdry-run。
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "scheduleトリガー: live実行"
+            node cron-engine.js --live
+          elif [ "${{ github.event.inputs.live }}" = "true" ]; then
+            echo "workflow_dispatch: live=trueが明示指定されたためlive実行"
             node cron-engine.js --live
           else
+            echo "workflow_dispatch: dry-run(既定)"
             node cron-engine.js
           fi

@@ -37,6 +37,7 @@ async function claimCandidates(client, runId, limit) {
   const { rows } = await client.query(
     `SELECT id FROM sns.posts
      WHERE status IN ('ready', 'scheduled')
+       AND (scheduled_at IS NULL OR scheduled_at <= now())
        AND (claimed_at IS NULL OR claimed_at < now() - interval '${CLAIM_STALE_MINUTES} minutes')
      ORDER BY created_at
      LIMIT $1
@@ -78,9 +79,20 @@ async function processOne(client, post, { dryRun }) {
   const log = { id: post.id, target_sns: post.target_sns };
 
   // --- 安全ガード再確認(アプリ側でも二重にチェック。DBトリガーは書き込み時のみ発動するため) ---
-  if (post.scheduled_at && new Date(post.scheduled_at) < new Date()) {
-    await setStatus(client, post.id, "expired", { guard_reason: "予約日時が過去" });
-    return { ...log, result: "stopped", reason: "予約日時が過去", new_status: "expired" };
+  // GitHub Actionsのscheduleは秒単位で厳密ではなく、Cronは15分間隔で実行される。
+  // そのため「scheduled_atを1秒でも過ぎたらexpired」にすると、Cronの実行タイミングのズレだけで
+  // 正常な投稿まで全てexpiredになってしまう(実機テストで発覚)。
+  // 「06:30以降の最初のCron実行で投稿する」という仕様を成立させるため、
+  // Cron間隔(15分)+バッファを見込んだ猶予(EXPIRE_GRACE_MINUTES)を設け、
+  // それを超えて大きく見逃された場合だけexpiredにする。
+  const EXPIRE_GRACE_MINUTES = 30;
+  if (post.scheduled_at) {
+    const scheduledMs = new Date(post.scheduled_at).getTime();
+    const nowMs = Date.now();
+    if (nowMs - scheduledMs > EXPIRE_GRACE_MINUTES * 60 * 1000) {
+      await setStatus(client, post.id, "expired", { guard_reason: `予約日時が過去(${EXPIRE_GRACE_MINUTES}分の猶予を超過)` });
+      return { ...log, result: "stopped", reason: "予約日時が過去(猶予超過)", new_status: "expired" };
+    }
   }
   if (!post.is_publishable) {
     await setStatus(client, post.id, "needs_review", { guard_reason: "公開可否false" });
@@ -145,15 +157,38 @@ async function processOne(client, post, { dryRun }) {
     return { ...log, result: "dry_run_ok", reason: "全チェック通過(実登録はしていません)", new_status: post.status };
   }
 
-  // --- 本番登録(dry_run=falseの時のみ到達する。今回のタスクでは呼ばれない想定) ---
+  // --- 本番登録 ---
+  // scheduled_atは既に過去(Cronがそれを検知して処理している)なので、
+  // Buffer側の独自キュー(addToQueue)に入れるのではなく、shareNow(即時配信)を使う。
+  // addToQueueのままだと、決めた投稿時刻が無視されBufferの空き枠に押し込まれてしまう。
   try {
     const channelMap = { instagram: "6a9ce332cd8b9c702c154469", tiktok: "6a9ce544cd8b9c702c154892", youtube: "6a9ce3facd8b9c702c154605" };
+    const isVideo = post.media_urls.some((u) => /\.(mp4|mov|webm)(\?|$)/i.test(u));
+    const assets = post.media_urls.map((url) => (isVideo ? { video: { url } } : { image: { url } }));
+
+    let metadata;
+    if (post.target_sns === "instagram") {
+      metadata = { instagram: { type: isVideo ? "reel" : "post", shouldShareToFeed: true } };
+    } else if (post.target_sns === "youtube") {
+      if (!isVideo) {
+        throw new Error("YouTubeは動画が必須ですが、media_urlsが動画形式ではありません");
+      }
+      metadata = {
+        youtube: {
+          title: (post.title || post.body_text || "").slice(0, 95) || "げんばアプリ工房",
+          categoryId: "28", // Science & Technology(過去の投稿と同じ分類)
+          privacy: "public",
+          madeForKids: false,
+        },
+      };
+    }
+
     const created = await createPost({
       channelId: channelMap[post.target_sns],
       text: post.body_text,
-      assets: post.media_urls.map((url) => ({ image: { url } })),
-      metadata: post.target_sns === "instagram" ? { instagram: { type: "post", shouldShareToFeed: true } } : undefined,
-      mode: "addToQueue",
+      assets,
+      metadata,
+      mode: "shareNow",
     });
     await setStatus(client, post.id, "sent", {
       external_service: "buffer",

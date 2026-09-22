@@ -11,8 +11,14 @@
 const https = require("https");
 const { getPool } = require("./db-client");
 const { findDuplicatePost, createPost, ORGANIZATION_ID } = require("./buffer-client");
+const threadsClient = require("./threads-client");
 
-const AUTOMATED_SNS = ["instagram", "tiktok", "youtube"]; // 現在自動化対象の3媒体のみ
+// Buffer経由の3媒体(instagram/tiktok/youtube)は無条件で有効。
+// threadsはガード・重複チェックまでは常に動かすが、実際のライブ登録は
+// THREADS_LIVE_ENABLED=trueが明示的に設定されている場合のみ行う(本番cron-engine.ymlには
+// 未設定のため、スケジュール実行では現時点で絶対にThreadsへ実投稿されない)。
+const AUTOMATED_SNS = ["instagram", "tiktok", "youtube", "threads"];
+const THREADS_LIVE_ENABLED = process.env.THREADS_LIVE_ENABLED === "true";
 const CLAIM_STALE_MINUTES = 10; // 前回実行が異常終了して残ったロックを再取得可能にするまでの時間
 
 function headCheck(url) {
@@ -120,7 +126,8 @@ async function processOne(client, post, { dryRun }) {
     await setStatus(client, post.id, "needs_review", { guard_reason: "対象SNSが未対応" });
     return { ...log, result: "stopped", reason: "対象SNSが未対応", new_status: "needs_review" };
   }
-  if (!post.media_urls || post.media_urls.length === 0) {
+  // Threadsはテキストのみの投稿にも対応するため、media_urls必須のチェックから除外する
+  if (post.target_sns !== "threads" && (!post.media_urls || post.media_urls.length === 0)) {
     await setStatus(client, post.id, "needs_review", { guard_reason: "素材不足" });
     return { ...log, result: "stopped", reason: "素材不足", new_status: "needs_review" };
   }
@@ -138,16 +145,22 @@ async function processOne(client, post, { dryRun }) {
     }
   }
 
-  // --- Buffer側での重複チェック(生きた確認) ---
+  // --- 外部サービス側での重複チェック(生きた確認。BufferとThreads APIで経路が異なる) ---
   let dup;
   try {
-    // target_sns → BufferチャンネルIDのマッピングは現状Instagramのみ実装済み(TikTok/YouTubeは今後追加)
-    const channelMap = { instagram: "6a9ce332cd8b9c702c154469", tiktok: "6a9ce544cd8b9c702c154892", youtube: "6a9ce3facd8b9c702c154605" };
-    const channelId = channelMap[post.target_sns];
-    dup = await findDuplicatePost(channelId, post.body_text);
+    if (post.target_sns === "threads") {
+      const me = await threadsClient.getMe();
+      dup = await threadsClient.findDuplicateText(me.id, post.body_text);
+    } else {
+      // target_sns → BufferチャンネルIDのマッピングは現状Instagramのみ実装済み(TikTok/YouTubeは今後追加)
+      const channelMap = { instagram: "6a9ce332cd8b9c702c154469", tiktok: "6a9ce544cd8b9c702c154892", youtube: "6a9ce3facd8b9c702c154605" };
+      const channelId = channelMap[post.target_sns];
+      dup = await findDuplicatePost(channelId, post.body_text);
+    }
   } catch (e) {
-    await setStatus(client, post.id, "failed", { error_detail: `Buffer APIエラー(重複チェック): ${e.message}` });
-    return { ...log, result: "stopped", reason: `Buffer APIエラー: ${e.message}`, new_status: "failed" };
+    const serviceLabel = post.target_sns === "threads" ? "Threads API" : "Buffer API";
+    await setStatus(client, post.id, "failed", { error_detail: `${serviceLabel}エラー(重複チェック): ${e.message}` });
+    return { ...log, result: "stopped", reason: `${serviceLabel}エラー: ${e.message}`, new_status: "failed" };
   }
   if (dup) {
     await setStatus(client, post.id, "needs_review", {
@@ -171,7 +184,11 @@ async function processOne(client, post, { dryRun }) {
     return { ...log, result: "dry_run_ok", reason: "全チェック通過(実登録はしていません)", new_status: post.status };
   }
 
-  // --- 本番登録 ---
+  // --- 本番登録: target_snsでBuffer経路とThreads API経路に分岐 ---
+  if (post.target_sns === "threads") {
+    return processThreadsPublish(client, post);
+  }
+
   // scheduled_atは既に過去(Cronがそれを検知して処理している)なので、
   // Buffer側の独自キュー(addToQueue)に入れるのではなく、shareNow(即時配信)を使う。
   // addToQueueのままだと、決めた投稿時刻が無視されBufferの空き枠に押し込まれてしまう。
@@ -213,6 +230,62 @@ async function processOne(client, post, { dryRun }) {
   } catch (e) {
     await setStatus(client, post.id, "failed", { error_detail: `Buffer登録エラー: ${e.message}` });
     return { ...log, result: "stopped", reason: `Buffer登録エラー: ${e.message}`, new_status: "failed" };
+  }
+}
+
+// Threads公式API経由での本番登録。
+// THREADS_LIVE_ENABLED=trueが明示的に設定されていない限り、ここで安全に停止する
+// (本番cron-engine.ymlには未設定のため、スケジュール実行では現状必ずここで止まる)。
+async function processThreadsPublish(client, post) {
+  const log = { id: post.id, target_sns: post.target_sns };
+
+  if (!THREADS_LIVE_ENABLED) {
+    await setStatus(client, post.id, "needs_review", {
+      guard_reason: "Threads本番投稿は現在無効化されています(THREADS_LIVE_ENABLED未設定)。有効化する場合はばるの承認のうえGitHub Actionsのworkflow環境変数を設定してください。",
+    });
+    return { ...log, result: "stopped", reason: "Threads本番投稿は無効化中", new_status: "needs_review" };
+  }
+
+  try {
+    const me = await threadsClient.getMe();
+    const isVideo = post.media_urls.some((u) => /\.(mp4|mov|webm)(\?|$)/i.test(u));
+    const isImage = post.media_urls.length > 0 && !isVideo;
+
+    const containerParams = { text: post.body_text, mediaType: "TEXT" };
+    if (isImage) {
+      containerParams.mediaType = "IMAGE";
+      containerParams.imageUrl = post.media_urls[0];
+    } else if (isVideo) {
+      containerParams.mediaType = "VIDEO";
+      containerParams.videoUrl = post.media_urls[0];
+    }
+
+    const containerId = await threadsClient.createContainer(me.id, containerParams);
+    await threadsClient.waitForContainerReady(containerId);
+    const mediaId = await threadsClient.publishContainer(me.id, containerId);
+    const detail = await threadsClient.getMediaDetail(mediaId);
+
+    let insights = null;
+    try {
+      insights = await threadsClient.getInsights(mediaId);
+    } catch (e) {
+      // 公開直後はインサイトが未対応の場合がある。投稿自体は成功しているため処理は継続する。
+      insights = { error: e.message };
+    }
+
+    await setStatus(client, post.id, "sent", {
+      external_service: "threads_api",
+      external_post_id: mediaId,
+      post_result: {
+        registeredAt: new Date().toISOString(),
+        permalink: detail.permalink || null,
+        insights,
+      },
+    });
+    return { ...log, result: "sent", new_status: "sent", external_post_id: mediaId };
+  } catch (e) {
+    await setStatus(client, post.id, "failed", { error_detail: `Threads API登録エラー: ${e.message}` });
+    return { ...log, result: "stopped", reason: `Threads API登録エラー: ${e.message}`, new_status: "failed" };
   }
 }
 

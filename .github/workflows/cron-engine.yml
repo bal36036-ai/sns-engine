@@ -26,6 +26,8 @@ jobs:
           SNS_DB_SCHEMA: "sns"
           SNS_ENGINE_DB_PASSWORD: ${{ secrets.SNS_ENGINE_DB_PASSWORD }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          # THREADS_LIVE_ENABLEDは意図的に未設定。trueにしない限りThreads本番投稿は行われない。
         run: |
           # イベント種別で完全に分離する。手動実行からliveへ進む経路は一切存在しない
           # (workflow_dispatchにinputすら定義していないため、何を指定してもliveにはならない)。

@@ -3,21 +3,10 @@
 // --publish-test を付けた場合のみ、実際にテキスト投稿を1件作成・公開し、
 // インサイト取得・削除まで確認する(この投稿は一時的に公開状態になる)。
 
-const { getMe, createContainer, getContainerStatus, publishContainer, getInsights, getMediaDetail, deletePost } = require("./threads-client");
+const { getMe, createContainer, waitForContainerReady, publishContainer, getInsights, getMediaDetail, deletePost } = require("./threads-client");
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function waitForContainerReady(containerId, maxWaitMs = 30000) {
-  const start = Date.now();
-  while (Date.now() - start < maxWaitMs) {
-    const status = await getContainerStatus(containerId);
-    if (status.status === "FINISHED") return true;
-    if (status.status === "ERROR") throw new Error(`コンテナ作成エラー: ${status.error_message || "詳細不明"}`);
-    await sleep(2000);
-  }
-  throw new Error("コンテナのFINISHED待機がタイムアウトしました");
 }
 
 async function main() {

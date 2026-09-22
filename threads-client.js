@@ -89,12 +89,43 @@ async function deletePost(mediaId) {
   return callThreadsApi("DELETE", `/${mediaId}`, {});
 }
 
+// 直近の自分の投稿一覧を取得(重複チェックに使用。Bufferのlist_posts相当)
+async function listRecentPosts(threadsUserId, limit = 50) {
+  const result = await callThreadsApi("GET", `/${threadsUserId}/threads`, {
+    fields: "id,text,permalink,timestamp",
+    limit: String(limit),
+  });
+  return result.data || [];
+}
+
+// 直近投稿の中に同一テキストが無いか確認(Bufferのfindの Threads版)
+async function findDuplicateText(threadsUserId, text) {
+  const posts = await listRecentPosts(threadsUserId, 50);
+  const normalized = text.trim();
+  return posts.find((p) => (p.text || "").trim() === normalized) || null;
+}
+
+// コンテナがFINISHEDになるまで待機(動画は処理に時間がかかるため)
+async function waitForContainerReady(containerId, maxWaitMs = 60000) {
+  const start = Date.now();
+  while (Date.now() - start < maxWaitMs) {
+    const status = await getContainerStatus(containerId);
+    if (status.status === "FINISHED") return true;
+    if (status.status === "ERROR") throw new Error(`コンテナ作成エラー: ${status.error_message || "詳細不明"}`);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
+  throw new Error("コンテナのFINISHED待機がタイムアウトしました");
+}
+
 module.exports = {
   getMe,
   createContainer,
   getContainerStatus,
+  waitForContainerReady,
   publishContainer,
   getInsights,
   getMediaDetail,
   deletePost,
+  listRecentPosts,
+  findDuplicateText,
 };

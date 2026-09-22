@@ -40,7 +40,7 @@ async function main() {
   }
 
   // --- テキスト投稿の作成・公開テスト ---
-  const testText = `【接続テスト投稿】sns-engine Threads公式APIアダプタの動作確認用です。すぐに削除します。(${new Date().toISOString()})`;
+  const testText = "【接続テスト投稿】\nsns-engine Threads公式APIアダプタの動作確認用です。すぐに削除します。";
   const containerId = await createContainer(me.id, { text: testText, mediaType: "TEXT" });
   result.steps.push({ step: "createContainer", ok: true, containerId });
   console.log(`コンテナ作成OK: ${containerId}`);
@@ -74,6 +74,17 @@ async function main() {
   } catch (e) {
     result.steps.push({ step: "deletePost", ok: false, error: e.message });
     console.log(`削除に失敗(手動削除が必要な可能性): ${e.message}`);
+  }
+
+  // --- 削除後の再取得確認: 投稿が本当に存在しなくなったか ---
+  await sleep(2000);
+  try {
+    await getMediaDetail(mediaId);
+    result.steps.push({ step: "verifyDeleted", ok: false, note: "削除後もgetMediaDetailが成功しました(削除できていない可能性)" });
+    console.log("警告: 削除後もまだ投稿が取得できました");
+  } catch (e) {
+    result.steps.push({ step: "verifyDeleted", ok: true, note: `再取得はエラーになりました(削除確認OK): ${e.message}` });
+    console.log(`削除確認OK(再取得はエラー): ${e.message}`);
   }
 
   console.log(JSON.stringify(result, null, 2));

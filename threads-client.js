@@ -10,7 +10,7 @@ const GRAPH_API_BASE = "graph.threads.net";
 const GRAPH_API_VERSION = "v1.0";
 
 function callThreadsApi(method, path, params = {}) {
-  const accessToken = process.env.THREADS_ACCESS_TOKEN;
+  const accessToken = (process.env.THREADS_ACCESS_TOKEN || "").trim();
   if (!accessToken) {
     throw new Error("環境変数 THREADS_ACCESS_TOKEN が見つかりません。GitHub Actions Secretsを確認してください。");
   }

@@ -1,0 +1,42 @@
+name: Threads Token Health Check
+
+# Threads長期アクセストークンは60日で失効する(Meta公式仕様)。
+# 自動更新の仕組みは未実装(更新後のトークンをGitHub Actions Secretsへ
+# 書き戻すには追加のPAT(secrets:write権限)が必要になり、今回はその追加コストを見送った)。
+# そのため、月1回このワークフローがトークンの生存確認だけを行い、
+# 無効になっていた場合はIssue #2へ警告コメントを出す。
+on:
+  schedule:
+    - cron: "0 0 1 * *" # 毎月1日 0:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+
+jobs:
+  check-token:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Check THREADS_ACCESS_TOKEN validity
+        id: check
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: node check-threads-token.js
+
+      - name: Warn on issue if token is invalid
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 2,
+              body: "⚠️ **Threads Token Health Check失敗**: `THREADS_ACCESS_TOKEN`が無効になっている可能性があります(60日の有効期限切れ等)。Meta Developer Consoleのユーザートークン生成ツールから再発行し、GitHub Actions Secretsを更新してください。",
+            });

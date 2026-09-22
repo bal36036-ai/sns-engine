@@ -1,0 +1,29 @@
+name: Threads API Connection Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_test:
+        description: "trueにすると実際にThreadsへテキスト投稿を1件作成・公開・削除するテストまで行う(falseなら接続確認のみ)"
+        required: false
+        default: "false"
+
+jobs:
+  test-connection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Run Threads connection test
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.publish_test }}" = "true" ]; then
+            node test-threads-connection.js --publish-test
+          else
+            node test-threads-connection.js
+          fi

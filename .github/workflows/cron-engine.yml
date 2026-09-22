@@ -27,7 +27,10 @@ jobs:
           SNS_ENGINE_DB_PASSWORD: ${{ secrets.SNS_ENGINE_DB_PASSWORD }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          # THREADS_LIVE_ENABLEDは意図的に未設定。trueにしない限りThreads本番投稿は行われない。
+          # 2026-09-22 ばる承認により本番有効化。ただしworkflow_dispatch(手動実行)は
+          # 従来どおりdry-run固定(cron-engine.jsの--liveフラグが立たないため、
+          # THREADS_LIVE_ENABLEDの値に関わらずThreadsへの実登録には到達しない)。
+          THREADS_LIVE_ENABLED: "true"
         run: |
           # イベント種別で完全に分離する。手動実行からliveへ進む経路は一切存在しない
           # (workflow_dispatchにinputすら定義していないため、何を指定してもliveにはならない)。

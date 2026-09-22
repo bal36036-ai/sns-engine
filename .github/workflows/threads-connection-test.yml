@@ -4,9 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       publish_test:
-        description: "trueにすると実際にThreadsへテキスト投稿を1件作成・公開・削除するテストまで行う(falseなら接続確認のみ)"
+        description: "trueにすると実際にThreadsへテキスト投稿を1件作成・公開するテストまで行う(falseなら接続確認のみ)"
         required: false
         default: "false"
+      media_type:
+        description: "画像/動画投稿テストを行う場合に指定(image / video / 空欄なら実行しない)"
+        required: false
+        default: ""
+      media_url:
+        description: "media_type指定時の公開メディアURL"
+        required: false
+        default: ""
 
 jobs:
   test-connection:
@@ -19,6 +27,7 @@ jobs:
           node-version: "24"
 
       - name: Run Threads connection test
+        if: ${{ github.event.inputs.media_type == '' }}
         env:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
         run: |
@@ -27,3 +36,10 @@ jobs:
           else
             node test-threads-connection.js
           fi
+
+      - name: Run Threads media test
+        if: ${{ github.event.inputs.media_type != '' }}
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: |
+          node test-threads-media.js --type="${{ github.event.inputs.media_type }}" --url="${{ github.event.inputs.media_url }}"

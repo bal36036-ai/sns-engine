@@ -25,7 +25,7 @@ function bodyHash(text) {
  * @param {boolean} input.isPublishable - 公開可否
  * @param {boolean} input.featurePublished - true=対象機能は公開済み、false=開発中(未公開)
  */
-async function ingestPost(input) {
+async function ingestPost(input, { pool: sharedPool } = {}) {
   const {
     topicId = null,
     targetApp = null,
@@ -43,9 +43,9 @@ async function ingestPost(input) {
   if (typeof isPublishable !== "boolean") throw new Error("isPublishable(true/false)は必須です");
   if (typeof featurePublished !== "boolean") throw new Error("featurePublished(true/false)は必須です");
 
-  const pool = getPool();
+  const pool = sharedPool || getPool();
   try {
-    // 二重登録チェック1: topic_id + target_sns(DBのユニーク制約でも防ぐが、事前に分かりやすく検出)
+    // topic_id の有無に関係なく、同一媒体の本文重複も防ぐ。
     if (topicId) {
       const existing = await pool.query(
         `SELECT id, status FROM sns.posts WHERE topic_id = $1 AND target_sns = $2;`,
@@ -54,28 +54,31 @@ async function ingestPost(input) {
       if (existing.rows.length > 0) {
         return { ok: false, reason: "duplicate_topic", existing: existing.rows[0] };
       }
-    } else {
-      // 二重登録チェック2: topic_idが無い場合は本文ハッシュで一致確認
-      const hash = bodyHash(bodyText);
-      const existing = await pool.query(
-        `SELECT id, status FROM sns.posts WHERE target_sns = $1 AND md5(body_text) = md5($2) LIMIT 1;`,
-        [targetSns, bodyText]
-      );
-      if (existing.rows.length > 0) {
-        return { ok: false, reason: "duplicate_body", existing: existing.rows[0] };
-      }
+    }
+    const existingBody = await pool.query(
+      `SELECT id, status FROM sns.posts WHERE target_sns = $1 AND md5(body_text) = md5($2) LIMIT 1;`,
+      [targetSns, bodyText]
+    );
+    if (existingBody.rows.length > 0) {
+      return { ok: false, reason: "duplicate_body", existing: existingBody.rows[0] };
     }
 
     const res = await pool.query(
       `INSERT INTO sns.posts
         (topic_id, target_app, target_sns, title, body_text, media_urls, scheduled_at, is_publishable, feature_published, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'draft')
+       SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,'draft'
+       WHERE NOT EXISTS (
+         SELECT 1 FROM sns.posts WHERE target_sns = $3 AND md5(body_text) = md5($5)
+       )
+       ON CONFLICT DO NOTHING
        RETURNING id, status;`,
       [topicId, targetApp, targetSns, title, bodyText, mediaUrls, scheduledAt, isPublishable, featurePublished]
     );
-    return { ok: true, post: res.rows[0] };
+    return res.rows.length > 0
+      ? { ok: true, post: res.rows[0] }
+      : { ok: false, reason: "duplicate_topic_or_body" };
   } finally {
-    await pool.end();
+    if (!sharedPool) await pool.end();
   }
 }
 

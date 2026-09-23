@@ -1,0 +1,37 @@
+name: SNS Calendar Inventory
+
+on:
+  schedule:
+    # 日本時間の毎日00:10。GitHub Actionsの実行遅延は処理側で吸収する。
+    - cron: "10 15 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: sns-calendar-inventory
+  cancel-in-progress: false
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: npm ci
+      - name: Verify planner
+        run: node --test test-calendar.js
+      - name: Refill draft calendar
+        env:
+          SNS_DB_HOST: "aws-0-ap-northeast-1.pooler.supabase.com"
+          SNS_DB_PORT: "5432"
+          SNS_DB_USER: "sns_engine.dvysbebkzvvqyqtlgqcx"
+          SNS_DB_NAME: "postgres"
+          SNS_DB_SCHEMA: "sns"
+          SNS_ENGINE_DB_PASSWORD: ${{ secrets.SNS_ENGINE_DB_PASSWORD }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            node maintain-calendar.js --apply
+          else
+            node maintain-calendar.js
+          fi

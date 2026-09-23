@@ -293,12 +293,19 @@ async function runCronEngine({ dryRun = true, limit = 10 } = {}) {
   const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const pool = getPool();
   const client = await pool.connect();
-  const report = { runId, dryRun, processed: [], errors: [] };
+  const report = { runId, dryRun, processed: [], due_drafts: 0, errors: [] };
 
   try {
     await client.query("BEGIN");
     const candidates = await claimCandidates(client, runId, limit);
     await client.query("COMMIT");
+
+    // 下書きは絶対に処理しない。予定時刻を過ぎた未承認枠だけ件数で知らせる。
+    const dueDrafts = await client.query(
+      `SELECT count(*)::int AS count FROM sns.posts
+       WHERE status = 'draft' AND scheduled_at <= now() AND is_historical = false;`
+    );
+    report.due_drafts = dueDrafts.rows[0].count;
 
     for (const post of candidates) {
       try {

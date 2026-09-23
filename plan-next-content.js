@@ -159,7 +159,7 @@ async function planNextContent() {
       ? { generated_at: feedbackRow.generated_at, sample_size: feedback.sample_size, summary: feedback.summary }
       : null,
     candidates: candidates.slice(0, MAX_CANDIDATES),
-    excluded_note: "投稿経路未接続(X/Threads)・未公開機能・履歴データは候補から自動的に除外しています。",
+    excluded_note: "投稿経路未接続(X/note)・未公開機能・履歴データは候補から自動的に除外しています。Threadsは接続済みです。",
   };
 }
 

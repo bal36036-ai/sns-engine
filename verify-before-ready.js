@@ -5,13 +5,14 @@
 const https = require("https");
 const { getPool } = require("./db-client");
 const { findDuplicatePost } = require("./buffer-client");
+const threadsClient = require("./threads-client");
 
 const CHANNEL_MAP = {
   instagram: "6a9ce332cd8b9c702c154469",
   tiktok: "6a9ce544cd8b9c702c154892",
   youtube: "6a9ce3facd8b9c702c154605",
 };
-const CONNECTED_CHANNELS = Object.keys(CHANNEL_MAP); // Buffer接続済み(実際に3チャンネル接続確認済み)
+const CONNECTED_CHANNELS = [...Object.keys(CHANNEL_MAP), "threads"];
 
 function headCheck(url) {
   return new Promise((resolve) => {
@@ -38,12 +39,13 @@ async function verifyOne(post) {
   // 公開可否・未公開機能
   if (!post.is_publishable) issues.push("公開可否false");
   if (!post.feature_published) issues.push("未公開機能");
+  if (!post.scheduled_at || new Date(post.scheduled_at) <= new Date()) issues.push("投稿予定日時が未設定または過去");
 
   // media_urls有効・実際に取得できる・形式
-  if (!post.media_urls || post.media_urls.length === 0) {
+  if ((!post.media_urls || post.media_urls.length === 0) && post.target_sns !== "threads") {
     issues.push("media_urlsが空");
   } else {
-    for (const url of post.media_urls) {
+    for (const url of post.media_urls || []) {
       if (!url.startsWith("https://sns-material-storage.gbapp.workers.dev/")) {
         issues.push(`Cloudflare公開URLではない: ${url}`);
         continue;
@@ -67,8 +69,10 @@ async function verifyOne(post) {
   // 重複チェック(Buffer側の生きた確認)
   if (CONNECTED_CHANNELS.includes(post.target_sns) && post.body_text) {
     try {
-      const dup = await findDuplicatePost(CHANNEL_MAP[post.target_sns], post.body_text);
-      if (dup) issues.push(`Buffer側に既存の同一投稿あり(id=${dup.id})`);
+      const dup = post.target_sns === "threads"
+        ? await threadsClient.findDuplicateText((await threadsClient.getMe()).id, post.body_text)
+        : await findDuplicatePost(CHANNEL_MAP[post.target_sns], post.body_text);
+      if (dup) issues.push(`外部サービスに既存の同一投稿あり(id=${dup.id})`);
     } catch (e) {
       issues.push(`重複確認エラー: ${e.message}`);
     }

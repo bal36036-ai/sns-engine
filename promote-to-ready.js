@@ -4,9 +4,10 @@
 
 const { getPool } = require("./db-client");
 const { findDuplicatePost } = require("./buffer-client");
+const threadsClient = require("./threads-client");
 
-const AUTOMATED_SNS = ["instagram", "tiktok", "youtube"];
-// Buffer連携済みチャンネル(自動化対象3媒体のみ)。X/Threads/noteは手動運用のため対象外。
+const AUTOMATED_SNS = ["instagram", "tiktok", "youtube", "threads"];
+// Buffer連携済みチャンネル。Threadsは公式APIで別途重複確認する。
 const CHANNEL_MAP = {
   instagram: "6a9ce332cd8b9c702c154469",
   tiktok: "6a9ce544cd8b9c702c154892",
@@ -36,19 +37,22 @@ async function promoteToReady(postId) {
     if (!post.body_text || !post.body_text.trim()) checks.push("本文が空");
 
     // 2. 素材確認(自動化対象SNSは画像/動画が必須)
-    if (AUTOMATED_SNS.includes(post.target_sns) && (!post.media_urls || post.media_urls.length === 0)) {
+    if (post.target_sns !== "threads" && (!post.media_urls || post.media_urls.length === 0)) {
       checks.push("素材未完成(media_urlsが空)");
     }
 
     // 3. 公開可否確認
     if (!post.is_publishable) checks.push("公開可否がfalse");
     if (!post.feature_published) checks.push("未公開機能(feature_publishedがfalse)");
+    if (!post.scheduled_at || new Date(post.scheduled_at) <= new Date()) checks.push("投稿予定日時が未設定または過去");
 
     // 4. 重複確認(Buffer側と実際に照合。自動化対象SNSのみ)
     let duplicateCheck = { checked_at: new Date().toISOString(), result: "not_applicable" };
-    if (checks.length === 0 && AUTOMATED_SNS.includes(post.target_sns)) {
+    if (checks.length === 0) {
       try {
-        const dup = await findDuplicatePost(CHANNEL_MAP[post.target_sns], post.body_text);
+        const dup = post.target_sns === "threads"
+          ? await threadsClient.findDuplicateText((await threadsClient.getMe()).id, post.body_text)
+          : await findDuplicatePost(CHANNEL_MAP[post.target_sns], post.body_text);
         if (dup) {
           checks.push("Buffer側に既存の同一投稿あり");
           duplicateCheck = { checked_at: new Date().toISOString(), result: "duplicate", matched_post_id: dup.id };
@@ -56,7 +60,7 @@ async function promoteToReady(postId) {
           duplicateCheck = { checked_at: new Date().toISOString(), result: "none" };
         }
       } catch (e) {
-        checks.push(`重複確認でBuffer APIエラー: ${e.message}`);
+        checks.push(`重複確認で外部APIエラー: ${e.message}`);
       }
     }
 

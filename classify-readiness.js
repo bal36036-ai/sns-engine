@@ -3,7 +3,7 @@
 //
 // 分類優先順位：
 //   historical            … 過去投稿済み、再投稿禁止(is_historical=true)
-//   waiting_channel       … X/Threads等、自動投稿経路が未接続の媒体(IG/TikTok/YouTube以外)
+//   waiting_channel       … X/note等、自動投稿経路が未接続の媒体
 //   waiting_media         … 画像/動画が無い(自動化対象媒体のみ判定)
 //   needs_review          … 公開可否false・未公開機能・重複疑いなど人の判断が必要
 //   waiting_schedule      … 内容・素材は揃っているが投稿日時が未定
@@ -11,12 +11,12 @@
 
 const { getPool } = require("./db-client");
 
-const AUTOMATED_SNS = ["instagram", "tiktok", "youtube"];
+const AUTOMATED_SNS = ["instagram", "tiktok", "youtube", "threads"];
 
 function classify(post) {
   if (post.is_historical) return "historical";
   if (!AUTOMATED_SNS.includes(post.target_sns)) return "waiting_channel";
-  if (!post.media_urls || post.media_urls.length === 0) return "waiting_media";
+  if (post.target_sns !== "threads" && (!post.media_urls || post.media_urls.length === 0)) return "waiting_media";
   if (!post.is_publishable || !post.feature_published) return "needs_review";
   if (post.duplicate_check && ["duplicate", "possible_duplicate"].includes(post.duplicate_check.result)) {
     return "needs_review";

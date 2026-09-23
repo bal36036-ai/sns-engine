@@ -4,6 +4,7 @@ const { getPool } = require("./db-client");
 const { ingestPost } = require("./ingest-post");
 const { classifyAll } = require("./classify-readiness");
 const { TOPICS } = require("./calendar-topics");
+const { contentFor } = require("./calendar-content");
 
 const TZ_OFFSET = 9 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -33,32 +34,6 @@ function targets(key) {
     x: [1, 2, 3, 4, 5].includes(dow) ? 1 : 0,
     note: dow === 1 ? 1 : 0,
   };
-}
-
-function copyFor(topic, sns, variant, second) {
-  const [app, category, angle, question] = topic;
-  const appName = app === "kiridori" ? "キリドリ" : "ハリナビ";
-  const lead = [
-    `最近、${angle}について考えています。`,
-    `現場の作業で気になっているのは、${angle}です。`,
-    `${angle}について、使いやすい形を考えています。`,
-  ][variant];
-  const context = app === "kiridori"
-    ? "材料取りの手間を減らすアプリ「キリドリ」を開発中です。"
-    : "梁の一次照査を補助する「ハリナビ」を開発中です。計算結果だけで安全を断定するものではありません。";
-  if (second) {
-    const follow = [
-      `${appName}の開発で、現場の使い方を知りたいと思っています。よければ教えてください。`,
-      `自分で決めつけずに作りたいので、皆さんのやり方を聞かせてください。${appName}は開発中です。`,
-      `このあたりの使い勝手を考える参考にしたいです。${appName}はまだ開発中です。`,
-    ][variant];
-    return `${question}\n${follow}`;
-  }
-  if (sns === "threads") return `${lead}\n${context}\n${question}`;
-  if (sns === "x") return `${lead} ${context} ${question}`;
-  if (sns === "note") return `【企画・下書き】${category}：${angle}\n\n${lead}\n\n${context}\n\nこの話題は、実際の作業手順と画面を確認してから記事に仕上げます。\n\n${question}`;
-  if (sns === "instagram") return `${lead}\n\n${context}\n\n${question}\n\n#現場改善 #個人開発`;
-  return `${lead}\n${context}\n${question}\n#現場改善 #個人開発`;
 }
 
 function planCalendar(existing, now = new Date(), horizonDays = 30) {
@@ -94,10 +69,11 @@ function planCalendar(existing, now = new Date(), horizonDays = 30) {
         if (new Date(at) <= now || occupied.has(`${at}\0${sns}`)) continue;
         const second = sns === "threads" && n === 1;
         const topicId = `cal-${key.replaceAll("-", "")}-${second ? "b" : "a"}`;
-        const bodyText = copyFor(topic, sns, variant, second);
+        const content = contentFor({ date: key, topic, sns, variant, second, index: topicIndex });
+        const bodyText = content.bodyText;
         const bodyKey = `${sns}\0${bodyText}`;
         if (bodyKeys.has(bodyKey) || existing.some((p) => p.topic_id === topicId && p.target_sns === sns)) continue;
-        planned.push({ topicId, targetApp: topic[0], targetSns: sns, title: `${topic[1]}｜${topic[2]}`, bodyText, mediaUrls: [], scheduledAt: at, isPublishable: false, featurePublished: false });
+        planned.push({ topicId, targetApp: topic[0], targetSns: sns, title: `${topic[1]}｜${topic[2]}`, bodyText, contentPlan: content.plan, mediaUrls: [], scheduledAt: at, isPublishable: false, featurePublished: false });
         occupied.add(`${at}\0${sns}`);
         bodyKeys.add(bodyKey);
         missing--;
@@ -120,11 +96,14 @@ async function maintainCalendar({ apply = false, now = new Date() } = {}) {
     );
     const plan = planCalendar(rows, now);
     if (!apply) return { ...plan, mode: "dry-run", planned: plan.planned.length, preview: plan.planned.slice(0, 8) };
-    const results = { inserted: 0, duplicates: 0, errors: [] };
+    const results = { inserted: 0, duplicates: 0, errors: [], productionPlans: [] };
     for (const post of plan.planned) {
       try {
         const result = await ingestPost(post, { pool });
-        if (result.ok) results.inserted++;
+        if (result.ok) {
+          results.inserted++;
+          if (post.contentPlan) results.productionPlans.push({ topicId: post.topicId, targetSns: post.targetSns, plan: post.contentPlan });
+        }
         else results.duplicates++;
       } catch (e) {
         results.errors.push({ topic_id: post.topicId, sns: post.targetSns, error: e.message });
@@ -137,7 +116,7 @@ async function maintainCalendar({ apply = false, now = new Date() } = {}) {
   }
 }
 
-module.exports = { planCalendar, maintainCalendar, targets, copyFor };
+module.exports = { planCalendar, maintainCalendar, targets };
 
 if (require.main === module) {
   maintainCalendar({ apply: process.argv.includes("--apply") })

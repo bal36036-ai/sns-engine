@@ -10,7 +10,6 @@ const dir = __dirname;
 const src = path.join(dir, 'source');
 const frames = path.join(dir, 'frames');
 fs.mkdirSync(frames, { recursive: true });
-const voiceCredit = process.argv.includes('--voice-credit');
 const edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const image = (name) => `data:image/png;base64,${fs.readFileSync(path.join(src, name)).toString('base64')}`;
 const assets = {
@@ -35,7 +34,7 @@ const videos = [
     S(5, 'キリドリで切り方を見てみる', '材料ごとの切り出し案まで確認', 'kResult', { summary: true })
   ] },
   { id: '20260925-youtube-harinavi', app: 'ハリナビ', date: '9/25 YouTube Shorts', slides: [
-    S(2, '曲げ応力69.691、元条件は？', '画面の数値は動作確認用の例', 'hCheck'),
+    S(2, '曲げ応力69.691、元条件は？', '曲げ応力の表示から見返す', 'hCheck'),
     S(5, '数字だけを転記すると', '元の条件を探すことに', 'memoH'),
     S(10, 'まず入力条件を確認', 'スパン長 3,000mm・吊り荷 2t', 'hConditions'),
     S(6, '次に結果を見返す', '条件と結果を一緒に確認', 'hResult'),
@@ -108,7 +107,7 @@ function html(video, slide, index) {
     *{box-sizing:border-box}html,body{margin:0;width:720px;height:1280px;overflow:hidden}
     body{font-family:'Yu Gothic','Meiryo',sans-serif;background:${hari?'#eef4f7':'#fff5ec'};color:#172c35}
     .top{height:96px;background:${hari?'#1d526c':'#b85031'};color:white;display:flex;align-items:center;justify-content:space-between;padding:0 42px;font-weight:800;font-size:27px;letter-spacing:.04em}
-    .main{height:1035px;padding:46px 46px 20px;display:flex;flex-direction:column}
+    .main{height:1184px;padding:46px 46px 90px;display:flex;flex-direction:column}
     .eyebrow{font-size:26px;font-weight:800;color:${hari?'#25667f':'#bb5b3a'};margin-bottom:22px}
     h1{font-size:${slide.title.length>24?'44':'52'}px;line-height:1.33;letter-spacing:.01em;margin:0 0 24px;font-weight:900;min-height:148px}
     .caption{font-size:30px;line-height:1.45;color:#435862;font-weight:700;min-height:92px}
@@ -119,11 +118,9 @@ function html(video, slide, index) {
     .screen img{display:block;width:100%;max-height:582px;object-fit:contain}.stack{display:flex;flex-direction:column;gap:24px}.stack img{max-height:180px}
     .memo{width:100%;background:#fffdf6;padding:40px 42px;border-radius:8px;box-shadow:4px 8px 24px #2d2d2d20;transform:rotate(-1deg);border:5px solid ${accent};border-top:12px solid ${accent}}
     .memoTitle{font-size:38px;font-weight:900;margin-bottom:34px}.memoValue{font-size:55px;font-weight:900;margin:26px 0;color:#2c5363}.memoLine{font-size:32px;font-weight:750;line-height:1.8;border-bottom:2px solid #e2e3dc}.memoNote{font-size:24px;color:#667075;margin-top:32px;font-weight:700}
-    .bottom{height:149px;border-top:3px solid ${hari?'#d7e6eb':'#f1d3c4'};padding:14px 46px 12px;display:flex;flex-direction:column;justify-content:space-between;background:#fffdfacc}
-    .source{font-size:25px;font-weight:850;color:#35515e}.note{font-size:22px;color:#57646a;line-height:1.25}.safety{font-size:21px;color:#5c6470;font-weight:700}.credit{font-size:18px;color:#57646a;font-weight:700}
     .summary h1{color:${hari?'#1c5d77':'#af4b2d'}}
     .hook h1{font-size:${hookFont}px;line-height:1.27;background:#fffdfb;border-left:10px solid ${accent};padding:18px 18px 20px;box-shadow:0 8px 24px #23394312;border-radius:0 18px 18px 0}
-  </style><body class="${slide.summary?'summary':''} ${index===0?'hook':''}"><div class="top"><span>${escape(video.app)}</span><span>${escape(video.date)}</span></div><div class="main"><div class="eyebrow">${String(index+1).padStart(2,'0')} / ${String(video.slides.length).padStart(2,'0')}</div><h1>${escape(slide.title)}</h1><div class="caption">${escape(slide.caption)}</div><div class="visual"><div class="focusCallout"><span class="focusArrow">↓</span><span>注目：${escape(focus)}</span></div>${visual}</div></div><div class="bottom"><div class="source">${memo?'説明用メモ':'アプリの実画面'} ｜ げんばアプリ工房</div><div class="note">画面の数値は動作確認用の例です。</div>${hari?'<div class="safety">一次照査の補助。安全の最終判断は専門家へ。</div>':''}${voiceCredit?'<div class="credit">音声：VOICEVOX Nemo</div>':''}</div></body></html>`;
+  </style><body class="${slide.summary?'summary':''} ${index===0?'hook':''}"><div class="top"><span>${escape(video.app)}</span><span>${escape(video.date)}</span></div><div class="main"><div class="eyebrow">${String(index+1).padStart(2,'0')} / ${String(video.slides.length).padStart(2,'0')}</div><h1>${escape(slide.title)}</h1><div class="caption">${escape(slide.caption)}</div><div class="visual">${memo || slide.summary ? "" : `<div class="focusCallout"><span class="focusArrow">↓</span><span>注目：${escape(focus)}</span></div>`}${visual}</div></div></body></html>`;
 }
 
 async function run() {
@@ -147,18 +144,11 @@ async function run() {
         await page.screenshot({ path: file });
         if (framesOnly) continue;
         const frameCount = slide.seconds * 24;
-        const lastFrame = frameCount - 1;
-        const forward = i % 2 === 0;
-        const x = forward ? `(iw-iw/zoom)*on/${lastFrame}` : `(iw-iw/zoom)*(1-on/${lastFrame})`;
-        const y = forward ? `(ih-ih/zoom)*(1-on/${lastFrame})` : `(ih-ih/zoom)*on/${lastFrame}`;
-        const filter = `[0:v]split=3[moving][header][footer];`+
-          `[moving]zoompan=z='1.02+0.02*on/${lastFrame}':x='${x}':y='${y}':d=1:s=720x1280:fps=24[zoomed];`+
-          `[header]crop=720:96:0:0[top];[footer]crop=720:149:0:1131[bottom];`+
-          `[zoomed][top]overlay=0:0:shortest=1[withtop];`+
-          `[withtop][bottom]overlay=0:1131:shortest=1,format=yuv420p[v]`;
+        // Hold every app screenshot still. Only scene changes get a short fade.
+        const filter = i === 0 ? 'format=yuv420p' : 'fade=t=in:st=0:d=0.16:color=white,format=yuv420p';
         const segment = path.join(work, `${video.id}-${i+1}.mp4`);
         execFileSync('ffmpeg', ['-y','-loglevel','error','-loop','1','-framerate','24','-i',file,
-          '-filter_complex',filter,'-map','[v]','-frames:v',String(frameCount),'-an','-c:v','libx264','-preset','veryfast',
+          '-vf',filter,'-frames:v',String(frameCount),'-an','-c:v','libx264','-preset','veryfast',
           '-crf','24','-pix_fmt','yuv420p',segment], { stdio:'inherit' });
         segments.push(segment);
       }
@@ -170,7 +160,7 @@ async function run() {
         '-f','lavfi','-i','anullsrc=channel_layout=stereo:sample_rate=48000',
         '-c:v','copy','-c:a','aac','-b:a','64k','-movflags','+faststart',
         '-t',String(video.slides.reduce((n,s)=>n+s.seconds,0)),'-shortest',output], { stdio:'inherit' });
-      console.log(`${path.basename(output)} ${video.slides.reduce((n,s)=>n+s.seconds,0)}s with motion`);
+      console.log(`${path.basename(output)} ${video.slides.reduce((n,s)=>n+s.seconds,0)}s with fixed screens`);
     }
   } finally {
     await browser.close();

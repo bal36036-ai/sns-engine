@@ -1,0 +1,352 @@
+{
+  "checked_at": "2026-09-24T14:28:42.327Z",
+  "audio_baseline": "6d6e3a0",
+  "videos": [
+    {
+      "id": "20260924-tiktok-kiridori",
+      "duration": 26,
+      "audio_hash": "MD5=cd17f5612271a323ea935a19f1c8a48b",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0.000027488425925925926,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.055185185185185184,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 7,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.013508391203703703,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 13,
+          "seconds": 8,
+          "static_mean_pixel_difference": 0.028492476851851852,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 21,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.025846354166666665,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260925-youtube-harinavi",
+      "duration": 28,
+      "audio_hash": "MD5=8a4374973a987ceb4cf1e09300e4d956",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.04067997685185185,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 7,
+          "seconds": 10,
+          "static_mean_pixel_difference": 0.029526909722222223,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 17,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.028268229166666665,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 23,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.08055700231481482,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260926-tiktok-kiridori",
+      "duration": 27,
+      "audio_hash": "MD5=4f48f4f087f3fe3f67e317b81d81db17",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0.0002025462962962963,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.015789930555555557,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 7,
+          "seconds": 9,
+          "static_mean_pixel_difference": 0.020283564814814813,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 16,
+          "seconds": 7,
+          "static_mean_pixel_difference": 0.019341724537037037,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 23,
+          "seconds": 4,
+          "static_mean_pixel_difference": 0.03300636574074074,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260927-tiktok-harinavi",
+      "duration": 29,
+      "audio_hash": "MD5=1e19762d3a59342aad65a052c04f9d0c",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0.0001171875,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.022333622685185184,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 8,
+          "seconds": 9,
+          "static_mean_pixel_difference": 0.03116608796296296,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 17,
+          "seconds": 7,
+          "static_mean_pixel_difference": 0.02476417824074074,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 24,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.07435185185185185,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260927-youtube-harinavi",
+      "duration": 29,
+      "audio_hash": "MD5=b46a5a689ee65814bea2c41bea4861b5",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.031516203703703706,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 8,
+          "seconds": 10,
+          "static_mean_pixel_difference": 0.05956163194444444,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 18,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.028599537037037038,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 24,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.07087239583333334,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260928-youtube-kiridori",
+      "duration": 28,
+      "audio_hash": "MD5=25b6779650718db78cbb9a5838d8eea0",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0.0009273726851851852,
+          "footer_mean_pixel_error": 2.1464351851851853,
+          "footer_spatial_variation": 0.31449074074074074
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.053981481481481484,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 8,
+          "seconds": 7,
+          "static_mean_pixel_difference": 0.009367766203703705,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 15,
+          "seconds": 8,
+          "static_mean_pixel_difference": 0.03563802083333333,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 23,
+          "seconds": 5,
+          "static_mean_pixel_difference": 0.009638310185185186,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260929-tiktok-harinavi",
+      "duration": 29,
+      "audio_hash": "MD5=03086ccfcdcd3d074a376e7b56d0ec54",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.018858506944444443,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 8,
+          "seconds": 8,
+          "static_mean_pixel_difference": 0.018800636574074076,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 16,
+          "seconds": 7,
+          "static_mean_pixel_difference": 0.06307581018518518,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 23,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.051987847222222223,
+          "footer_mean_pixel_error": 1.6666666666666667,
+          "footer_spatial_variation": 0
+        }
+      ]
+    },
+    {
+      "id": "20260930-youtube-kiridori",
+      "duration": 28,
+      "audio_hash": "MD5=b9b584bbc26d69589bcdef50a48c5875",
+      "audio_max_db": -1.5,
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "static_mean_pixel_difference": 0.001015625,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.020872395833333335,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 8,
+          "seconds": 8,
+          "static_mean_pixel_difference": 0.03513454861111111,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 16,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.0225,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        },
+        {
+          "start": 22,
+          "seconds": 6,
+          "static_mean_pixel_difference": 0.035629340277777775,
+          "footer_mean_pixel_error": 2,
+          "footer_spatial_variation": 0
+        }
+      ]
+    }
+  ],
+  "publication_captions": 8,
+  "result": "passed"
+}

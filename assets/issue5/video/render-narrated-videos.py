@@ -1,6 +1,7 @@
 """Build the eight review-only videos with local VOICEVOX Nemo narration.
 
 Run a locally started official Nemo engine at 127.0.0.1:50121 first.
+Use --reuse-audio to keep the existing narration without starting the engine.
 No external voice service, BGM, or posting API is used.
 """
 
@@ -73,7 +74,7 @@ def make_voice(video: dict, work: Path):
 def render_visuals(work: Path, selected: str | None):
     args = [
         "node", str(HERE / "render-videos.cjs"), f"--output-dir={work}",
-        "--output-suffix=-narrated-base", "--voice-credit"
+        "--output-suffix=-narrated-base"
     ]
     if selected:
         args.append(f"--id={selected}")
@@ -106,10 +107,12 @@ def mux(video: dict, inputs: list[Path], work: Path):
 def main():
     if MANIFEST["speaker_id"] != VOICE:
         raise RuntimeError("Narration manifest and requested speaker differ")
-    speakers = json.loads(api("/speakers").decode("utf-8"))
-    available = {style["id"] for person in speakers for style in person["styles"]}
-    if VOICE not in available:
-        raise RuntimeError("VOICEVOX Nemo speaker 10005 is unavailable")
+    reuse_audio = "--reuse-audio" in sys.argv
+    if not reuse_audio:
+        speakers = json.loads(api("/speakers").decode("utf-8"))
+        available = {style["id"] for person in speakers for style in person["styles"]}
+        if VOICE not in available:
+            raise RuntimeError("VOICEVOX Nemo speaker 10005 is unavailable")
     if len(MANIFEST["videos"]) != 8:
         raise RuntimeError("Expected exactly eight review videos")
     selected = next((arg[5:] for arg in sys.argv[1:] if arg.startswith("--id=")), None)
@@ -118,6 +121,25 @@ def main():
         raise RuntimeError(f"Unknown video id: {selected}")
     with tempfile.TemporaryDirectory(prefix="sns-issue5-narrated-") as temp_dir:
         work = Path(temp_dir)
+        if reuse_audio:
+            # Preserve every original audio stream before replacing any video.
+            for video in videos:
+                source = HERE / f'{video["id"]}-narrated.mp4'
+                subprocess.run([
+                    "ffmpeg", "-y", "-loglevel", "error", "-i", str(source),
+                    "-map", "0:a:0", "-c:a", "copy", str(work / f'{video["id"]}.m4a')
+                ], check=True)
+            render_visuals(work, selected)
+            for video in videos:
+                subprocess.run([
+                    "ffmpeg", "-y", "-loglevel", "error",
+                    "-i", str(work / f'{video["id"]}-narrated-base.mp4'),
+                    "-i", str(work / f'{video["id"]}.m4a'),
+                    "-map", "0:v:0", "-map", "1:a:0", "-c", "copy",
+                    "-movflags", "+faststart", "-t", str(sum(video["seconds"])),
+                    str(HERE / f'{video["id"]}-narrated.mp4')
+                ], check=True)
+            return
         voices = {video["id"]: make_voice(video, work) for video in videos}
         if "--voice-only" in sys.argv:
             return

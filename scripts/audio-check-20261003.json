@@ -1,0 +1,105 @@
+{
+  "tool": "check-video-audio.py",
+  "offline_inference": true,
+  "external_api_used": false,
+  "model": "small",
+  "reports": [
+    {
+      "video": "assets/issue5/future/20261003/20261003-tiktok-harinavi-narrated.mp4",
+      "status": "WARN",
+      "duration_seconds": 27.0,
+      "script_seconds": 27,
+      "model": "faster-whisper/small, CPU int8, Japanese",
+      "reasons": [],
+      "scenes": [
+        {
+          "scene": 1,
+          "seconds": 2,
+          "script": "この数字の前提、どこ？",
+          "transcript": "この数字の前提、どこ?",
+          "prompted_transcript": null,
+          "similarity": 1.0,
+          "status": "PASS",
+          "missing_critical_terms": [],
+          "phonetic_asr_matches": [],
+          "active_seconds": 1.22,
+          "first_active_offset": 0.18,
+          "last_active_end": 1.7,
+          "peak_dbfs": -1.51,
+          "rms_dbfs": -15.42,
+          "clipped_samples": 0
+        },
+        {
+          "scene": 2,
+          "seconds": 5,
+          "script": "まず、結果の位置と、表示された項目を見ます。",
+          "transcript": "まず、結果の位置と表示された項目を見ます。",
+          "prompted_transcript": null,
+          "similarity": 1.0,
+          "status": "PASS",
+          "missing_critical_terms": [],
+          "phonetic_asr_matches": [],
+          "active_seconds": 2.66,
+          "first_active_offset": 0.16,
+          "last_active_end": 3.42,
+          "peak_dbfs": -1.45,
+          "rms_dbfs": -18.19,
+          "clipped_samples": 0
+        },
+        {
+          "scene": 3,
+          "seconds": 8,
+          "script": "次に元の条件へ。スパン長と吊り荷を見返します。",
+          "transcript": "次に元の条件へ、スパンチョウと釣りにを見返します。",
+          "prompted_transcript": "次に元の条件へ、スパンチョウと釣り荷を見返します。",
+          "similarity": 0.818,
+          "status": "WARN",
+          "missing_critical_terms": [
+            "吊り荷"
+          ],
+          "phonetic_asr_matches": [],
+          "active_seconds": 2.96,
+          "first_active_offset": 0.18,
+          "last_active_end": 3.38,
+          "peak_dbfs": -1.58,
+          "rms_dbfs": -19.32,
+          "clipped_samples": 0
+        },
+        {
+          "scene": 4,
+          "seconds": 7,
+          "script": "条件と結果の並びを、今、画面で検討しています。",
+          "transcript": "条件と結果の並びを、今、画面で検討しています。",
+          "prompted_transcript": null,
+          "similarity": 1.0,
+          "status": "PASS",
+          "missing_critical_terms": [],
+          "phonetic_asr_matches": [],
+          "active_seconds": 2.96,
+          "first_active_offset": 0.16,
+          "last_active_end": 3.76,
+          "peak_dbfs": -1.56,
+          "rms_dbfs": -18.42,
+          "clipped_samples": 0
+        },
+        {
+          "scene": 5,
+          "seconds": 5,
+          "script": "条件を探しやすい画面へ。最終判断は専門家に。",
+          "transcript": "条件を探しやすいなめんへ、最終判断は専門家に",
+          "prompted_transcript": null,
+          "similarity": 0.878,
+          "status": "PASS",
+          "missing_critical_terms": [],
+          "phonetic_asr_matches": [],
+          "active_seconds": 3.24,
+          "first_active_offset": 0.16,
+          "last_active_end": 3.6,
+          "peak_dbfs": -1.38,
+          "rms_dbfs": -16.92,
+          "clipped_samples": 0
+        }
+      ]
+    }
+  ]
+}

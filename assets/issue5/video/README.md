@@ -1,6 +1,6 @@
 # Issue #5 直近7日分・縦型動画素材（画面固定・下部表示なし）
 
-最新の対応：[変更前後と検証結果](../../../stage15-issue5-clean-video-review.md)。Issue #5の23:19のコメントに対応。再確認待ち。
+最新の対応：[変更前後と検証結果](../../../stage15-issue5-clean-video-review.md)。Issue #5の23:19のコメントに対応。[現在の進行方針と音声確認](../../../stage16-issue5-audio-check-and-workflow.md)：細部の再承認待ちは挟まない。技術確認済み、聴感は未確認。
 
 ## 制作結果
 
@@ -49,4 +49,4 @@
 
 `node assets/issue5/verify-media.cjs --video-only --audio-baseline=6d6e3a0 --report=assets/issue5/video/verification.json` 成功。[検証結果](verification.json)に8本・40場面の静止確認、下部の空白、音声の一致、寸法・長さを記録した。投稿用原稿8件の音声クレジット・ハリナビ4件の専門家による最終判断の記載も確認した。
 
-音声の聴感による自然さと公開判断は再確認待ち。ready化・投稿・予約・Buffer登録・素材URL登録はしていない。
+音声の聴感による自然さは未確認。品質の確認範囲と次工程への進み方は上記の最新記録を参照。ready化・投稿・予約・Buffer登録・素材URL登録はしていない。

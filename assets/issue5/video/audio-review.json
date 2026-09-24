@@ -1,0 +1,458 @@
+{
+  "scope": "decoded waveform measurements only; not a perceptual or pronunciation review",
+  "speech_detection_threshold_dbfs": -42,
+  "window_seconds": 0.02,
+  "voice": "VOICEVOX Nemo 女声1 ノーマル",
+  "speaker_id": 10005,
+  "subjective_listening": "not_performed_no_audio_perception_tool",
+  "videos": [
+    {
+      "id": "20260924-tiktok-kiridori",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "この切り方、どう出す？",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 0.28,
+          "active_rms_dbfs": -14.54,
+          "peak_dbfs": -1.51,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 5,
+          "script": "六メートル材から、必要な部材を取りたい。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 2.18,
+          "active_rms_dbfs": -15.01,
+          "peak_dbfs": -1.5,
+          "clipped_samples": 0
+        },
+        {
+          "start": 7,
+          "seconds": 6,
+          "script": "定尺と刃幅、部材の長さを入力します。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 3.06,
+          "active_rms_dbfs": -15.1,
+          "peak_dbfs": -1.58,
+          "clipped_samples": 0
+        },
+        {
+          "start": 13,
+          "seconds": 8,
+          "script": "必要な本数をそろえて入力。すると、材料ごとの切り出し案が出ます。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 3.2,
+          "active_rms_dbfs": -15.02,
+          "peak_dbfs": -1.53,
+          "clipped_samples": 0
+        },
+        {
+          "start": 21,
+          "seconds": 5,
+          "script": "一本目はこの組み合わせ。ほかの材料も、キリドリで見てみる。",
+          "speech_start_offset": 0.14,
+          "end_silence_seconds": 0.9,
+          "active_rms_dbfs": -13.79,
+          "peak_dbfs": -1.58,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 1.31
+    },
+    {
+      "id": "20260925-youtube-harinavi",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "この数値、元は？",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 0.38,
+          "active_rms_dbfs": -14.78,
+          "peak_dbfs": -1.65,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 5,
+          "script": "結果の数字だけでは、元の条件を忘れがち。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 1.78,
+          "active_rms_dbfs": -14.59,
+          "peak_dbfs": -1.53,
+          "clipped_samples": 0
+        },
+        {
+          "start": 7,
+          "seconds": 10,
+          "script": "ハリナビは梁の一次照査を補助。スパン長三千ミリ、吊り荷二トンなど、入力した条件を確認できます。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 3.12,
+          "active_rms_dbfs": -15.37,
+          "peak_dbfs": -1.7,
+          "clipped_samples": 0
+        },
+        {
+          "start": 17,
+          "seconds": 6,
+          "script": "その条件で表示された確認項目と結果を、順に見返します。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 1.84,
+          "active_rms_dbfs": -14.31,
+          "peak_dbfs": -1.51,
+          "clipped_samples": 0
+        },
+        {
+          "start": 23,
+          "seconds": 5,
+          "script": "数字の出どころを確かめる。ハリナビの実画面です。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 1.66,
+          "active_rms_dbfs": -14.26,
+          "peak_dbfs": -1.51,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 1.11
+    },
+    {
+      "id": "20260926-tiktok-kiridori",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "この端材、なぜ？",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 0.32,
+          "active_rms_dbfs": -14.61,
+          "peak_dbfs": -1.51,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 5,
+          "script": "まず定尺六メートルと刃幅を入れます。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 2.6,
+          "active_rms_dbfs": -15.32,
+          "peak_dbfs": -1.45,
+          "clipped_samples": 0
+        },
+        {
+          "start": 7,
+          "seconds": 9,
+          "script": "次に、二千五百ミリを二本など、必要な部材と本数をそろえます。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 4.5,
+          "active_rms_dbfs": -15.11,
+          "peak_dbfs": -2.22,
+          "clipped_samples": 0
+        },
+        {
+          "start": 16,
+          "seconds": 7,
+          "script": "結果では、一番目の材料の切り方と、残る長さを図で確認できます。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 2.08,
+          "active_rms_dbfs": -14.6,
+          "peak_dbfs": -1.42,
+          "clipped_samples": 0
+        },
+        {
+          "start": 23,
+          "seconds": 4,
+          "script": "ほかの材料は？キリドリで見てみる。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 1.54,
+          "active_rms_dbfs": -13.87,
+          "peak_dbfs": -1.49,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 1.45
+    },
+    {
+      "id": "20260927-tiktok-harinavi",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "二トン、結果はどこ？",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 0.32,
+          "active_rms_dbfs": -13.41,
+          "peak_dbfs": -1.61,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "script": "スパン長と吊り荷。まずは入力条件を確かめます。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 2.6,
+          "active_rms_dbfs": -14.63,
+          "peak_dbfs": -1.56,
+          "clipped_samples": 0
+        },
+        {
+          "start": 8,
+          "seconds": 9,
+          "script": "梁の一次照査を補助する結果画面へ。確認項目が並び、数値を順にたどれます。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 3.44,
+          "active_rms_dbfs": -14.96,
+          "peak_dbfs": -1.58,
+          "clipped_samples": 0
+        },
+        {
+          "start": 17,
+          "seconds": 7,
+          "script": "条件に戻って、また結果へ。数字の元を一緒に見返せます。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 2.82,
+          "active_rms_dbfs": -13.93,
+          "peak_dbfs": -1.52,
+          "clipped_samples": 0
+        },
+        {
+          "start": 24,
+          "seconds": 5,
+          "script": "条件が変わるとどうなる？ハリナビで確かめてみる。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 1.7,
+          "active_rms_dbfs": -14.64,
+          "peak_dbfs": -1.58,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 1.55
+    },
+    {
+      "id": "20260927-youtube-harinavi",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "曲げ応力、元は？",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 0.38,
+          "active_rms_dbfs": -13.76,
+          "peak_dbfs": -1.56,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "script": "この例では、スパン長三千ミリ、吊り荷二トンを入力。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 2.14,
+          "active_rms_dbfs": -15.1,
+          "peak_dbfs": -1.52,
+          "clipped_samples": 0
+        },
+        {
+          "start": 8,
+          "seconds": 10,
+          "script": "ハリナビは梁の一次照査を補助。結果画面の曲げ応力などを、入力条件と合わせて見ます。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 4.06,
+          "active_rms_dbfs": -15.11,
+          "peak_dbfs": -1.56,
+          "clipped_samples": 0
+        },
+        {
+          "start": 18,
+          "seconds": 6,
+          "script": "元の入力をもう一度確認して、結果の読み違いを防ぎます。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 1.82,
+          "active_rms_dbfs": -13.95,
+          "peak_dbfs": -1.51,
+          "clipped_samples": 0
+        },
+        {
+          "start": 24,
+          "seconds": 5,
+          "script": "別の条件では？ハリナビの画面で見てみる。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 2.0,
+          "active_rms_dbfs": -14.3,
+          "peak_dbfs": -1.35,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 1.35
+    },
+    {
+      "id": "20260928-youtube-kiridori",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "メモが、切り出し図に？",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 0.3,
+          "active_rms_dbfs": -13.96,
+          "peak_dbfs": -1.53,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "script": "必要な長さと本数を、まずメモから拾います。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 2.86,
+          "active_rms_dbfs": -15.27,
+          "peak_dbfs": -1.52,
+          "clipped_samples": 0
+        },
+        {
+          "start": 8,
+          "seconds": 7,
+          "script": "同じ条件をキリドリへ。定尺六メートルと刃幅五ミリも入力。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 2.72,
+          "active_rms_dbfs": -15.31,
+          "peak_dbfs": -1.46,
+          "clipped_samples": 0
+        },
+        {
+          "start": 15,
+          "seconds": 8,
+          "script": "材料ごとの切り出し案が図で出ます。どの部材を組み合わせたかも見られます。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 3.32,
+          "active_rms_dbfs": -14.77,
+          "peak_dbfs": -1.48,
+          "clipped_samples": 0
+        },
+        {
+          "start": 23,
+          "seconds": 5,
+          "script": "あなたの条件なら、どんな切り方？キリドリで見てみる。",
+          "speech_start_offset": 0.14,
+          "end_silence_seconds": 1.34,
+          "active_rms_dbfs": -14.82,
+          "peak_dbfs": -1.56,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 1.35
+    },
+    {
+      "id": "20260929-tiktok-harinavi",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "結果、どこから読む？",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 0.32,
+          "active_rms_dbfs": -14.55,
+          "peak_dbfs": -1.68,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "script": "先に確認するのは、スパン長と吊り荷の条件です。",
+          "speech_start_offset": 0.22,
+          "end_silence_seconds": 2.66,
+          "active_rms_dbfs": -14.13,
+          "peak_dbfs": -1.45,
+          "clipped_samples": 0
+        },
+        {
+          "start": 8,
+          "seconds": 8,
+          "script": "一次照査の補助として、曲げ応力など画面の確認項目を順に見ます。",
+          "speech_start_offset": 0.14,
+          "end_silence_seconds": 3.4,
+          "active_rms_dbfs": -14.46,
+          "peak_dbfs": -1.4,
+          "clipped_samples": 0
+        },
+        {
+          "start": 16,
+          "seconds": 7,
+          "script": "同じ画面で結果をたどり、元の条件と合わせて確認。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 3.3,
+          "active_rms_dbfs": -14.31,
+          "peak_dbfs": -1.59,
+          "clipped_samples": 0
+        },
+        {
+          "start": 23,
+          "seconds": 6,
+          "script": "条件、項目、結果。この順でハリナビの画面を見てみましょう。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 1.4,
+          "active_rms_dbfs": -13.95,
+          "peak_dbfs": -1.45,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 0.6
+    },
+    {
+      "id": "20260930-youtube-kiridori",
+      "scenes": [
+        {
+          "start": 0,
+          "seconds": 2,
+          "script": "この図、入力は三つ。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 0.32,
+          "active_rms_dbfs": -13.39,
+          "peak_dbfs": -1.4,
+          "clipped_samples": 0
+        },
+        {
+          "start": 2,
+          "seconds": 6,
+          "script": "一つ目は、使う定尺の長さ。ここでは六メートル。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 2.36,
+          "active_rms_dbfs": -15.15,
+          "peak_dbfs": -1.51,
+          "clipped_samples": 0
+        },
+        {
+          "start": 8,
+          "seconds": 8,
+          "script": "二つ目は、必要な部材の長さと本数。二千五百ミリを二本など。",
+          "speech_start_offset": 0.2,
+          "end_silence_seconds": 3.4,
+          "active_rms_dbfs": -15.6,
+          "peak_dbfs": -1.77,
+          "clipped_samples": 0
+        },
+        {
+          "start": 16,
+          "seconds": 6,
+          "script": "三つ目は刃幅。切るときに減る長さも条件に入れます。",
+          "speech_start_offset": 0.16,
+          "end_silence_seconds": 2.34,
+          "active_rms_dbfs": -14.59,
+          "peak_dbfs": -1.57,
+          "clipped_samples": 0
+        },
+        {
+          "start": 22,
+          "seconds": 6,
+          "script": "条件をそろえたら、材料ごとの切り方をキリドリで見てみる。",
+          "speech_start_offset": 0.18,
+          "end_silence_seconds": 2.2,
+          "active_rms_dbfs": -14.75,
+          "peak_dbfs": -1.54,
+          "clipped_samples": 0
+        }
+      ],
+      "scene_active_rms_range_db": 2.21
+    }
+  ]
+}

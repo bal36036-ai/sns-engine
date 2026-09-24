@@ -1,4 +1,4 @@
-// Render eight review-only vertical videos from verified local app screenshots.
+// Render review-only vertical videos from verified local app screenshots.
 // Requires capture-source.cjs, Edge, puppeteer-core, and ffmpeg on PATH.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -81,6 +81,13 @@ const videos = [
     S(8, '2. 必要部材の長さと本数', '2,500mm × 2本など', 'kParts'),
     S(6, '3. 刃幅などの条件', '刃幅 5mmを確認', 'kCondition'),
     S(6, '条件をそろえて結果を見る', '次は結果画面の見方へ', 'kResult', { summary: true })
+  ] },
+  { id: '20261001-tiktok-harinavi', app: 'ハリナビ', date: '10/1 TikTok', slides: [
+    S(2, 'この結果、元の条件は？', '曲げ応力の実際の表示', 'hCheck'),
+    S(5, '何を入力したか', 'まず元の条件に戻ります', 'hConditions'),
+    S(8, '条件をそろえる', 'スパン長 3,000mm・吊り荷 2t', 'hConditions'),
+    S(8, '条件と結果を行き来', '同じ動作確認例の結果を確認', 'hCheck'),
+    S(4, '結果の前に条件を確認', '最終判断は専門家へ', 'hConditions', { summary: true })
   ] }
 ];
 

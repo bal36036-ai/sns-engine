@@ -25,25 +25,29 @@ function productionPlan(topic, sns) {
       kind: "carousel_draft",
       screen,
       slides: [
-        `1枚目｜${angle}、どこで迷う？`,
-        `2枚目｜${category}として、作業の場面を整理`,
+        `1枚目｜${angle}（具体的な作業場面を示す）`,
+        `2枚目｜${category}で確認する条件`,
         `3枚目｜${screen}`,
-        "4枚目｜入力条件と結果の見比べ方（実画面確認後に記入）",
-        "最終枚｜見落としやすい点を一つ振り返る",
+        "4枚目｜入力条件と結果をセットで確認（実画面確認後に記入）",
+        "最終枚｜今回の確認点を一言でまとめ、保存して見返す導線を付ける",
       ],
+      note: app === "harinavi" ? "安全上の注意は本文にも簡潔に残す。最終枚を免責だけで終わらせない。" : "質問型の締めを連投しない。",
     };
   }
   if (sns === "tiktok" || sns === "youtube") {
+    const openingVisual = app === "kiridori" ? "実際の切り出し案の結果画面" : "実際の入力条件と一次照査の結果画面";
+    const openingTelop = app === "kiridori" ? "この切り出し案、元の条件は？" : "この結果、どの条件で出た？";
     return {
       kind: "short_video_draft",
       duration_seconds: 24,
       screen,
       shots: [
-        { seconds: "0-2", visual: "紙のメモか作業手元", telop: `${angle}、どう確認する？`, narration: "" },
-        { seconds: "2-7", visual: "作業の前提を一つずつ示す", telop: "まず条件をそろえる", narration: "" },
-        { seconds: "7-17", visual: screen, telop: "条件と表示を見比べる", narration: "実画面の確認後に文言を確定" },
-        { seconds: "17-24", visual: "画面を止め、確認点を一つ示す", telop: "最後は人が条件を確認", narration: "" },
+        { seconds: "0-2", visual: openingVisual, telop: openingTelop, narration: "" },
+        { seconds: "2-7", visual: "対応する入力画面", telop: "まず元の条件を確認", narration: "" },
+        { seconds: "7-17", visual: screen, telop: `${category}の確認点を実画面で示す`, narration: "実画面の確認後に文言を確定" },
+        { seconds: "17-24", visual: "条件と結果を並べた画面", telop: "条件と結果をセットで確認", narration: "" },
       ],
+      note: app === "harinavi" ? "最後に安全上の注意を補足表示。数字や項目は実画面と照合し、最終判断を保証しない。" : "数字を使う場合は実画面の動作確認用の例と一致させる。",
     };
   }
   if (sns === "note") {
@@ -60,22 +64,22 @@ function genericContent(topic, sns, variant, second, index) {
   const appName = app === "kiridori" ? "キリドリ" : "ハリナビ";
   const close = CLOSES[index % CLOSES.length];
   const frame = ["作業メモ", "画面を見直すメモ", "次の検討メモ"][variant];
-  const safety = app === "harinavi" ? "結果だけで安全を決めず、前提とあわせて確認します。" : "";
+  const safety = app === "harinavi" && index % 3 === 0 ? "一次照査の補助です。最終判断は専門家が条件を確認します。" : "";
   let bodyText;
   if (sns === "threads") {
     bodyText = second
-      ? `${frame}。${angle}。\n作業をやり直すなら、どこから確認するか。${close}`
+      ? `${frame}。${angle}。\n入力した条件と結果を見返すとき、何を先に確認するか。${close}`
       : variant % 2 === 0
         ? `${frame}｜${angle}。\n${category}を考えるとき、${appName}では条件と結果を一緒に見返せる形を検討しています。${safety}\n${close}`
         : `${category}の${frame}。\n${angle}。\n${close}${safety}`;
   } else if (sns === "x") {
-    bodyText = `${frame}：${angle}。${close}`;
+    bodyText = `${frame}：${angle}。${app === "harinavi" ? "梁の一次照査を補助する画面で、条件と結果を見返します。" : "入力した条件と切り出し案を見比べます。"}${close}`;
   } else if (sns === "instagram") {
-    bodyText = `${frame}｜${angle}。\n\n条件を先にそろえてから、画面のどこを見ればよいか考えています。${safety}\n\n※画像は構成案。実画面と表記は制作時に確認します。`;
+    bodyText = `${frame}｜${angle}。\n\n入力した条件を先に確認し、結果のどこを見るかを順に追います。${safety}\n\nあとで条件と結果を見比べられるよう保存してください。\n※画像は構成案。実画面と表記は制作時に確認します。`;
   } else if (sns === "note") {
     bodyText = `【記事案・${frame}】${angle}\n\n導入：この作業が起きる場面\n課題：確認に時間がかかるところ\n実例：架空の条件を使った比較\n改善：画面で見せたい情報（実画面確認後に確定）\nまとめ：${close}`;
   } else {
-    bodyText = `${frame}｜${angle}を、作業の順番に沿って見直す。${safety}\n※画面・テロップは制作案。実素材の確認前です。`;
+    bodyText = `${frame}｜${angle}。実画面で入力条件から結果までを短く追います。${safety}\n※画面・テロップは制作案。実素材の確認前です。`;
   }
   return { bodyText, plan: productionPlan(topic, sns) };
 }

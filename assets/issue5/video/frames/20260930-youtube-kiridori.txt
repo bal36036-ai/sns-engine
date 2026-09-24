@@ -1,0 +1,11 @@
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260930-youtube-kiridori-1.png'
+duration 2
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260930-youtube-kiridori-2.png'
+duration 6
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260930-youtube-kiridori-3.png'
+duration 8
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260930-youtube-kiridori-4.png'
+duration 6
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260930-youtube-kiridori-5.png'
+duration 6
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260930-youtube-kiridori-5.png'

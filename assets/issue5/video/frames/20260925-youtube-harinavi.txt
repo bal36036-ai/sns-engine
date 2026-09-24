@@ -1,0 +1,11 @@
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260925-youtube-harinavi-1.png'
+duration 2
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260925-youtube-harinavi-2.png'
+duration 5
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260925-youtube-harinavi-3.png'
+duration 10
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260925-youtube-harinavi-4.png'
+duration 6
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260925-youtube-harinavi-5.png'
+duration 5
+file 'C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン\assets\issue5\video\frames\20260925-youtube-harinavi-5.png'

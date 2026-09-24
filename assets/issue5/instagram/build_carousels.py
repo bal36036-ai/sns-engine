@@ -1,13 +1,14 @@
 """Issue #5 初週 Instagram 下書き画像を再生成する。
 
-実画面を模した表示・未確認の計算結果は使わない。図は説明図と表示する。
-Python Pillow と Windows の Noto Sans JP を使用する。
+指定した9枚に実アプリのスクリーンショットをそのまま配置する。
+その他の図は説明図と表示し、未確認の計算結果は作らない。
 """
 
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent
+SOURCE = ROOT.parent / "video" / "source"
 SIZE = (1080, 1350)
 NAVY = "#19313d"
 ORANGE = "#d76426"
@@ -36,7 +37,7 @@ POSTS = {
             ("まず、入力した条件を見る", "梁の検討に使った条件を確認します。", "conditions"),
             ("次に、確認項目と結果を見る", "どの項目を見た結果なのか、順に確かめます。", "checks"),
             ("ハリナビは\n一次照査の作業を補助", "条件と結果を見返すための道具として作っています。", "flow"),
-            ("条件と結果を\nセットで確認", "安全の最終判断は、現場の条件を確認した専門家が行います。", "safety"),
+            ("条件と結果を\nセットで確認", "保存して見返せるように。安全の最終判断は専門家が行います。", "safety"),
         ],
     },
     "20260928": {
@@ -46,7 +47,7 @@ POSTS = {
             ("紙のメモで\n長さと本数を拾う", "現場で書き留めた必要部材を、まず整理します。", "memo"),
             ("メモした条件を入力する", "定尺と必要な部材。切り方を考えるための条件をそろえます。", "conditions"),
             ("切り出し案を図で見る", "入力した条件から、材料ごとの切り方を確かめます。", "bars"),
-            ("拾う → 組み合わせる", "紙と画面の役割を見返せるように、この投稿を保存。", "save"),
+            ("拾う → 組み合わせる", "紙メモと計画画面の比較用に、この投稿を残しておけます。", "save"),
         ],
     },
     "20260929": {
@@ -68,6 +69,28 @@ POSTS = {
             ("3　刃幅などの条件", "切るときのロスも確かめてから、結果へ進みます。", "kerf"),
             ("条件をそろえて、\n切り出し案を見る", "入力項目を見返せるよう保存。次は結果画面の見方へ。", "save"),
         ],
+    },
+}
+
+# 実画面はすべて現行アプリを撮影した source/ の原画像。
+# crop は読みやすくするための切り出しで、表示内容の編集はしない。
+REAL_SCREENS = {
+    "20260924": {
+        2: [("kiridori-parts-card.png", "部材リスト上部の実画面", (0, 0, 516, 260), None)],
+        3: [("kiridori-stock1-card.png", "1本目の切り出し図・残り990mm", None, (0.80, 0.34, 0.99, 0.72))],
+        4: [("kiridori-conditions-card.png", "入力した定尺と刃幅", None, None),
+            ("kiridori-stock1-card.png", "同じ条件の1本目の結果", None, None)],
+    },
+    "20260927": {
+        2: [("harinavi-span-card.png", "入力したスパン長 3,000mm", None, None),
+            ("harinavi-load-card.png", "入力した吊り荷 2t", None, None)],
+        3: [("harinavi-check-card.png", "梁全体の曲げ応力の表示", None, (0.02, 0.32, 0.44, 0.68))],
+        4: [("harinavi-judgement-card.png", "計算済み項目の一次照査表示", None, None)],
+    },
+    "20260930": {
+        2: [("kiridori-conditions-card.png", "定尺長の入力欄", None, (0.02, 0.46, 0.49, 0.94))],
+        3: [("kiridori-parts-card.png", "必要部材の長さと本数", (0, 0, 516, 260), None)],
+        4: [("kiridori-conditions-card.png", "刃幅の入力欄", None, (0.50, 0.46, 0.99, 0.94))],
     },
 }
 
@@ -189,6 +212,41 @@ def icon(draw, kind, accent):
         rule(draw, 513, 823, 513, 982, NAVY, 3)
 
 
+def real_screen_card(image, draw, date, index, accent):
+    """元画面のピクセルを保って配置し、注釈はカード外に描く。"""
+    items = REAL_SCREENS[date][index]
+    rounded(draw, (92, 640, 988, 1140), WHITE, LINE, 22, 2)
+    draw.text((126, 665), "実アプリ画面 / 動作確認用の例", font=font(29, True), fill=accent)
+    draw.text((126, 705), "色枠は見る場所を示す注釈です", font=font(23), fill=MUTED)
+    top, bottom = 760, 1085
+    gap = 18
+    each = (bottom - top - gap * (len(items) - 1)) // len(items)
+    for n, (name, label, crop, focus) in enumerate(items):
+        path = SOURCE / name
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        with Image.open(path) as source:
+            source = source.convert("RGB")
+            if crop:
+                source = source.crop(crop)
+            max_width, max_height = 830, each - 29
+            scale = min(max_width / source.width, max_height / source.height)
+            width, height = round(source.width * scale), round(source.height * scale)
+            screen = source.resize((width, height), Image.Resampling.LANCZOS)
+        y0 = top + n * (each + gap)
+        draw.text((128, y0), label, font=font(23, True), fill=NAVY)
+        x, y = (1080 - width) // 2, y0 + 31 + (max_height - height) // 2
+        image.paste(screen, (x, y))
+        draw.rounded_rectangle((x-3, y-3, x+width+3, y+height+3), radius=9,
+                               outline=LINE, width=3)
+        if focus:
+            a, b, c, d = focus
+            draw.rounded_rectangle((x+round(a*width), y+round(b*height),
+                                    x+round(c*width), y+round(d*height)),
+                                   radius=8, outline=accent, width=5)
+    draw.text((126, 1102), "画面の数値は架空条件による動作確認例", font=font(21), fill=MUTED)
+
+
 def make_slide(date, cfg, index, item):
     title, sub, motif = item
     accent = cfg["accent"]
@@ -204,7 +262,10 @@ def make_slide(date, cfg, index, item):
     title_font = font(50 if longest > 16 else (57 if longest > 13 else 67), True)
     end = text_block(d, (88, 300), title, title_font, NAVY, 900, 18)
     text_block(d, (91, end + 48), sub, font(29), MUTED, 885, 11)
-    icon(d, motif, accent)
+    if index in REAL_SCREENS.get(date, {}):
+        real_screen_card(im, d, date, index, accent)
+    else:
+        icon(d, motif, accent)
     rule(d, 88, 1205, 988, 1205, LINE, 2)
     d.text((88, 1234), f"{date[:4]}.{date[4:6]}.{date[6:]}  ·  {cfg['app']}", font=font(24), fill=MUTED)
     d.text((842, 1230), f"{index} / 5", font=font(30), fill=accent)
@@ -217,4 +278,10 @@ if __name__ == "__main__":
     files = [make_slide(date, cfg, i, slide)
              for date, cfg in POSTS.items()
              for i, slide in enumerate(cfg["slides"], 1)]
+    sheet = Image.new("RGB", (1500, 1875), WHITE)
+    for position, path in enumerate(files):
+        with Image.open(path) as slide:
+            thumbnail = slide.resize((300, 375), Image.Resampling.LANCZOS)
+        sheet.paste(thumbnail, ((position % 5) * 300, (position // 5) * 375))
+    sheet.save(ROOT / "contact_sheet.jpg", quality=90, subsampling=0)
     print(f"created {len(files)} PNG files in {ROOT}")

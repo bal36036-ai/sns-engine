@@ -47,17 +47,15 @@ test("画像・動画・noteに投稿単位の制作案があり、素材なし�
     const [date, sns] = keyFor({ topic_id: p.topicId, target_sns: p.targetSns, scheduled_at: p.scheduledAt }).split(":");
     return Boolean(FIRST_WEEK[date]?.[sns]);
   });
-  assert.equal(selected.length, 31);
+  assert.equal(selected.length, 25);
   assert.ok(selected.every((p) => p.isPublishable === false && p.featurePublished === false && p.mediaUrls.length === 0));
 });
 
 test("対象が下書きの元文面から外れたら7日分を一括中止する", () => {
-  const week = planCalendar([], new Date("2026-09-23T22:00:00Z"), 6);
-  const rows = week.planned.filter((p) => {
-    const [date, sns] = keyFor({ topic_id: p.topicId, target_sns: p.targetSns, scheduled_at: p.scheduledAt }).split(":");
-    return Boolean(FIRST_WEEK[date]?.[sns]);
-  }).map((p, i) => ({
-    id: String(i), topic_id: p.topicId, target_sns: p.targetSns, scheduled_at: p.scheduledAt,
+  const rows = Object.entries(FIRST_WEEK).flatMap(([date, items]) => Object.keys(items).map((sns) => ({ date, sns }))).map(({ date, sns }, i) => ({
+    id: String(i), topic_id: `cal-${date.replaceAll("-", "")}-${sns === "threads_b" ? "b" : "a"}`,
+    target_sns: sns === "threads_b" ? "threads" : sns,
+    scheduled_at: `${date}T${{ threads: "09:30", threads_b: "17:00", instagram: "12:45", tiktok: "18:15", youtube: "20:15", x: "11:00", note: "08:00" }[sns]}:00+09:00`,
     body_text: "開発中です", status: "draft", readiness_state: "needs_review", is_historical: false,
     is_publishable: false, feature_published: false, media_urls: [],
   }));

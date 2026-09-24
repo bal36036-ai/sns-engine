@@ -9,6 +9,7 @@ test("30日先までの媒体別在庫を作り、すべて下書きで止める
   assert.equal(plan.from, "2026-09-24");
   assert.equal(plan.through, "2026-10-24");
   assert.equal(plan.shortages.length, 0);
+  assert.ok(plan.planned.every((post) => !["x", "note"].includes(post.targetSns)));
   const byDay = new Map();
   for (const p of plan.planned) {
     assert.equal(p.isPublishable, false);

@@ -20,7 +20,21 @@ jobs:
           node-version: "24"
       - run: npm ci
       - name: Verify planner
-        run: node --test test-calendar.js
+        run: node --test test-calendar.js test-reschedule-calendar.js
+      - name: Roll overdue draft slots forward
+        env:
+          SNS_DB_HOST: "aws-0-ap-northeast-1.pooler.supabase.com"
+          SNS_DB_PORT: "5432"
+          SNS_DB_USER: "sns_engine.dvysbebkzvvqyqtlgqcx"
+          SNS_DB_NAME: "postgres"
+          SNS_DB_SCHEMA: "sns"
+          SNS_ENGINE_DB_PASSWORD: ${{ secrets.SNS_ENGINE_DB_PASSWORD }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            node reschedule-calendar.js --apply
+          else
+            node reschedule-calendar.js
+          fi
       - name: Refill draft calendar
         env:
           SNS_DB_HOST: "aws-0-ap-northeast-1.pooler.supabase.com"

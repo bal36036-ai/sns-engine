@@ -71,7 +71,8 @@ test("日次補充でも対象日に承認待ちの個別文案を再利用す�
     const [date, sns] = key.split(":");
     return Boolean(REMAINING[date]?.[sns]);
   });
-  assert.equal(selected.length, 111);
+  assert.equal(selected.length, 91);
+  assert.ok(selected.every((post) => !["x", "note"].includes(post.targetSns)));
   for (const post of selected) {
     const [date, sns] = keyFor({ topic_id: post.topicId, target_sns: post.targetSns, scheduled_at: post.scheduledAt }).split(":");
     assert.equal(post.bodyText, REMAINING[date][sns].bodyText);

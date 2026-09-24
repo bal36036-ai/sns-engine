@@ -10,6 +10,7 @@ const dir = __dirname;
 const src = path.join(dir, 'source');
 const frames = path.join(dir, 'frames');
 fs.mkdirSync(frames, { recursive: true });
+const voiceCredit = process.argv.includes('--voice-credit');
 const edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const image = (name) => `data:image/png;base64,${fs.readFileSync(path.join(src, name)).toString('base64')}`;
 const assets = {
@@ -27,11 +28,11 @@ const assets = {
 const S = (seconds, title, caption, visual, extra = {}) => ({ seconds, title, caption, visual, ...extra });
 const videos = [
   { id: '20260924-tiktok-kiridori', app: 'キリドリ', date: '9/24 TikTok', slides: [
-    S(2, '6m材、どう切る？', '2,500mm × 2本から考える', 'memo'),
+    S(2, '6m材、どう切る？', 'まず切り出し図を見てください', 'kStock'),
     S(5, '必要な長さと本数を拾う', '紙のメモから条件をそろえる', 'memo'),
     S(6, '定尺と刃幅を入力', '6,000mm・5mm', 'kCondition'),
     S(8, '入力から切り出し案へ', '部材の長さと本数を確認', 'kParts'),
-    S(5, '次は1本目の切り方を見る', 'この条件を残して、結果画面へ', 'kStock', { summary: true })
+    S(5, 'キリドリで切り方を見てみる', '材料ごとの切り出し案まで確認', 'kResult', { summary: true })
   ] },
   { id: '20260925-youtube-harinavi', app: 'ハリナビ', date: '9/25 YouTube Shorts', slides: [
     S(2, '曲げ応力69.691、元条件は？', '画面の数値は動作確認用の例', 'hCheck'),
@@ -42,13 +43,13 @@ const videos = [
   ] },
   { id: '20260926-tiktok-kiridori', app: 'キリドリ', date: '9/26 TikTok', slides: [
     S(2, '6m材の端材990mm、どこから？', '定尺1本目の切り出し図', 'kStock'),
-    S(5, '材料ごとに確認', '1本目の構成を図で見る', 'kStock'),
-    S(9, 'どの部材を切るか', '柱用部材A 2,500mm × 2本', 'kStock'),
+    S(5, '最初に条件をそろえる', '定尺6,000mmと刃幅5mm', 'kCondition'),
+    S(9, '必要な部材を入力', '柱用部材A 2,500mm × 2本など', 'kParts'),
     S(7, '残る長さも確認', '1本目の端材 990mm', 'kStock'),
-    S(4, 'この切り出し案を見返す', '材料ごとの結果を比較用に残す', 'kResult', { summary: true })
+    S(4, '他の材料はどう切る？', 'キリドリの結果画面で見てみる', 'kResult', { summary: true })
   ] },
   { id: '20260927-tiktok-harinavi', app: 'ハリナビ', date: '9/27 TikTok', slides: [
-    S(2, '2tの入力、結果のどこを見る？', '結果の数字には入力条件があります', 'hCheck'),
+    S(2, '2tの入力、結果のどこを見る？', '実際の入力画面から', 'hLoad'),
     S(6, 'どんな条件で見たか', 'スパン長と荷重を確認', 'hConditions'),
     S(9, '何を確認したか', '結果画面の確認項目を見る', 'hResult'),
     S(7, '条件と結果を往復', '数字の出どころを見返す', 'hLoad'),
@@ -62,11 +63,11 @@ const videos = [
     S(5, '入力条件と結果を見返しやすく', '比較用に、この条件を残す', 'hJudge', { summary: true })
   ] },
   { id: '20260928-youtube-kiridori', app: 'キリドリ', date: '9/28 YouTube Shorts', slides: [
-    S(2, '6m材、メモからどう切る？', '紙と計画画面を見比べる', 'memo'),
+    S(2, 'メモが切り出し図に？', 'まずキリドリの実画面から', 'kResult'),
     S(6, '必要な長さと本数を拾う', '柱用部材A 2,500mm × 2本など', 'memo'),
     S(7, '同じ条件を入力', '定尺 6,000mm・刃幅 5mm', 'kCondition'),
     S(8, '切り出し案を図で確認', '材料ごとの組み合わせと端材', 'kResult'),
-    S(5, '拾う→組み合わせる', '紙メモと結果画面を比較する', 'kStock', { summary: true })
+    S(5, '同じ条件で、切り方を見てみる', 'キリドリの材料ごとの結果へ', 'kStock', { summary: true })
   ] },
   { id: '20260929-tiktok-harinavi', app: 'ハリナビ', date: '9/29 TikTok', slides: [
     S(2, '曲げ応力69.691、どこから読む？', '結果画面の実際の表示', 'hCheck'),
@@ -118,16 +119,19 @@ function html(video, slide, index) {
     .screen img{display:block;width:100%;max-height:582px;object-fit:contain}.stack{display:flex;flex-direction:column;gap:24px}.stack img{max-height:180px}
     .memo{width:100%;background:#fffdf6;padding:40px 42px;border-radius:8px;box-shadow:4px 8px 24px #2d2d2d20;transform:rotate(-1deg);border:5px solid ${accent};border-top:12px solid ${accent}}
     .memoTitle{font-size:38px;font-weight:900;margin-bottom:34px}.memoValue{font-size:55px;font-weight:900;margin:26px 0;color:#2c5363}.memoLine{font-size:32px;font-weight:750;line-height:1.8;border-bottom:2px solid #e2e3dc}.memoNote{font-size:24px;color:#667075;margin-top:32px;font-weight:700}
-    .bottom{height:149px;border-top:3px solid ${hari?'#d7e6eb':'#f1d3c4'};padding:26px 46px 12px;display:flex;flex-direction:column;justify-content:space-between;background:#fffdfacc}
-    .source{font-size:25px;font-weight:850;color:#35515e}.note{font-size:22px;color:#57646a;line-height:1.25}.safety{font-size:21px;color:#5c6470;font-weight:700}
+    .bottom{height:149px;border-top:3px solid ${hari?'#d7e6eb':'#f1d3c4'};padding:14px 46px 12px;display:flex;flex-direction:column;justify-content:space-between;background:#fffdfacc}
+    .source{font-size:25px;font-weight:850;color:#35515e}.note{font-size:22px;color:#57646a;line-height:1.25}.safety{font-size:21px;color:#5c6470;font-weight:700}.credit{font-size:18px;color:#57646a;font-weight:700}
     .summary h1{color:${hari?'#1c5d77':'#af4b2d'}}
     .hook h1{font-size:${hookFont}px;line-height:1.27;background:#fffdfb;border-left:10px solid ${accent};padding:18px 18px 20px;box-shadow:0 8px 24px #23394312;border-radius:0 18px 18px 0}
-  </style><body class="${slide.summary?'summary':''} ${index===0?'hook':''}"><div class="top"><span>${escape(video.app)}</span><span>${escape(video.date)}</span></div><div class="main"><div class="eyebrow">${String(index+1).padStart(2,'0')} / ${String(video.slides.length).padStart(2,'0')}</div><h1>${escape(slide.title)}</h1><div class="caption">${escape(slide.caption)}</div><div class="visual"><div class="focusCallout"><span class="focusArrow">↓</span><span>注目：${escape(focus)}</span></div>${visual}</div></div><div class="bottom"><div class="source">${memo?'説明用メモ':'アプリの実画面'} ｜ げんばアプリ工房</div><div class="note">画面の数値は動作確認用の例です。</div>${hari?'<div class="safety">一次照査の補助。安全の最終判断は専門家へ。</div>':''}</div></body></html>`;
+  </style><body class="${slide.summary?'summary':''} ${index===0?'hook':''}"><div class="top"><span>${escape(video.app)}</span><span>${escape(video.date)}</span></div><div class="main"><div class="eyebrow">${String(index+1).padStart(2,'0')} / ${String(video.slides.length).padStart(2,'0')}</div><h1>${escape(slide.title)}</h1><div class="caption">${escape(slide.caption)}</div><div class="visual"><div class="focusCallout"><span class="focusArrow">↓</span><span>注目：${escape(focus)}</span></div>${visual}</div></div><div class="bottom"><div class="source">${memo?'説明用メモ':'アプリの実画面'} ｜ げんばアプリ工房</div><div class="note">画面の数値は動作確認用の例です。</div>${hari?'<div class="safety">一次照査の補助。安全の最終判断は専門家へ。</div>':''}${voiceCredit?'<div class="credit">音声：VOICEVOX Nemo</div>':''}</div></body></html>`;
 }
 
 async function run() {
   const selected = process.argv.find((arg) => arg.startsWith('--id='))?.slice(5);
+  const outputDir = process.argv.find((arg) => arg.startsWith('--output-dir='))?.slice(13) || dir;
+  const outputSuffix = process.argv.find((arg) => arg.startsWith('--output-suffix='))?.slice(16) || '';
   const framesOnly = process.argv.includes('--frames-only');
+  fs.mkdirSync(outputDir, { recursive: true });
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'sns-issue5-motion-'));
   const browser = await puppeteer.launch({ executablePath: edge, headless: 'new', defaultViewport: { width: 720, height: 1280, deviceScaleFactor: 1 } });
   try {
@@ -161,12 +165,12 @@ async function run() {
       if (framesOnly) { console.log(`${video.id} 5 frames`); continue; }
       const concat = path.join(work, `${video.id}.txt`);
       fs.writeFileSync(concat, segments.map((file) => `file '${file.replace(/'/g, "'\\''")}'`).join('\n')+'\n', 'utf8');
-      const output = path.join(dir, `${video.id}.mp4`);
+      const output = path.join(outputDir, `${video.id}${outputSuffix}.mp4`);
       execFileSync('ffmpeg', ['-y','-loglevel','error','-f','concat','-safe','0','-i',concat,
         '-f','lavfi','-i','anullsrc=channel_layout=stereo:sample_rate=48000',
         '-c:v','copy','-c:a','aac','-b:a','64k','-movflags','+faststart',
         '-t',String(video.slides.reduce((n,s)=>n+s.seconds,0)),'-shortest',output], { stdio:'inherit' });
-      console.log(`${video.id}.mp4 ${video.slides.reduce((n,s)=>n+s.seconds,0)}s with motion`);
+      console.log(`${path.basename(output)} ${video.slides.reduce((n,s)=>n+s.seconds,0)}s with motion`);
     }
   } finally {
     await browser.close();

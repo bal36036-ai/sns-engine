@@ -2,7 +2,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+const { execFileSync, spawnSync } = require('node:child_process');
 
 const root = __dirname;
 const instagram = path.join(root, 'instagram');
@@ -21,10 +21,16 @@ const ids = [
   '20260927-youtube-harinavi', '20260928-youtube-kiridori',
   '20260929-tiktok-harinavi', '20260930-youtube-kiridori'
 ];
+const narration = require('./video/narration.json');
+assert.deepEqual(narration.videos.map((item) => item.id), ids, 'Narration must cover each review video');
+for (const item of narration.videos) {
+  assert.equal(item.lines.length, 5, `${item.id}: expected five narration scenes`);
+  assert.equal(item.seconds.length, 5, `${item.id}: expected five scene durations`);
+}
 const mp4s = fs.readdirSync(video).filter((name) => /^202609\d{2}-(?:tiktok|youtube)-.+\.mp4$/.test(name));
-assert.equal(mp4s.length, ids.length, 'There must be exactly eight review videos');
+assert.equal(mp4s.length, ids.length * 2, 'Keep eight silent drafts and eight narrated review videos');
 for (const id of ids) {
-  const file = path.join(video, `${id}.mp4`);
+  const file = path.join(video, `${id}-narrated.mp4`);
   const data = JSON.parse(execFileSync('ffprobe', ['-v','error','-show_entries',
     'format=duration:stream=codec_name,width,height,avg_frame_rate','-of','json',file], { encoding:'utf8' }));
   const picture = data.streams.find((stream) => stream.width);
@@ -36,5 +42,10 @@ for (const id of ids) {
   const frameHash = (second) => execFileSync('ffmpeg', ['-v','error','-ss',String(second),
     '-i',file,'-frames:v','1','-f','md5','-'], { encoding:'utf8' }).trim();
   assert.notEqual(frameHash(0.25), frameHash(1.75), `${id}: opening two seconds are static`);
+  const decoded = spawnSync('ffmpeg', ['-hide_banner','-nostats','-i',file,'-vn','-af','volumedetect',
+    '-f','null','-'], { encoding:'utf8' });
+  assert.equal(decoded.status, 0, `${id}: audio cannot be decoded`);
+  const level = Number(decoded.stderr.match(/max_volume: (-?[\d.]+) dB/)?.[1]);
+  assert.ok(Number.isFinite(level) && level > -40, `${id}: narration is silent or too quiet (${level} dB)`);
 }
-console.log('Issue #5 media verified: 25 Instagram PNGs and 8 moving MP4s');
+console.log('Issue #5 media verified: 25 Instagram PNGs, 8 silent drafts, 8 moving MP4s with audible narration');

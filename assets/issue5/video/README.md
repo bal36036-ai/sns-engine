@@ -1,34 +1,35 @@
-# Issue #5 直近7日分・縦型動画素材（レビュー改善版）
+# Issue #5 直近7日分・縦型動画素材（ナレーション付きレビュー版）
 
 ## 制作結果
 
-- 8本修正、未制作0本。すべて720×1280、24fps、26〜29秒のMP4。
-- 実アプリの静止画と説明テロップを組み合わせた無音動画。全40場面の中央部に交互方向のズームとパンを追加し、各場面に注目箇所を示す色枠・矢印・ラベルを付けた。上部の媒体名と下部の出典・安全注意は固定し、動きで欠けないようにした。冒頭0〜2秒には実画面で確認した条件や数値を使った大きいフックを表示。操作録画ではない。
+- 8本のナレーション付きMP4を制作。すべて720×1280、24fps、26〜29秒。以前の無音MP4も比較用として残した。**レビュー対象はファイル名が `-narrated.mp4` で終わる8本**。
+- 実アプリの静止画にズームとパンを付けた動画。操作録画ではない。9/24と9/28のキリドリは冒頭から結果の実画面を見せ、9/26は同じ図が連続しないよう条件・部材入力・結果を順に見せる構成に変更した。
+- 画面に合う日本語ナレーションを5場面ごとに配置した。音声はローカル起動した公式 **VOICEVOX Nemo 0.24.0／女声1・ノーマル（speaker 10005）**。BGMなし。各動画内に「音声：VOICEVOX Nemo」を表示。台本と場面秒数は [`narration.json`](narration.json) に記録した。
 - 投稿・予約・公開URLへのアップロードはしていない。レビュー用素材として扱う。
 - 制作案と本文は `first-week-content.js`、`stage10-issue5-first-week.md` を参照。ここに投稿本文やDB状態を複製しない。
 - [全8本の冒頭・結末一覧](contact_sheet.jpg)。右隣が同じ動画の結末。変更前はコミット `f8566e7` で確認できる。
 
 | 投稿日・媒体 | 投稿キー | 動画ファイル | 実画面・説明素材 |
 |---|---|---|---|
-| 9/24 TikTok | `cal-20260924-a` | `20260924-tiktok-kiridori.mp4` | 紙メモ風の説明用数値、キリドリ基本設定・部材入力・1本目の切り出し図 |
-| 9/25 YouTube Shorts | `cal-20260925-a` | `20260925-youtube-harinavi.mp4` | ハリナビ入力条件・計算結果・曲げ応力の表示 |
-| 9/26 TikTok | `cal-20260926-a` | `20260926-tiktok-kiridori.mp4` | キリドリ1本目の切り出し図と結果画面 |
-| 9/27 TikTok | `cal-20260927-a` | `20260927-tiktok-harinavi.mp4` | ハリナビ入力条件・計算結果 |
-| 9/27 YouTube Shorts | `cal-20260927-a` | `20260927-youtube-harinavi.mp4` | ハリナビ入力条件・計算結果 |
-| 9/28 YouTube Shorts | `cal-20260928-a` | `20260928-youtube-kiridori.mp4` | 紙メモ風の説明用数値、キリドリ基本設定・切り出し結果 |
-| 9/29 TikTok | `cal-20260929-a` | `20260929-tiktok-harinavi.mp4` | ハリナビ入力条件・曲げ応力などの結果項目 |
-| 9/30 YouTube Shorts | `cal-20260930-a` | `20260930-youtube-kiridori.mp4` | キリドリ定尺・部材・刃幅の入力と結果 |
+| 9/24 TikTok | `cal-20260924-a` | [キリドリ・切り方](20260924-tiktok-kiridori-narrated.mp4) | 結果の実画面→紙メモ→入力→切り出し案 |
+| 9/25 YouTube Shorts | `cal-20260925-a` | [ハリナビ・数字の元条件](20260925-youtube-harinavi-narrated.mp4) | 曲げ応力の表示→入力条件→結果 |
+| 9/26 TikTok | `cal-20260926-a` | [キリドリ・端材990mm](20260926-tiktok-kiridori-narrated.mp4) | 結果の実画面→条件→部材→結果 |
+| 9/27 TikTok | `cal-20260927-a` | [ハリナビ・2tの入力](20260927-tiktok-harinavi-narrated.mp4) | 入力条件と結果を往復 |
+| 9/27 YouTube Shorts | `cal-20260927-a` | [ハリナビ・曲げ応力](20260927-youtube-harinavi-narrated.mp4) | 曲げ応力の表示と元条件 |
+| 9/28 YouTube Shorts | `cal-20260928-a` | [キリドリ・メモから切り出し図](20260928-youtube-kiridori-narrated.mp4) | 結果の実画面→メモ→入力→結果 |
+| 9/29 TikTok | `cal-20260929-a` | [ハリナビ・結果の見方](20260929-tiktok-harinavi-narrated.mp4) | 条件→確認項目→結果 |
+| 9/30 YouTube Shorts | `cal-20260930-a` | [キリドリ・入力する3つ](20260930-youtube-kiridori-narrated.mp4) | 定尺→部材→刃幅→結果 |
 
 ## 冒頭と結末の再確認
 
 | 動画 | 冒頭0〜2秒 | 結末の導線 |
 |---|---|---|
-| 9/24 TikTok | 6m材、どう切る？ | 次は1本目の切り方を見る |
+| 9/24 TikTok | 6m材、どう切る？ | キリドリで材料ごとの切り方を見てみる |
 | 9/25 YouTube | 曲げ応力69.691、元条件は？ | 数字の出どころを保存 |
-| 9/26 TikTok | 6m材の端材990mm、どこから？ | 切り出し案を比較用に残す |
+| 9/26 TikTok | 6m材の端材990mm、どこから？ | ほかの材料はどう切る？ |
 | 9/27 TikTok | 2tの入力、結果のどこを見る？ | 入力条件から見返す |
 | 9/27 YouTube | 曲げ応力69.691、どの条件？ | 比較用に条件を残す |
-| 9/28 YouTube | 6m材、メモからどう切る？ | 紙メモと結果画面を比較 |
+| 9/28 YouTube | メモが切り出し図に？ | 同じ条件で切り方を見てみる |
 | 9/29 TikTok | 曲げ応力69.691、どこから読む？ | 続きで結果画面の見方へ |
 | 9/30 YouTube | 6m材の切り方、入力はこの3つ | 次は結果画面の見方へ |
 
@@ -40,4 +41,4 @@
 
 ## 再制作
 
-`node assets/issue5/video/capture-source.cjs` で現行アプリの画面を取得し、`python assets/issue5/video/make_source_crops.py` で結果の実画面を切り出す。`node assets/issue5/video/render-videos.cjs` でズーム・パン入りの8本を書き出し、`python assets/issue5/video/make_contact_sheet.py` で一覧を更新する。再制作時は現行版と画面内の数値を再照合すること。`source/` は照合用の実画面、`frames/` は動画生成用フレーム。既存の `frames/*.txt` は初版の静止画連結記録で、改善版の書き出しには使用しない。
+`node assets/issue5/video/capture-source.cjs` で現行アプリの画面を取得し、`python assets/issue5/video/make_source_crops.py` で結果の実画面を切り出す。公式VOICEVOX Nemoを `127.0.0.1:50121` で起動し、`python assets/issue5/video/render-narrated-videos.py` で音声合成と動画の合成を行う。`python assets/issue5/video/make_contact_sheet.py` で一覧を更新する。再制作時は現行版と画面内の数値を再照合すること。`source/` は照合用の実画面、`frames/` は動画生成用フレーム。既存の `frames/*.txt` は初版の静止画連結記録で、今回の書き出しには使用しない。

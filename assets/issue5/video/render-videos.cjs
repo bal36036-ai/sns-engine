@@ -88,6 +88,13 @@ const videos = [
     S(8, '条件をそろえる', 'スパン長 3,000mm・吊り荷 2t', 'hConditions'),
     S(8, '条件と結果を行き来', '同じ動作確認例の結果を確認', 'hCheck'),
     S(4, '結果の前に条件を確認', '最終判断は専門家へ', 'hConditions', { summary: true })
+  ] },
+  { id: '20261002-youtube-kiridori', app: 'キリドリ', date: '10/2 YouTube Shorts', slides: [
+    S(2, 'この1本に、何が入る？', '動作確認用の架空条件', 'kStock'),
+    S(5, 'まず長さと本数', '部材の入力例を見る', 'kParts'),
+    S(8, '1本目の並びを見る', '2,500mmが2本・残り990mm', 'kStock'),
+    S(8, 'ほかの材料も見る', '定尺ごとの部材と端材を確認', 'kResult'),
+    S(4, '条件と案を見比べる', '入力と切り出し図をセットで', 'kStock', { summary: true })
   ] }
 ];
 

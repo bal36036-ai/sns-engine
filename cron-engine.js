@@ -326,7 +326,9 @@ async function runCronEngine({ dryRun = true, limit = 10 } = {}) {
   return report;
 }
 
-module.exports = { runCronEngine };
+// 予定時刻前に指定投稿だけを確認する専用入口からも、同じ安全ガードを使う。
+// 本番Cronの候補抽出とlive経路は変更しない。
+module.exports = { runCronEngine, processOne };
 
 if (require.main === module) {
   const dryRun = !process.argv.includes("--live");

@@ -10,7 +10,8 @@
 const { getPool } = require("./db-client");
 const { promoteToReady } = require("./promote-to-ready");
 
-// 引数でIDの先頭8文字を渡すと、その投稿だけを対象にする（例：繰り延べ後の 54c748e6）。
+// 引数でIDの先頭8文字を渡すと、その投稿だけを対象にする（例：繰り延べ後の 54c748e6、修正後にばるがOKした3件）。
+// 引数で指定したときは 10/2 までという期間の制限をかけない。
 const ARG_IDS = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
 const DEFAULT_APPROVED = [
   "b3ffb0f8", "ab4eca39", "d0c23464", "562b701f", "2642df5a", "73094f30", "1c7f7a47",
@@ -36,7 +37,7 @@ async function main() {
       const problems = [];
       if (post.status !== "draft" || post.readiness_state !== "needs_review") problems.push(`状態 ${post.status}/${post.readiness_state}`);
       if (post.is_historical || post.external_post_id) problems.push("履歴または投稿済み");
-      if (!(at.getTime() > Date.now() + MIN_LEAD_MS) || at > LAST_SLOT) problems.push(`予定日時 ${at.toISOString()}`);
+      if (!(at.getTime() > Date.now() + MIN_LEAD_MS) || (!ARG_IDS.length && at > LAST_SLOT)) problems.push(`予定日時 ${at.toISOString()}`);
       if (!post.body_text?.trim()) problems.push("本文なし");
       if (post.target_sns !== "threads" && !post.media_urls?.length) problems.push("素材なし");
       if (post.target_sns === "threads") {

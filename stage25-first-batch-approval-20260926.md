@@ -44,3 +44,12 @@
 ## 6. ChatGPTへの見直し依頼
 
 10/10以降のThreads 36件の見直し依頼を `../ChatGPT共有用_10月後半の見直し依頼_20260926.md` に作成。ばるがChatGPTへ渡す。
+
+## 7. 追記：修正後3件の承認（2026-09-26）
+
+ばるが修正後の内容を確認して「OKです」。`approve-20260926-first-batch.js` にIDを指定して同じ手順で ready 化（ID指定時は10/2までの期間制限をかけないよう変更）。
+
+- `fd0eb894` 9/29 12:45 Instagram（3枚目を -v2 画像に差し替え済み）：`promote-to-ready.js` で ready（Buffer側照合あり）
+- `a727c0be` 10/2 17:00 Threads、`2b01b67f` 10/3 09:30 Threads：DB内の重複なしを確認して ready（Threads API照合は投稿直前のCron）
+
+これで ready は26件（9/26 17:00〜10/3 09:30）。

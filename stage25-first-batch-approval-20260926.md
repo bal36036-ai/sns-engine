@@ -43,7 +43,7 @@
 
 ## 6. ChatGPTへの見直し依頼
 
-10/10以降のThreads 36件の見直し依頼を `../ChatGPT共有用_10月後半の見直し依頼_20260926.md` に作成。ばるがChatGPTへ渡す。
+10/10以降のThreads 36件の見直し依頼を `chatgpt-request-20260926-october-review.md` に作成し、Issue #5 のコメントでChatGPTへ依頼した。
 
 ## 7. 追記：修正後3件の承認（2026-09-26）
 

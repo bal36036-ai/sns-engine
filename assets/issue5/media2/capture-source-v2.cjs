@@ -54,6 +54,41 @@ async function cropClosest(page, selector, ancestorSelector, name) {
     const stockCount = await kiri.$$eval('#resultsArea .stock.card', (els) => els.length);
     if (stockCount > 1) await crop(kiri, '#resultsArea .stock.card:nth-of-type(2)', 'kiridori-stock2-card.png');
     fs.writeFileSync(path.join(OUT, 'kiridori-results.txt'), kiriText, 'utf8');
+    await crop(kiri, '#exportFilenameRow', 'kiridori-filename-card.png');
+
+    // 同じ入力で並び替え方式だけ変えた案（2案比較用）：入力順
+    const setKiri = (id, v) => kiri.evaluate((i, val) => { const e = document.querySelector(i); e.value = val; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, id, v);
+    const recalc = async () => { await kiri.evaluate(() => document.querySelector('#kiridoriCalcBtn').click()); await wait(700); return kiri.$eval('#resultsArea', (el) => el.innerText); };
+    let sortBtns = await kiri.$$('#sortSeg button');
+    await sortBtns[0].evaluate((e) => e.click()); await wait(200);
+    const inputOrderText = await recalc();
+    if (!inputOrderText.includes('3本')) throw new Error('Input-order result changed from the verified example (3本)');
+    await crop(kiri, '#sortCard', 'kiridori-sort-inputorder-card.png');
+    await crop(kiri, '#resultsArea > .stat-grid', 'kiridori-summary-inputorder-card.png');
+    await crop(kiri, '#resultsArea .stock.card:nth-of-type(1)', 'kiridori-stock1-inputorder-card.png');
+    fs.writeFileSync(path.join(OUT, 'kiridori-results-inputorder.txt'), inputOrderText, 'utf8');
+    sortBtns = await kiri.$$('#sortSeg button');
+    await sortBtns[3].evaluate((e) => e.click()); await wait(200);
+
+    // 刃幅0mmとの比較用
+    await setKiri('#kerf', '0');
+    const kerf0Text = await recalc();
+    if (!kerf0Text.includes('刃幅ロス 0mm')) throw new Error('Kerf-0 result missing 刃幅ロス 0mm');
+    await crop(kiri, '#basicCard', 'kiridori-conditions-kerf0-card.png');
+    await crop(kiri, '#resultsArea > .stat-grid', 'kiridori-summary-kerf0-card.png');
+    await crop(kiri, '#resultsArea .stock.card:nth-of-type(1)', 'kiridori-stock1-kerf0-card.png');
+    fs.writeFileSync(path.join(OUT, 'kiridori-results-kerf0.txt'), kerf0Text, 'utf8');
+    await setKiri('#kerf', '5');
+
+    // 数量変更（柱用部材-A 2本→4本）後の再計算
+    await kiri.evaluate(() => { const q = document.querySelector('#partRows .pqty'); q.value = '4'; q.dispatchEvent(new Event('input', { bubbles: true })); q.dispatchEvent(new Event('change', { bubbles: true })); });
+    const qty4Text = await recalc();
+    await crop(kiri, '#partsCard', 'kiridori-parts-qty4-card.png');
+    await crop(kiri, '#resultsArea > .stat-grid', 'kiridori-summary-qty4-card.png');
+    await crop(kiri, '#resultsArea .stock.card:nth-of-type(1)', 'kiridori-stock1-qty4-card.png');
+    fs.writeFileSync(path.join(OUT, 'kiridori-results-qty4.txt'), qty4Text, 'utf8');
+    await kiri.evaluate(() => { const q = document.querySelector('#partRows .pqty'); q.value = '2'; q.dispatchEvent(new Event('input', { bubbles: true })); q.dispatchEvent(new Event('change', { bubbles: true })); });
+    await recalc();
     // 保存（版管理の題材用）：プラン名を入れた状態の保存フォームだけを見せる
     await kiri.click('#navSave');
     await wait(300);
@@ -86,6 +121,21 @@ async function cropClosest(page, selector, ancestorSelector, name) {
     await crop(hari, '#check2', 'harinavi-check2-deflection-card.png');
     await crop(hari, '#check4', 'harinavi-check4-shear-card.png');
     await crop(hari, '#maxLoadBox', 'harinavi-maxload-card.png');
+
+    // 支持条件を「両端固定」に変えて再計算（1項目だけ直した比較用）
+    await hari.click('#supportSeg button[data-v="fixed"]');
+    await wait(250);
+    const confirmBox = await hari.$('#fixedSupportConfirmed');
+    if (confirmBox && await confirmBox.evaluate((e) => e.offsetParent !== null && !e.checked)) { await confirmBox.click(); await wait(150); }
+    await hari.click('#calcBtn');
+    await wait(900);
+    const fixedText = await hari.$eval('#results', (el) => el.innerText);
+    if (fixedText.includes('69.691')) throw new Error('Fixed-support result did not change from the simple-support value');
+    fs.writeFileSync(path.join(OUT, 'harinavi-results-fixed.txt'), fixedText, 'utf8');
+    await cropClosest(hari, '#supportSeg', '.field', 'harinavi-support-fixed-card.png');
+    await crop(hari, '#judgement', 'harinavi-judgement-fixed-card.png');
+    await crop(hari, '#check1', 'harinavi-check1-fixed-card.png');
+    await crop(hari, '#check2', 'harinavi-check2-fixed-card.png');
     await hari.close();
 
     console.log('capture-source-v2: done.', fs.readdirSync(OUT).filter((f) => f.endsWith('.png')).length, 'PNG files');

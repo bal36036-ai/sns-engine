@@ -31,3 +31,10 @@
 ## 止め方
 
 `select cron.unschedule('sns-cron-engine-dispatch');`（Supabase）。GitHub側は`repository_dispatch`の行を消せば元に戻る。
+
+## 追記：鍵の登録と動作確認（2026-09-28 22:30 JST）
+
+- ばるがGitHubのfine-grainedトークン（sns-engine限定・Contents読み書き・期限366日）を作成し、Supabase Vaultに`github_dispatch_token`で登録。Vault上で名前と形式（`github_pat_`、93文字）を確認（値は表示していない）。
+- `select sns.dispatch_cron_engine();`で手動テスト → GitHub APIの応答 204。GitHubで`repository_dispatch`の実行（run 36428823787）が起動し、ログに「repository_dispatch(cron-live, Supabase pg_cron): live実行」を確認。成功で完了。
+- この日は旧経路（GitHubのschedule）が15:59 JSTを最後に止まっていたため、12:45 Instagram（`281b2249`）・17:00 Threads（`aa0598b5`）は期限切れ、20:15 YouTube（`5aff942f`）は遅延ポリシーで確認待ちになった（設計どおり、遅れて自動投稿はしない）。
+- 3件を`reslot-missed.js`（新規・汎用：期限切れ／遅延で戻った承認済み投稿を次の空き枠へ）で10/4の空き枠へ入れ直し（Instagram 12:45、Threads 9:30、YouTube 20:15）。`reschedule-calendar.js --apply`で下書き86件を後ろへ。

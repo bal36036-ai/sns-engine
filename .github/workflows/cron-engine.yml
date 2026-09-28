@@ -4,9 +4,20 @@ on:
   schedule:
     # 2026-09-26〜28、*/15（毎時0/15/30/45分）で3〜6時間の実行抜けが発生し、予約2件が期限切れになった。
     # GitHub公式ドキュメントは「毎時0分など高負荷時はscheduleが遅延・欠落しうる。時刻をずらすことを推奨」としているため、
-    # 混雑する0分を避けて7/22/37/52分に変更（ばる承認、2026-09-28）。根本対策は別途検討。
+    # 混雑する0分を避けて7/22/37/52分に変更（ばる承認、2026-09-28）。時刻をずらしても抜けが続いたため、下の repository_dispatch を追加。
     - cron: "7,22,37,52 * * * *"
+  # 2026-09-28 根本対策（ばる承認）：Supabase の pg_cron が 7/22/37/52分に GitHub API で event_type=cron-live を送る。
+  # GitHub の schedule が抜けても、この合図で本番処理が動く。schedule は予備として残す。
+  # 合図を送れるのは、このリポジトリの Contents 書き込み権限を持つトークンだけ（Supabase Vault に保管）。
+  repository_dispatch:
+    types: [cron-live]
   workflow_dispatch: {}
+
+# schedule と repository_dispatch が同時に来ても、処理は1本ずつ順番に動かす（途中で止めない）。
+# 投稿の取り合いは cron-engine.js の FOR UPDATE SKIP LOCKED と claimed_at でも防いでいる。
+concurrency:
+  group: sns-cron-engine
+  cancel-in-progress: false
 
 jobs:
   run-engine:
@@ -35,12 +46,16 @@ jobs:
           # THREADS_LIVE_ENABLEDの値に関わらずThreadsへの実登録には到達しない)。
           THREADS_LIVE_ENABLED: "true"
         run: |
-          # イベント種別で完全に分離する。手動実行からliveへ進む経路は一切存在しない
+          # イベント種別で完全に分離する。手動実行（workflow_dispatch）からliveへ進む経路は一切存在しない
           # (workflow_dispatchにinputすら定義していないため、何を指定してもliveにはならない)。
+          # live になるのは、定期実行（schedule）と、Supabaseからの定期の合図（repository_dispatch の cron-live）だけ。
           if [ "${{ github.event_name }}" = "schedule" ]; then
             echo "scheduleトリガー: live実行"
             node cron-engine.js --live
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ] && [ "${{ github.event.action }}" = "cron-live" ]; then
+            echo "repository_dispatch(cron-live, Supabase pg_cron): live実行"
+            node cron-engine.js --live
           else
-            echo "workflow_dispatch(手動実行): dry-run固定(live経路なし)"
+            echo "${{ github.event_name }}: dry-run固定(live経路なし)"
             node cron-engine.js
           fi

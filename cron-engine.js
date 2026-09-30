@@ -12,12 +12,13 @@ const https = require("https");
 const { getPool } = require("./db-client");
 const { findDuplicatePost, createPost, ORGANIZATION_ID } = require("./buffer-client");
 const threadsClient = require("./threads-client");
+const { ACTIVE_BUFFER_MAP, TEXT_ONLY_SNS, AUTOMATED_SNS } = require("./buffer-channels");
 
 // Buffer経由の3媒体(instagram/tiktok/youtube)は無条件で有効。
 // threadsはガード・重複チェックまでは常に動かすが、実際のライブ登録は
 // THREADS_LIVE_ENABLED=trueが明示的に設定されている場合のみ行う(本番cron-engine.ymlには
 // 未設定のため、スケジュール実行では現時点で絶対にThreadsへ実投稿されない)。
-const AUTOMATED_SNS = ["instagram", "tiktok", "youtube", "threads"];
+// AUTOMATED_SNS は buffer-channels.js（Instagramは一時停止中、XはチャンネルID登録後に有効）。
 const THREADS_LIVE_ENABLED = process.env.THREADS_LIVE_ENABLED === "true";
 const CLAIM_STALE_MINUTES = 10; // 前回実行が異常終了して残ったロックを再取得可能にするまでの時間
 
@@ -126,8 +127,8 @@ async function processOne(client, post, { dryRun }) {
     await setStatus(client, post.id, "needs_review", { guard_reason: "対象SNSが未対応" });
     return { ...log, result: "stopped", reason: "対象SNSが未対応", new_status: "needs_review" };
   }
-  // Threadsはテキストのみの投稿にも対応するため、media_urls必須のチェックから除外する
-  if (post.target_sns !== "threads" && (!post.media_urls || post.media_urls.length === 0)) {
+  // Threads・Xはテキストのみの投稿にも対応するため、media_urls必須のチェックから除外する
+  if (!TEXT_ONLY_SNS.includes(post.target_sns) && (!post.media_urls || post.media_urls.length === 0)) {
     await setStatus(client, post.id, "needs_review", { guard_reason: "素材不足" });
     return { ...log, result: "stopped", reason: "素材不足", new_status: "needs_review" };
   }
@@ -137,7 +138,7 @@ async function processOne(client, post, { dryRun }) {
   }
 
   // --- 素材URLの到達確認 ---
-  for (const url of post.media_urls) {
+  for (const url of post.media_urls || []) {
     const ok = await headCheck(url);
     if (!ok) {
       await setStatus(client, post.id, "needs_review", { guard_reason: "素材不足", error_detail: `素材URLに到達できません: ${url}` });
@@ -153,8 +154,7 @@ async function processOne(client, post, { dryRun }) {
       dup = await threadsClient.findDuplicateText(me.id, post.body_text);
     } else {
       // target_sns → BufferチャンネルIDのマッピングは現状Instagramのみ実装済み(TikTok/YouTubeは今後追加)
-      const channelMap = { instagram: "6a9ce332cd8b9c702c154469", tiktok: "6a9ce544cd8b9c702c154892", youtube: "6a9ce3facd8b9c702c154605" };
-      const channelId = channelMap[post.target_sns];
+      const channelId = ACTIVE_BUFFER_MAP[post.target_sns];
       dup = await findDuplicatePost(channelId, post.body_text);
     }
   } catch (e) {
@@ -193,9 +193,8 @@ async function processOne(client, post, { dryRun }) {
   // Buffer側の独自キュー(addToQueue)に入れるのではなく、shareNow(即時配信)を使う。
   // addToQueueのままだと、決めた投稿時刻が無視されBufferの空き枠に押し込まれてしまう。
   try {
-    const channelMap = { instagram: "6a9ce332cd8b9c702c154469", tiktok: "6a9ce544cd8b9c702c154892", youtube: "6a9ce3facd8b9c702c154605" };
     const isVideo = post.media_urls.some((u) => /\.(mp4|mov|webm)(\?|$)/i.test(u));
-    const assets = post.media_urls.map((url) => (isVideo ? { video: { url } } : { image: { url } }));
+    const assets = (post.media_urls || []).map((url) => (isVideo ? { video: { url } } : { image: { url } }));
 
     let metadata;
     if (post.target_sns === "instagram") {
@@ -215,9 +214,9 @@ async function processOne(client, post, { dryRun }) {
     }
 
     const created = await createPost({
-      channelId: channelMap[post.target_sns],
+      channelId: ACTIVE_BUFFER_MAP[post.target_sns],
       text: post.body_text,
-      assets,
+      assets: assets.length ? assets : undefined,
       metadata,
       mode: "shareNow",
     });

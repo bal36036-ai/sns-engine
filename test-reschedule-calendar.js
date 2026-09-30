@@ -42,8 +42,8 @@ test("未接続のXとnoteは予定日時を消し、実績とreadyは固定す�
 
 test("変更後の日時を再入力しても同じ投稿を再移動しない", () => {
   const now = new Date("2026-09-24T23:00:00Z");
-  const first = planReschedule([row("old", "instagram", "2026-09-24T03:45:00Z")], now);
+  const first = planReschedule([row("old", "tiktok", "2026-09-24T09:15:00Z")], now);
   assert.equal(first.changes.length, 1);
-  const second = planReschedule([row("old", "instagram", first.changes[0].to)], now);
+  const second = planReschedule([row("old", "tiktok", first.changes[0].to)], now);
   assert.equal(second.changes.length, 0);
 });

@@ -1,13 +1,15 @@
 // Issue #5: 投稿できなかった下書きを、媒体ごとの次の空き枠へ繰り延べる。
 // --apply 以外は読み取りのみ。ready/scheduled、投稿済み、過去の実績は変更しない。
 const { getPool } = require("./db-client");
+const { AUTOMATED_SNS } = require("./buffer-channels");
 
 const DAY_MS = 86_400_000;
 const JST_MS = 9 * 3_600_000;
 const MIN_GAP_MS = 3 * 3_600_000;
 const MIN_LEAD_MS = 60 * 60_000;
-const CONNECTED = ["threads", "instagram", "tiktok", "youtube"];
-const TIMES = { threads: ["09:30", "17:00"], instagram: ["12:45"], tiktok: ["18:15"], youtube: ["20:15"] };
+// 自動投稿の対象は buffer-channels.js（Instagramは一時停止中、XはチャンネルID登録後に対象になる）
+const CONNECTED = AUTOMATED_SNS;
+const TIMES = { threads: ["09:30", "17:00"], instagram: ["12:45"], tiktok: ["18:15"], youtube: ["20:15"], x: ["12:15"] };
 
 function jstDay(date) {
   return new Date(date.getTime() + JST_MS).toISOString().slice(0, 10);
@@ -23,6 +25,7 @@ function dailyTarget(sns, day) {
   if (sns === "instagram") return [0, 1, 2, 3, 4].includes(dow) ? 1 : 0;
   if (sns === "tiktok") return [0, 2, 4, 6].includes(dow) ? 1 : 0;
   if (sns === "youtube") return [0, 1, 3, 5].includes(dow) ? 1 : 0;
+  if (sns === "x") return 1;
   return 0;
 }
 
@@ -37,7 +40,7 @@ function isCalendarDraft(row) {
 function planReschedule(rows, now = new Date()) {
   const nowMs = now.getTime();
   const movable = rows.filter((row) => isCalendarDraft(row) && CONNECTED.includes(row.target_sns) && row.scheduled_at);
-  const disconnected = rows.filter((row) => isCalendarDraft(row) && ["x", "note"].includes(row.target_sns) && row.scheduled_at);
+  const disconnected = rows.filter((row) => isCalendarDraft(row) && !CONNECTED.includes(row.target_sns) && ["x", "note"].includes(row.target_sns) && row.scheduled_at);
   const fixed = rows.filter((row) => CONNECTED.includes(row.target_sns) && row.scheduled_at && !movable.includes(row)
     && !["failed", "expired"].includes(row.status) && new Date(row.scheduled_at).getTime() > nowMs);
   const changes = [];

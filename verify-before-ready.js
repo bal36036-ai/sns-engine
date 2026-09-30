@@ -6,13 +6,7 @@ const https = require("https");
 const { getPool } = require("./db-client");
 const { findDuplicatePost } = require("./buffer-client");
 const threadsClient = require("./threads-client");
-
-const CHANNEL_MAP = {
-  instagram: "6a9ce332cd8b9c702c154469",
-  tiktok: "6a9ce544cd8b9c702c154892",
-  youtube: "6a9ce3facd8b9c702c154605",
-};
-const CONNECTED_CHANNELS = [...Object.keys(CHANNEL_MAP), "threads"];
+const { ACTIVE_BUFFER_MAP: CHANNEL_MAP, TEXT_ONLY_SNS, AUTOMATED_SNS: CONNECTED_CHANNELS } = require("./buffer-channels");
 
 function headCheck(url) {
   return new Promise((resolve) => {
@@ -42,7 +36,7 @@ async function verifyOne(post) {
   if (!post.scheduled_at || new Date(post.scheduled_at) <= new Date()) issues.push("投稿予定日時が未設定または過去");
 
   // media_urls有効・実際に取得できる・形式
-  if ((!post.media_urls || post.media_urls.length === 0) && post.target_sns !== "threads") {
+  if ((!post.media_urls || post.media_urls.length === 0) && !TEXT_ONLY_SNS.includes(post.target_sns)) {
     issues.push("media_urlsが空");
   } else {
     for (const url of post.media_urls || []) {

@@ -51,6 +51,8 @@ test("翌日の補充では新しく30日先に入った日だけを追加する
 test("Threadsは接続済みの文章投稿として判定し、素材待ちは残す", () => {
   const base = { is_historical: false, media_urls: [], is_publishable: true, feature_published: true, duplicate_check: null, scheduled_at: "2026-10-01T00:30:00Z" };
   assert.equal(classify({ ...base, target_sns: "threads" }), "ready_candidate");
-  assert.equal(classify({ ...base, target_sns: "instagram" }), "waiting_media");
+  assert.equal(classify({ ...base, target_sns: "tiktok" }), "waiting_media");
+  // Instagramは2026-10-01から一時停止（buffer-channels.js）、XはチャンネルID登録まで接続待ち
+  assert.equal(classify({ ...base, target_sns: "instagram" }), "waiting_channel");
   assert.equal(classify({ ...base, target_sns: "x" }), "waiting_channel");
 });

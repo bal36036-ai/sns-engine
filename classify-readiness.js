@@ -10,13 +10,13 @@
 //   ready_candidate       … 全て揃っている(promote-to-ready.js でreadyへ進められる)
 
 const { getPool } = require("./db-client");
+const { AUTOMATED_SNS, TEXT_ONLY_SNS } = require("./buffer-channels");
 
-const AUTOMATED_SNS = ["instagram", "tiktok", "youtube", "threads"];
 
 function classify(post) {
   if (post.is_historical) return "historical";
   if (!AUTOMATED_SNS.includes(post.target_sns)) return "waiting_channel";
-  if (post.target_sns !== "threads" && (!post.media_urls || post.media_urls.length === 0)) return "waiting_media";
+  if (!TEXT_ONLY_SNS.includes(post.target_sns) && (!post.media_urls || post.media_urls.length === 0)) return "waiting_media";
   if (!post.is_publishable || !post.feature_published) return "needs_review";
   if (post.duplicate_check && ["duplicate", "possible_duplicate"].includes(post.duplicate_check.result)) {
     return "needs_review";

@@ -5,14 +5,9 @@
 const { getPool } = require("./db-client");
 const { findDuplicatePost } = require("./buffer-client");
 const threadsClient = require("./threads-client");
+const { ACTIVE_BUFFER_MAP: CHANNEL_MAP, TEXT_ONLY_SNS, AUTOMATED_SNS } = require("./buffer-channels");
 
-const AUTOMATED_SNS = ["instagram", "tiktok", "youtube", "threads"];
-// Buffer連携済みチャンネル。Threadsは公式APIで別途重複確認する。
-const CHANNEL_MAP = {
-  instagram: "6a9ce332cd8b9c702c154469",
-  tiktok: "6a9ce544cd8b9c702c154892",
-  youtube: "6a9ce3facd8b9c702c154605",
-};
+// Buffer連携済みチャンネルは buffer-channels.js（Instagramは一時停止中）。Threadsは公式APIで別途重複確認する。
 
 async function promoteToReady(postId) {
   const pool = getPool();
@@ -37,7 +32,7 @@ async function promoteToReady(postId) {
     if (!post.body_text || !post.body_text.trim()) checks.push("本文が空");
 
     // 2. 素材確認(自動化対象SNSは画像/動画が必須)
-    if (post.target_sns !== "threads" && (!post.media_urls || post.media_urls.length === 0)) {
+    if (!TEXT_ONLY_SNS.includes(post.target_sns) && (!post.media_urls || post.media_urls.length === 0)) {
       checks.push("素材未完成(media_urlsが空)");
     }
 

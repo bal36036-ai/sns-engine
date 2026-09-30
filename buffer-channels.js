@@ -6,7 +6,7 @@ const CHANNEL_MAP = {
   instagram: "6a9ce332cd8b9c702c154469",
   tiktok: "6a9ce544cd8b9c702c154892",
   youtube: "6a9ce3facd8b9c702c154605",
-  x: null,
+  x: "6abd8087ea19ca0bde398054", // 2026-10-01 BufferにXをつないだ（@genba_apps）
 };
 const PAUSED_SNS = ["instagram"];
 // 画像・動画がなくても投稿できる媒体（本文だけで投稿する）

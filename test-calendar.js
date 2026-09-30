@@ -9,7 +9,8 @@ test("30日先までの媒体別在庫を作り、すべて下書きで止める
   assert.equal(plan.from, "2026-09-24");
   assert.equal(plan.through, "2026-10-24");
   assert.equal(plan.shortages.length, 0);
-  assert.ok(plan.planned.every((post) => !["x", "note"].includes(post.targetSns)));
+  // noteは接続前。Xは2026-10-01にBufferへ接続（毎日12:15に1件）。Instagramは一時停止中
+  assert.ok(plan.planned.every((post) => post.targetSns !== "note" && post.targetSns !== "instagram"));
   const byDay = new Map();
   for (const p of plan.planned) {
     assert.equal(p.isPublishable, false);
@@ -54,5 +55,6 @@ test("Threadsは接続済みの文章投稿として判定し、素材待ちは�
   assert.equal(classify({ ...base, target_sns: "tiktok" }), "waiting_media");
   // Instagramは2026-10-01から一時停止（buffer-channels.js）、XはチャンネルID登録まで接続待ち
   assert.equal(classify({ ...base, target_sns: "instagram" }), "waiting_channel");
-  assert.equal(classify({ ...base, target_sns: "x" }), "waiting_channel");
+  assert.equal(classify({ ...base, target_sns: "x" }), "ready_candidate"); // Xは文章だけで投稿できる（2026-10-01接続）
+  assert.equal(classify({ ...base, target_sns: "note" }), "waiting_channel");
 });

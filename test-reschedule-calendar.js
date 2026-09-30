@@ -26,7 +26,7 @@ test("過去の下書きを先に移し、未来の下書きも空き枠へ順�
   assert.ok(plan.changes.every((change) => change.id !== "legacy"));
 });
 
-test("未接続のXとnoteは予定日時を消し、実績とreadyは固定する", () => {
+test("未接続のnoteは予定日時を消し、接続済みのXは空き枠へ移し、実績とreadyは固定する", () => {
   const now = new Date("2026-09-24T23:00:00Z");
   const rows = [
     row("x", "x", "2026-09-24T02:00:00Z"),
@@ -36,8 +36,12 @@ test("未接続のXとnoteは予定日時を消し、実績とreadyは固定す�
     row("ready", "threads", "2026-09-24T00:30:00Z", { status: "ready" }),
   ];
   const plan = planReschedule(rows, now);
-  assert.deepEqual(plan.changes.map((change) => [change.id, change.to]), [["x", null], ["note", null]]);
-  assert.equal(plan.overdue, 0);
+  const byId = Object.fromEntries(plan.changes.map((change) => [change.id, change.to]));
+  assert.equal(byId.note, null); // noteは未接続のまま日時を消す
+  assert.ok(byId.x && new Date(byId.x) > now); // Xは2026-10-01に接続済み。過去の枠は未来の空き枠（12:15）へ
+  assert.equal(new Date(byId.x).toISOString().slice(11, 16), "03:15");
+  assert.deepEqual(Object.keys(byId).sort(), ["note", "x"]);
+  assert.equal(plan.overdue, 1); // 過去日時の接続済み下書き（x）の1件
 });
 
 test("変更後の日時を再入力しても同じ投稿を再移動しない", () => {

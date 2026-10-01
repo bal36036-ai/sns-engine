@@ -9,6 +9,7 @@
 
 const { getPool } = require("./db-client");
 const { promoteToReady } = require("./promote-to-ready");
+const { TEXT_ONLY_SNS } = require("./buffer-channels");
 
 // 引数でIDの先頭8文字を渡すと、その投稿だけを対象にする（例：繰り延べ後の 54c748e6、修正後にばるがOKした3件）。
 // 引数で指定したときは 10/2 までという期間の制限をかけない。
@@ -39,7 +40,7 @@ async function main() {
       if (post.is_historical || post.external_post_id) problems.push("履歴または投稿済み");
       if (!(at.getTime() > Date.now() + MIN_LEAD_MS) || (!ARG_IDS.length && at > LAST_SLOT)) problems.push(`予定日時 ${at.toISOString()}`);
       if (!post.body_text?.trim()) problems.push("本文なし");
-      if (post.target_sns !== "threads" && !post.media_urls?.length) problems.push("素材なし");
+      if (!TEXT_ONLY_SNS.includes(post.target_sns) && !post.media_urls?.length) problems.push("素材なし"); // Threads・Xは文章だけで投稿できる
       if (post.target_sns === "threads") {
         const dup = await client.query(
           "SELECT id FROM sns.posts WHERE target_sns = 'threads' AND id <> $1 AND body_text = $2 AND status IN ('ready','scheduled','sent')",

@@ -105,4 +105,10 @@ function contentFor({ date, topic, sns, variant, second = false, index = 0 }) {
   return genericContent(topic, sns, variant, second, index);
 }
 
-module.exports = { contentFor, genericContent, productionPlan };
+// 手書きの本文（FIRST_WEEK / REMAINING）がある日・媒体か
+function hasHandWritten(date, sns, second = false) {
+  const key = sns === "threads" && second ? "threads_b" : sns;
+  return Boolean(FIRST_WEEK[date]?.[key] || REMAINING[date]?.[key]);
+}
+
+module.exports = { contentFor, genericContent, productionPlan, hasHandWritten };

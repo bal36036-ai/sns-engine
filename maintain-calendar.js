@@ -4,7 +4,8 @@ const { getPool } = require("./db-client");
 const { ingestPost } = require("./ingest-post");
 const { classifyAll } = require("./classify-readiness");
 const { TOPICS } = require("./calendar-topics");
-const { contentFor } = require("./calendar-content");
+const { contentFor, hasHandWritten } = require("./calendar-content");
+const { pickFromPool } = require("./post-pool");
 const { AUTOMATED_SNS } = require("./buffer-channels");
 
 const TZ_OFFSET = 9 * 60 * 60 * 1000;
@@ -58,6 +59,7 @@ function planCalendar(existing, now = new Date(), horizonDays = 30) {
 
   for (let offset = 0; offset <= horizonDays; offset++) {
     const key = dayKey(today, offset);
+    const usedTopicsToday = new Set(); // その日にもう使った「本文の材料」の話題（同じ日に重ねない）
     const daysFromFirst = Math.floor((Date.parse(`${key}T00:00:00Z`) - FIRST_DAY) / DAY_MS);
     const topicIndex = ((daysFromFirst % TOPICS.length) + TOPICS.length) % TOPICS.length;
     const variant = ((Math.floor(daysFromFirst / TOPICS.length) % 3) + 3) % 3;
@@ -72,7 +74,12 @@ function planCalendar(existing, now = new Date(), horizonDays = 30) {
         const second = sns === "threads" && n === 1;
         const topicId = `cal-${key.replaceAll("-", "")}-${second ? "b" : "a"}`;
         const content = contentFor({ date: key, topic, sns, variant, second, index: topicIndex });
-        const bodyText = content.bodyText;
+        // 手書きの本文がない日のThreads・Xは、定型文より先に、反応の分析に沿った「本文の材料」（post-pool.js）を使う。材料が尽きたら定型文に戻る。
+        let bodyText = content.bodyText;
+        if ((sns === "threads" || sns === "x") && !hasHandWritten(key, sns, second)) {
+          const pooled = pickFromPool({ app: topic[0], sns, taken: bodyKeys, usedTopicsToday, start: daysFromFirst });
+          if (pooled) { bodyText = pooled.text; usedTopicsToday.add(pooled.topic); }
+        }
         const bodyKey = `${sns}\0${bodyText}`;
         if (bodyKeys.has(bodyKey) || existing.some((p) => p.topic_id === topicId && p.target_sns === sns)) continue;
         planned.push({ topicId, targetApp: topic[0], targetSns: sns, title: `${topic[1]}｜${topic[2]}`, bodyText, contentPlan: content.plan, mediaUrls: [], scheduledAt: at, isPublishable: false, featurePublished: false });

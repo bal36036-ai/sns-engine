@@ -58,3 +58,28 @@ test("Threadsは接続済みの文章投稿として判定し、素材待ちは�
   assert.equal(classify({ ...base, target_sns: "x" }), "ready_candidate"); // Xは文章だけで投稿できる（2026-10-01接続）
   assert.equal(classify({ ...base, target_sns: "note" }), "waiting_channel");
 });
+
+test("本文の材料（post-pool.js）：字数・禁止表現・安全表現・重複がなく、同じ日に同じ話題を重ねない", () => {
+  const { POOL } = require("./post-pool");
+  const weight = (t) => [...t].reduce((w, ch) => { const c = ch.codePointAt(0); return w + ((c <= 0x10ff || (c >= 0x2000 && c <= 0x200d) || (c >= 0x2010 && c <= 0x201f) || (c >= 0x2032 && c <= 0x2037)) ? 1 : 2); }, 0);
+  const banned = /テスター|唯一|業界初|世界初|市場にない|競合がない|保証します|必ず安全|フォローしてお待ちください|フォローして見守って/;
+  assert.equal(new Set(POOL.map((p) => `${p.sns}\0${p.text}`)).size, POOL.length);
+  for (const p of POOL) {
+    assert.ok(p.sns === "x" ? weight(p.text) <= 280 : [...p.text].length <= 500, `${p.topic} ${p.sns} 長さ`);
+    assert.ok(!banned.test(p.text), `${p.topic} ${p.sns} 禁止表現`);
+    if (p.app === "harinavi") assert.ok(p.text.includes("専門家"), `${p.topic} ${p.sns} 専門家`);
+    assert.ok(p.text.includes("？"), `${p.topic} ${p.sns} 質問で終える`);
+  }
+  // 手書き本文のない日（11/2以降）に、材料が使われ、同じ日に同じ話題が重ならない
+  const plan = planCalendar([], new Date("2026-11-01T15:30:00Z"));
+  const pooled = plan.planned.filter((p) => POOL.some((m) => m.sns === p.targetSns && m.text === p.bodyText));
+  assert.ok(pooled.length > 0, "材料が使われている");
+  const byDayTopic = new Map();
+  for (const p of pooled) {
+    const day = new Date(new Date(p.scheduledAt).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
+    const topic = POOL.find((m) => m.sns === p.targetSns && m.text === p.bodyText).topic;
+    const k = `${day}:${topic}`;
+    assert.ok(!byDayTopic.has(k), `同じ日に同じ話題 ${k}`);
+    byDayTopic.set(k, true);
+  }
+});

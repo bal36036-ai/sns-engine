@@ -1,0 +1,113 @@
+[
+ {
+  "id": "ec98053d-cf89-4698-bb4c-680581f1af19",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-45d435f2-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-45d435f2-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-45d435f2-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-45d435f2-instagram-05.png"
+  ],
+  "before_text": "梁の確認は、結果を見る前の条件整理から。ハリナビでは「何を入力したか」を追いやすい画面を考えています。 結果を見る前に、何から整理しますか？",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-20261003-tiktok-harinavi-narrated.mp4"
+  ],
+  "after_text": "梁の確認は、結果を見る前の条件整理から。ハリナビでは「何を入力したか」を追いやすい画面を考えています。 結果を見る前に、何から整理しますか？ 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "c6daee57-5aa0-4840-ae3e-59ba53b322b3",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-x-c6daee57-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-x-c6daee57-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-x-c6daee57-03.png"
+  ],
+  "before_text": "キリドリの動作確認用の架空条件で、定尺ごとの切り出し案を図で見る。数字は画面と照合してから紹介します。 切り出し案は、図と数字のどちらで見ることが多いですか？",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-20261002-youtube-kiridori-narrated.mp4"
+  ],
+  "after_text": "キリドリの動作確認用の架空条件で、定尺ごとの切り出し案を図で見る。数字は画面と照合してから紹介します。 切り出し案は、図と数字のどちらで見ることが多いですか？ 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "df0cba13-322d-4335-859e-a15c9b8402b2",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-7782639b-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-7782639b-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-7782639b-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-7782639b-instagram-05.png"
+  ],
+  "before_text": "結果の数字のそばに、何の説明が必要か。ハリナビでは一次照査の条件と確認項目を追いやすくする表示を考えています。 結果のそばに、どんな説明があると助かりますか？",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-1bda024c-narrated.mp4"
+  ],
+  "after_text": "結果の数字のそばに、何の説明が必要か。ハリナビでは一次照査の条件と確認項目を追いやすくする表示を考えています。 結果のそばに、どんな説明があると助かりますか？ 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "d5c7430c-6c92-4ec9-831c-687a0f747da1",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-0c6823ff-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-0c6823ff-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-0c6823ff-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-0c6823ff-instagram-04.png"
+  ],
+  "before_text": "手書きの切断メモから作業指示へ。長さ・本数だけでなく、どの定尺から切るかも伝えたい。キリドリの切り出し図で確認します。 切断メモには、何を必ず書きますか？",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-f417b312-narrated.mp4"
+  ],
+  "after_text": "手書きの切断メモから作業指示へ。長さ・本数だけでなく、どの定尺から切るかも伝えたい。キリドリの切り出し図で確認します。 切断メモには、何を必ず書きますか？ 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "a9bf1a25-dc37-4df8-9d27-d90d82b6b122",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27089211-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27089211-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27089211-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27089211-instagram-05.png"
+  ],
+  "before_text": "結果を見て条件を直す。その往復が迷わずできるか、ハリナビの入力画面と結果画面を見直しています。 結果から条件へ戻る操作で、迷うことはありますか？",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-a4055ef4-narrated.mp4"
+  ],
+  "after_text": "結果を見て条件を直す。その往復が迷わずできるか、ハリナビの入力画面と結果画面を見直しています。 結果から条件へ戻る操作で、迷うことはありますか？ 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "e6523e58-2f47-4d30-8f45-69db1d3cde54",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-8f58d801-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-8f58d801-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-8f58d801-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-8f58d801-instagram-04.png"
+  ],
+  "before_text": "材料の呼び方が違うと、長さが合っていても確認が必要。切り出し案を見る前に、材料名と規格をそろえることから。 材料の呼び方は、どうそろえていますか？",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-09ae193f-narrated.mp4"
+  ],
+  "after_text": "材料の呼び方が違うと、長さが合っていても確認が必要。切り出し案を見る前に、材料名と規格をそろえることから。 材料の呼び方は、どうそろえていますか？ 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "c14f2e03-8e46-46e0-90b9-c671a0f55c15",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27fa762b-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27fa762b-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27fa762b-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-27fa762b-instagram-05.png"
+  ],
+  "before_text": "短時間で読める画面にしたい。でも条件の確認は省けない。ハリナビの結果画面で、見る順番を考えています。",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-f4853e5c-narrated.mp4"
+  ],
+  "after_text": "短時間で読める画面にしたい。でも条件の確認は省けない。ハリナビの結果画面で、見る順番を考えています。 音声：VOICEVOX Nemo"
+ },
+ {
+  "id": "252f176b-68bd-46d3-afb8-0ba03d79cf50",
+  "before_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-4450f01f-instagram-01.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-4450f01f-instagram-02.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-4450f01f-instagram-03.png",
+   "https://sns-material-storage.gbapp.workers.dev/issue5-4450f01f-instagram-04.png"
+  ],
+  "before_text": "部材が1本増えたら、まず入力数量を確認。キリドリの切り出し案を見る前に、前の条件の結果と混ざらないようにします。",
+  "after_media": [
+   "https://sns-material-storage.gbapp.workers.dev/issue5-4fe9df1a-narrated.mp4"
+  ],
+  "after_text": "部材が1本増えたら、まず入力数量を確認。キリドリの切り出し案を見る前に、前の条件の結果と混ざらないようにします。 音声：VOICEVOX Nemo"
+ }
+]

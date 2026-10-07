@@ -14,8 +14,9 @@ const Voice: React.FC<{ name: keyof typeof VOICE_FRAMES }> = ({ name }) => (
   <Audio src={staticFile(`audio/voice-${name}.wav`)} from={LEAD_FRAMES} volume={1} />
 );
 
+// 2026-10-08 ばる判断：標準の曲はB（明るいポップ、bgm-pop.wav）。
 // bgm：曲のファイル名（public/audio）。bgmVolume：曲の音量（曲ごとの大きさの違いをそろえるため、曲だけの部分が約 -30dB になる値）
-export const RealVideo: React.FC<{ bgm?: string; bgmVolume?: number }> = ({ bgm = "bgm.wav", bgmVolume = 0.12 }) => (
+export const RealVideo: React.FC<{ bgm?: string; bgmVolume?: number }> = ({ bgm = "bgm-pop.wav", bgmVolume = 0.37 }) => (
   <>
     <Audio src={staticFile(`audio/${bgm}`)} volume={bgmVolume} />
     <Series>

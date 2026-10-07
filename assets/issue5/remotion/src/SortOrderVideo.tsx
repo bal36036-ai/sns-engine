@@ -1,4 +1,6 @@
-import { Series } from "remotion";
+import { Audio } from "@remotion/media";
+import { Series, staticFile } from "remotion";
+import { LEAD_FRAMES, TOTAL_AUDIO_FRAMES, VOICE_FRAMES } from "./audioTiming";
 import { ConditionScene } from "./ConditionScene";
 import { HookScene } from "./HookScene";
 import { QuestionScene } from "./QuestionScene";
@@ -16,37 +18,51 @@ export const AUTO_ORDER: Stock[] = [
   { label: "2本目", parts: ["A", "B", "C"], remainMm: 485 },
 ];
 
-export const SCENE_FRAMES = { hook: 105, condition: 135, input: 135, auto: 135, question: 120 } as const;
-export const TOTAL_FRAMES = Object.values(SCENE_FRAMES).reduce((a, b) => a + b, 0);
+// 場面の長さは、声の長さに合わせて tools/make_audio.py が決める（src/audioTiming.ts）
+export const SCENE_FRAMES = VOICE_FRAMES;
+export const TOTAL_FRAMES = TOTAL_AUDIO_FRAMES;
+
+const Voice: React.FC<{ name: keyof typeof VOICE_FRAMES }> = ({ name }) => (
+  <Audio src={staticFile(`audio/voice-${name}.wav`)} from={LEAD_FRAMES} volume={1} />
+);
 
 export const SortOrderVideo: React.FC = () => (
-  <Series>
-    <Series.Sequence name="Hook" durationInFrames={105}>
-      <HookScene />
-    </Series.Sequence>
-    <Series.Sequence name="Condition" durationInFrames={135}>
-      <ConditionScene />
-    </Series.Sequence>
-    <Series.Sequence name="Input order" durationInFrames={135}>
-      <ResultScene
-        headline="書いた順に並べると"
-        stocks={INPUT_ORDER}
-        resultText="定尺 3本 ／ 歩留まり "
-        highlight="61.1%"
-        caption={"歩留まり＝使った定尺のうち、\n部材になった割合"}
-      />
-    </Series.Sequence>
-    <Series.Sequence name="Auto order" durationInFrames={135}>
-      <ResultScene
-        headline="自動で並べると"
-        stocks={AUTO_ORDER}
-        resultText="定尺 2本 ／ 歩留まり "
-        highlight="91.7%"
-        caption="同じ6本の部材が、定尺2本に収まりました"
-      />
-    </Series.Sequence>
-    <Series.Sequence name="Question" durationInFrames={120}>
-      <QuestionScene />
-    </Series.Sequence>
-  </Series>
+  <>
+    {/* 曲：声の下で小さく流す（オリジナルの自作BGM。他人の曲は使っていない） */}
+    <Audio src={staticFile("audio/bgm.wav")} volume={0.12} />
+    <Series>
+      <Series.Sequence name="Hook" durationInFrames={VOICE_FRAMES.hook}>
+        <HookScene />
+        <Voice name="hook" />
+      </Series.Sequence>
+      <Series.Sequence name="Condition" durationInFrames={VOICE_FRAMES.condition}>
+        <ConditionScene />
+        <Voice name="condition" />
+      </Series.Sequence>
+      <Series.Sequence name="Input order" durationInFrames={VOICE_FRAMES.input}>
+        <ResultScene
+          headline="書いた順に並べると"
+          stocks={INPUT_ORDER}
+          resultText="定尺 3本 ／ 歩留まり "
+          highlight="61.1%"
+          caption={"歩留まり＝使った定尺のうち、\n部材になった割合"}
+        />
+        <Voice name="input" />
+      </Series.Sequence>
+      <Series.Sequence name="Auto order" durationInFrames={VOICE_FRAMES.auto}>
+        <ResultScene
+          headline="自動で並べると"
+          stocks={AUTO_ORDER}
+          resultText="定尺 2本 ／ 歩留まり "
+          highlight="91.7%"
+          caption="同じ6本の部材が、定尺2本に収まりました"
+        />
+        <Voice name="auto" />
+      </Series.Sequence>
+      <Series.Sequence name="Question" durationInFrames={VOICE_FRAMES.question}>
+        <QuestionScene />
+        <Voice name="question" />
+      </Series.Sequence>
+    </Series>
+  </>
 );

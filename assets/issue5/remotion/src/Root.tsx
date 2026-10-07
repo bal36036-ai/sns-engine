@@ -46,6 +46,8 @@ export const RemotionRoot: React.FC = () => {
         <Composition id="Question" component={QuestionScene} width={W} height={H} fps={FPS} durationInFrames={SCENE_FRAMES.question} />
       </Folder>
       <Composition id="SortOrderRealVideo" component={RealVideo} width={W} height={H} fps={FPS} durationInFrames={REAL_TOTAL_FRAMES} />
+      <Composition id="SortOrderRealLofi" component={RealVideo} width={W} height={H} fps={FPS} durationInFrames={REAL_TOTAL_FRAMES} defaultProps={{ bgm: "bgm-lofi.wav", bgmVolume: 0.19 }} />
+      <Composition id="SortOrderRealPop" component={RealVideo} width={W} height={H} fps={FPS} durationInFrames={REAL_TOTAL_FRAMES} defaultProps={{ bgm: "bgm-pop.wav", bgmVolume: 0.37 }} />
       <Composition id="SortOrderVideo" component={SortOrderVideo} width={W} height={H} fps={FPS} durationInFrames={TOTAL_FRAMES} />
     </>
   );

@@ -14,9 +14,10 @@ const Voice: React.FC<{ name: keyof typeof VOICE_FRAMES }> = ({ name }) => (
   <Audio src={staticFile(`audio/voice-${name}.wav`)} from={LEAD_FRAMES} volume={1} />
 );
 
-export const RealVideo: React.FC = () => (
+// bgm：曲のファイル名（public/audio）。bgmVolume：曲の音量（曲ごとの大きさの違いをそろえるため、曲だけの部分が約 -30dB になる値）
+export const RealVideo: React.FC<{ bgm?: string; bgmVolume?: number }> = ({ bgm = "bgm.wav", bgmVolume = 0.12 }) => (
   <>
-    <Audio src={staticFile("audio/bgm.wav")} volume={0.12} />
+    <Audio src={staticFile(`audio/${bgm}`)} volume={bgmVolume} />
     <Series>
       <Series.Sequence name="Hook" durationInFrames={VOICE_FRAMES.hook}>
         <HookScene />

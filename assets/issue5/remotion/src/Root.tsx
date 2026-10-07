@@ -5,6 +5,7 @@ import { QuestionScene } from "./QuestionScene";
 import { ResultScene } from "./ResultScene";
 import { AUTO_ORDER, INPUT_ORDER, SCENE_FRAMES, SortOrderVideo, TOTAL_FRAMES } from "./SortOrderVideo";
 import { FPS, H, W } from "./theme";
+import { RealVideo, REAL_TOTAL_FRAMES } from "./RealVideo";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -44,6 +45,7 @@ export const RemotionRoot: React.FC = () => {
         />
         <Composition id="Question" component={QuestionScene} width={W} height={H} fps={FPS} durationInFrames={SCENE_FRAMES.question} />
       </Folder>
+      <Composition id="SortOrderRealVideo" component={RealVideo} width={W} height={H} fps={FPS} durationInFrames={REAL_TOTAL_FRAMES} />
       <Composition id="SortOrderVideo" component={SortOrderVideo} width={W} height={H} fps={FPS} durationInFrames={TOTAL_FRAMES} />
     </>
   );

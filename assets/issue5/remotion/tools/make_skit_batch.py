@@ -111,6 +111,15 @@ SKITS = {
              enter={},
              fixed={"kantoku": L_X, "shuna": R_X},
              lines=[("shuna", "出す順番と置く順番、\nどう合わせていますか？", "だすじゅんばんと、おくじゅんばん、どう、あわせてますか？", {"kantoku": "kantoku/s1-1", "shuna": "shuna/s1_1-1"})]),
+    # 案2の短縮版（2026-10-09 バズりの見方：実画面のナレーションが長いと離脱しやすい、が仮説。22.8秒→約15秒）。10 から「名前と長さを…」の台詞を外し、画面の読み上げを短くした。
+    12: dict(title="待って、それB。（後半・短縮版）", enter_end=0, scale=1.3, credit="げんばアプリ工房｜キャラクターの絵：AIで作成／音声：VOICEVOX Nemo",
+             enter={},
+             fixed={"shuna": R_X, "shinjin": L_X},
+             lines=[("shinjin", "形は同じでも、\n長さが違うんですね", "かたちは、おなじでも、ながさが、ちがうんですね。", {"shinjin": "shinjin/s1-3", "shuna": "shuna/s1_1-1"}),
+                    ("shuna", "画面でも、\n名前と長さを組で", "どうさかくにんようのれいです。エーは、にせんごひゃく。ビーは、せんはっぴゃく。", {"shinjin": "shinjin/s1-1", "shuna": "shuna/s1_1-4"},
+                     dict(note="キリドリの実際の画面（動作確認用の例）", foot="部材A 2,500mm／部材B 1,800mm",
+                          items=[dict(dir="screens", file="parts.png", w=820, crop=(0, 0.1, 1, 0.42), marks=[dict(x=0.0, y=0.27, w=1.0, h=0.27, at=50), dict(x=0.0, y=0.64, w=1.0, h=0.27, at=95)])])),
+                    ("shuna", "似ていても、\n同じとは限らないね", "にていても、おなじとは、かぎらないね。", {"shinjin": "shinjin/s1-3", "shuna": "shuna/s1_1-1"})]),
 }
 INSERT_NOTE = "ハリナビの実際の画面（動作確認用の例）"
 INSERT_FOOT = "一次照査の補助です。最終判断は専門家。"

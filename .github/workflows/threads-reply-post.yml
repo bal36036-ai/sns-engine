@@ -1,0 +1,28 @@
+name: Threads Reply Post (manual)
+
+# 2026-10-09：ばるの承認（「返信していいですよ」）を受けて、クイズの投稿へ来たコメント2件に返信する。手動実行のみ。
+# apply を true にしたときだけ投稿する。false（既定）は、投稿先の確認だけ。
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "true で実際に投稿する（既定は確認だけ）"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+
+jobs:
+  post-replies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Post replies
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          APPLY: ${{ github.event.inputs.apply == 'true' && '1' || '0' }}
+        run: node post-threads-replies-20261009.js

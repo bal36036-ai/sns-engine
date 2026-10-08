@@ -80,6 +80,6 @@ export const Mark: React.FC<{ x: number; y: number; w: number; h: number; at: nu
 };
 
 // 画面の上に出す小さな説明（実際のアプリ画面であること）
-export const ScreenNote: React.FC<{ top: number; text?: string }> = ({ top, text = "キリドリの実際の画面（v66・動作確認用の例）" }) => (
+export const ScreenNote: React.FC<{ top: number; text?: string }> = ({ top, text = "キリドリの実際の画面（動作確認用の例）" }) => (
   <div style={{ position: "absolute", left: 80, right: 80, top, fontSize: 34, fontWeight: 700, color: COLORS.muted }}>{text}</div>
 );

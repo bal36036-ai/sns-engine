@@ -1,0 +1,21 @@
+name: Threads Replies Read (manual, read-only)
+
+# 2026-10-09：Threadsの返信（コメント）を読むだけの手動ワークフロー。投稿・削除・変更はしない。定期実行はしない。
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  read-replies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Read replies
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: node fetch-threads-replies.js

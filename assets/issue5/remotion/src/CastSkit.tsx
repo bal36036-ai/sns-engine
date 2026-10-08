@@ -28,7 +28,7 @@ export type CastSkitProps = {
 
 const FEET_Y = 1000;
 
-const Stage: React.FC = () => (
+export const Stage: React.FC = () => (
   <>
     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(#F3EEE4 0 70%, #E2D6C0 70% 100%)" }} />
     {/* 奥の鉄骨と端材の棚（説明用の絵。寸法は書かない） */}
@@ -43,7 +43,7 @@ const Stage: React.FC = () => (
   </>
 );
 
-const Bubble: React.FC<{ text: string; name: string; color: string; tailX: number }> = ({ text, name, color, tailX }) => {
+export const Bubble: React.FC<{ text: string; name: string; color: string; tailX: number }> = ({ text, name, color, tailX }) => {
   const frame = useCurrentFrame();
   const s = interpolate(frame, [0, 10], [0.9, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const left = 70;

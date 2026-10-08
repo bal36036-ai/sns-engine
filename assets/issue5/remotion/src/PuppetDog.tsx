@@ -29,8 +29,9 @@ export const PuppetDog: React.FC<{
   talking: boolean;
   tilt?: number; // 首かしげ（度）
   seed?: number;
-}> = ({ rig, height, x, feetY, mouth, talking, tilt = 0, seed = 0 }) => {
-  const frame = useCurrentFrame() + seed * 37;
+  offset?: number; // 場面の開始フレーム（場面が変わっても揺れやまばたきが途切れないように）
+}> = ({ rig, height, x, feetY, mouth, talking, tilt = 0, seed = 0, offset = 0 }) => {
+  const frame = useCurrentFrame() + offset + seed * 37;
   const [W, H] = rig.size;
   const s = height / H;
   const width = W * s;

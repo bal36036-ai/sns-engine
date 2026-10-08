@@ -11,6 +11,8 @@ import { calcDogMetadata, DogSkit } from "./DogSkit";
 import { calcSpriteMetadata, SpriteSkit } from "./SpriteSkit";
 import { calcCastMetadata, CastSkit } from "./CastSkit";
 import { calcPuppetMetadata, PuppetDemo } from "./PuppetDemo";
+import { calcPuppetCastMetadata, PuppetCast } from "./PuppetCast";
+import { calcWorkshopCastMetadata, WorkshopCast } from "./WorkshopCast";
 
 // 台本データ（props/*.json）から作る動画。render時に --props=props/<名前>.json を渡す。
 const EMPTY_SPEC = { scenes: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.37 };
@@ -61,6 +63,8 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SpriteSkit" component={SpriteSkit} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.3, credit: "", sizes: {} }} calculateMetadata={calcSpriteMetadata} />
       <Composition id="CastSkit" component={CastSkit} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ cast: {}, lines: [], sizes: {}, bgm: "bgm-pop-long.wav", bgmVolume: 0.28, credit: "" }} calculateMetadata={calcCastMetadata} />
       <Composition id="PuppetDemo" component={PuppetDemo} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ rig: { dir: "rig/shuna", size: [302, 566], neckY: 248, pivot: [151, 240], mouth: { half: "mouth_half.png", open: "mouth_open.png", region: [120, 190, 185, 225] } }, lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.3, credit: "" }} calculateMetadata={calcPuppetMetadata} />
+      <Composition id="PuppetCast" component={PuppetCast} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ cast: {}, rigs: {}, lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.28, credit: "" }} calculateMetadata={calcPuppetCastMetadata} />
+      <Composition id="WorkshopCast" component={WorkshopCast} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ cast: {}, rigs: {}, lines: [], bg: "scene/bg_workshop.png", bgm: "bgm-pop-long.wav", bgmVolume: 0.28, credit: "" }} calculateMetadata={calcWorkshopCastMetadata} />
       <Composition id="SortOrderVideo" component={SortOrderVideo} width={W} height={H} fps={FPS} durationInFrames={TOTAL_FRAMES} />
     </>
   );

@@ -8,6 +8,7 @@ import { FPS, H, W } from "./theme";
 import { RealVideo, REAL_TOTAL_FRAMES } from "./RealVideo";
 import { calcSpecMetadata, SpecVideo } from "./SpecVideo";
 import { calcDogMetadata, DogSkit } from "./DogSkit";
+import { calcSpriteMetadata, SpriteSkit } from "./SpriteSkit";
 
 // 台本データ（props/*.json）から作る動画。render時に --props=props/<名前>.json を渡す。
 const EMPTY_SPEC = { scenes: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.37 };
@@ -55,6 +56,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SortOrderRealPop" component={RealVideo} width={W} height={H} fps={FPS} durationInFrames={REAL_TOTAL_FRAMES} defaultProps={{ bgm: "bgm-pop.wav", bgmVolume: 0.37 }} />
       <Composition id="SpecVideo" component={SpecVideo} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={EMPTY_SPEC} calculateMetadata={calcSpecMetadata} />
       <Composition id="DogSkit" component={DogSkit} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.3, credit: "" }} calculateMetadata={calcDogMetadata} />
+      <Composition id="SpriteSkit" component={SpriteSkit} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.3, credit: "", sizes: {} }} calculateMetadata={calcSpriteMetadata} />
       <Composition id="SortOrderVideo" component={SortOrderVideo} width={W} height={H} fps={FPS} durationInFrames={TOTAL_FRAMES} />
     </>
   );

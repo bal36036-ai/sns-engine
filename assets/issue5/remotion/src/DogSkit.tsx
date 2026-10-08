@@ -9,7 +9,7 @@ export type DogLine = { text: string; voice: string; frames: number; lead: numbe
 export type DogSkitProps = { lines: DogLine[]; bgm: string; bgmVolume: number; credit: string };
 
 // 端材の棚（説明用の絵。寸法は書かない）
-const Rack: React.FC<{ measure: boolean }> = ({ measure }) => {
+export const Rack: React.FC<{ measure: boolean }> = ({ measure }) => {
   const frame = useCurrentFrame();
   const bars = [270, 190, 250, 140, 220, 170];
   const tape = interpolate(frame, [8, 30], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.16, 1, 0.3, 1) });
@@ -30,7 +30,7 @@ const Rack: React.FC<{ measure: boolean }> = ({ measure }) => {
   );
 };
 
-const Bubble: React.FC<{ text: string }> = ({ text }) => {
+export const Bubble: React.FC<{ text: string }> = ({ text }) => {
   const frame = useCurrentFrame();
   const s = interpolate(frame, [0, 10], [0.85, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.16, 1, 0.3, 1) });
   return (

@@ -1,53 +1,64 @@
-"""会話劇の「最初の2秒」の試作（Opening）の props を作る。2026-10-09 ChatGPT企画 案2「待って、それB。」・案3「ここ、読めない。」。
+"""会話劇の「手元の寄り」から始める場面（Opening）の props を作る。2026-10-09 ChatGPT企画 案1〜3（Issue #5）。ばる「Claudeに任せる」。
 絵：public/scene/op/（SNS集客/キャラクター/gen_opening_art.py → prep_opening_art.py）。声：VOICEVOX Nemo（make_cast_skit.py の CAST の声）。
 座標は 1080×1080 の画面の画素。layers の x, y は切り抜きの中心。
-使い方：VOICEVOX Nemo を起動してから  python tools/make_opening.py [op2 op3]  → props/op2.json など
+長い版は、寄りの場面（Opening）→ 口が動く場面（WorkScene、make_skit_batch.py）の順に作って、build_short.sh でつなぎ、BGMを重ねる。
+使い方：VOICEVOX Nemo を起動してから  python tools/make_opening.py [名前…]  → props/<名前>.json
 """
 import json
 import sys
 from pathlib import Path
-
-from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_cast_skit import CAST, synth  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 CREDIT = "げんばアプリ工房｜キャラクターの絵：AIで作成／音声：VOICEVOX Nemo"
-
-
-def wsize(file, width):
-    w, h = Image.open(ROOT / "public" / file).size
-    return width, round(h * width / w)
-
+BOX_TOP = dict(left=430, right=40, top=474)  # 案2：吹き出しを上に（メモの上）
 
 OPS = {
-    # 案2：Bの札の横に、新人がAのメモを置きかける → 黒シュナの指が入って止める
-    "op2": dict(bg="scene/op/op2_bg.png", zoom=[1.0, 1.05], label="作業台",
+    # 案2（試作）：Bの札の横に、新人がAのメモを置きかける → 黒シュナの指が入って止める
+    "op2": dict(bg="scene/op/op2_bg.png", zoom=[1.0, 1.05], label="作業台", min=75,
                 layers=[
                     dict(file="scene/op/op2_memo.png", width=620, keys=[
-                        dict(at=0, pose=dict(x=-260, y=790, rot=-4)),
-                        dict(at=20, pose=dict(x=540, y=765, rot=-2)),
-                        dict(at=30, pose=dict(x=520, y=770, rot=-2)),
-                        dict(at=75, pose=dict(x=512, y=772, rot=-2))]),
+                        dict(at=0, pose=dict(x=-260, y=790, rot=-4)), dict(at=20, pose=dict(x=540, y=765, rot=-2)),
+                        dict(at=30, pose=dict(x=520, y=770, rot=-2)), dict(at=75, pose=dict(x=512, y=772, rot=-2))]),
                     dict(file="scene/op/op2_point.png", width=640, keys=[
-                        dict(at=0, pose=dict(x=1500, y=760, rot=-14)),
-                        dict(at=10, pose=dict(x=1500, y=760, rot=-14)),
-                        dict(at=24, pose=dict(x=1070, y=712, rot=-14)),
-                        dict(at=75, pose=dict(x=1060, y=714, rot=-14))])],
+                        dict(at=0, pose=dict(x=1500, y=760, rot=-14)), dict(at=10, pose=dict(x=1500, y=760, rot=-14)),
+                        dict(at=24, pose=dict(x=1070, y=712, rot=-14)), dict(at=75, pose=dict(x=1060, y=714, rot=-14))])],
                 texts=[],
-                line=dict(who="shuna", text="待って、それB。", voice="まって、それ、ビー。", start=14, box=dict(left=430, right=40, top=474))),
-    # 案3：寸法線をなぞる新人の指が、数字を隠しているマグネットの手前で止まる
-    "op3": dict(bg="scene/op/op3_bg.png", zoom=[1.0, 1.05], label="作業台",
+                lines=[dict(who="shuna", text="待って、それB。", voice="まって、それ、ビー。", start=14, box=BOX_TOP)]),
+    # 案3（試作）：寸法線をなぞる新人の指が、数字を隠しているマグネットの手前で止まる
+    "op3": dict(bg="scene/op/op3_bg.png", zoom=[1.0, 1.05], label="作業台", min=75,
                 layers=[
                     dict(file="scene/op/op3_magnet.png", width=150, z=20, keys=[dict(at=0, pose=dict(x=540, y=718))]),
                     dict(file="scene/op/op3_paw.png", width=560, z=30, keys=[
-                        dict(at=0, pose=dict(x=-200, y=760, rot=0)),
-                        dict(at=26, pose=dict(x=180, y=752, rot=0)),
-                        dict(at=34, pose=dict(x=175, y=752, rot=0)),
-                        dict(at=75, pose=dict(x=175, y=752, rot=0))])],
+                        dict(at=0, pose=dict(x=-200, y=760, rot=0)), dict(at=26, pose=dict(x=180, y=752, rot=0)),
+                        dict(at=34, pose=dict(x=175, y=752, rot=0)), dict(at=75, pose=dict(x=175, y=752, rot=0))])],
                 texts=[dict(text="3,000", x=540, y=708, size=46, z=10)],
-                line=dict(who="shinjin", text="ここ、読めない。", voice="ここ、よめない。", start=12)),
+                lines=[dict(who="shinjin", text="ここ、読めない。", voice="ここ、よめない。", start=12)]),
+    # 案1（本編の前半）：①監督の指が、最初から下の段の札を指している「先に出すの、これ。」②黒シュナ「……いちばん下だね。」（上の部材は動かさない）。口が動く後半は skit-11
+    "s1a": dict(bg="scene/op/op1_bg.png", zoom=[1.0, 1.1], label="部材置き場", min=140,
+                layers=[
+                    dict(file="scene/op/op1_point.png", width=700, keys=[
+                        dict(at=0, pose=dict(x=225, y=870)), dict(at=14, pose=dict(x=225, y=884)), dict(at=24, pose=dict(x=225, y=870)),
+                        dict(at=120, pose=dict(x=225, y=870)), dict(at=150, pose=dict(x=-150, y=870))])],
+                texts=[],
+                lines=[dict(who="kantoku", text="先に出すの、\nこれ。", voice="さきに、だすの、これ。", start=6, size=46, box=dict(left=620, right=30, bottom=60)),
+                       dict(who="shuna", text="……いちばん\n下だね。", voice="……いちばん、した、だね。", start=66, size=46, box=dict(left=620, right=30, bottom=60))]),
+    # 案3（本編の前半）：①新人「ここ、読めない。」→ ②設計がマグネットをずらす「……私が隠してた。」。口が動く後半は skit-9（make_skit_batch.py）
+    "s3a": dict(bg="scene/op/op3_bg.png", zoom=[1.0, 1.06], label="作業台", min=150,
+                layers=[
+                    dict(file="scene/op/op3_magnet.png", width=150, z=20, keys=[
+                        dict(at=0, pose=dict(x=540, y=718)), dict(at=84, pose=dict(x=540, y=718)), dict(at=112, pose=dict(x=735, y=722, rot=40))]),
+                    dict(file="scene/op/op3_paw.png", width=560, z=30, keys=[
+                        dict(at=0, pose=dict(x=-200, y=760)), dict(at=26, pose=dict(x=180, y=752)), dict(at=34, pose=dict(x=175, y=752)),
+                        dict(at=100, pose=dict(x=175, y=752)), dict(at=130, pose=dict(x=60, y=760))]),
+                    dict(file="scene/op/op3_paw2.png", width=560, z=40, keys=[
+                        dict(at=0, pose=dict(x=1500, y=722)), dict(at=76, pose=dict(x=1500, y=722)), dict(at=100, pose=dict(x=980, y=724)),
+                        dict(at=118, pose=dict(x=930, y=724)), dict(at=140, pose=dict(x=1500, y=722))])],
+                texts=[dict(text="3,000", x=540, y=708, size=46, z=10)],
+                lines=[dict(who="shinjin", text="ここ、読めない。", voice="ここ、よめない。", start=12),
+                       dict(who="sekkei", text="……私が隠してた。", voice="……わたしが、かくしてた。", start=72)]),
 }
 
 
@@ -55,14 +66,16 @@ def build(name):
     op = OPS[name]
     out = ROOT / "public" / "audio" / name
     out.mkdir(parents=True, exist_ok=True)
-    ln = op["line"]
-    c = CAST[ln["who"]]
-    d, _ = synth(ln["voice"], out / "line-0.wav", c["voice"], c["pitch"])
-    total = max(75, ln["start"] + 6 + round(d * 30) + 15)
-    props = {"bg": op["bg"], "zoom": op["zoom"], "layers": op["layers"], "texts": op["texts"], "label": op.get("label"), "total": total, "credit": CREDIT,
-             "lines": [{"start": ln["start"], "name": c["name"], "color": c["color"], "text": ln["text"], "voice": f"{name}/line-0.wav", "lead": 6, **({"box": ln["box"]} if "box" in ln else {})}]}
+    lines, end = [], 0
+    for i, ln in enumerate(op["lines"]):
+        c = CAST[ln["who"]]
+        d, _ = synth(ln["voice"], out / f"line-{i}.wav", c["voice"], c["pitch"])
+        end = max(end, ln["start"] + 6 + round(d * 30))
+        lines.append({"start": ln["start"], "name": c["name"], "color": c["color"], "text": ln["text"], "voice": f"{name}/line-{i}.wav", "lead": 6, **({"box": ln["box"]} if "box" in ln else {}), **({"size": ln["size"]} if "size" in ln else {})})
+    total = max(op["min"], end + 15)
+    props = {"bg": op["bg"], "zoom": op["zoom"], "layers": op["layers"], "texts": op["texts"], "label": op.get("label"), "total": total, "credit": CREDIT, "lines": lines}
     (ROOT / "props" / f"{name}.json").write_text(json.dumps(props, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"{name}: 声 {d:.2f}秒、全体 {total / 30:.1f}秒")
+    print(f"{name}: 全体 {total / 30:.1f}秒")
 
 
 if __name__ == "__main__":

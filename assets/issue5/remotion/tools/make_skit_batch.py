@@ -91,6 +91,26 @@ SKITS = {
                    ("sekkei", "判定に入っていない項目も、\n画面で確認します", "はんていに、はいっていない、こうもくも、がめんで、かくにんします。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s1-4"},
                     dict(items=[("judgement-simple.png", 820), ("unevaluated.png", 820)])),
                    ("sekkei", "一次照査の補助です。\n最終判断は専門家。", "いちじしょうさの、ほじょです。さいしゅうはんだんは、せんもんかです。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s2-3"})]),
+    # 案3の後半（口が動く場面）。前半は make_opening.py の s3a（手元の寄り）。ChatGPT台本 3つ目の問いかけ。
+    9: dict(title="見たい数字、そこ。（後半）", enter_end=0, scale=1.45,
+            enter={},
+            fixed={"sekkei": R_X, "shinjin": L_X},
+            lines=[("sekkei", "見たいところ、ちょうど\n隠れてたこと、ありますか？", "みたいところ、ちょうど、かくれてたこと、ありますか？", {"sekkei": "sekkei/s2-3", "shinjin": "shinjin/s1-1"})]),
+    # 案2の後半（口が動く場面＋キリドリの実入力欄）。前半は make_opening.py の op2b（手元の寄り）。ChatGPT台本の2〜5つ目。
+    10: dict(title="待って、それB。（後半）", enter_end=0, scale=1.3, credit="げんばアプリ工房｜キャラクターの絵：AIで作成／音声：VOICEVOX Nemo",
+             enter={},
+             fixed={"shuna": R_X, "shinjin": L_X},
+             lines=[("shinjin", "形は同じでも、\n長さが違うんですね", "かたちは、おなじでも、ながさが、ちがうんですね。", {"shinjin": "shinjin/s1-3", "shuna": "shuna/s1_1-1"}),
+                    ("shuna", "名前と長さを、\n組で確かめよう", "なまえと、ながさを、くみで、たしかめよう。", {"shinjin": "shinjin/s1-1", "shuna": "shuna/s1_1-1"}),
+                    ("shuna", "入力した行を、\n見返します", "どうさかくにんようの、れいです。ぶざいエーは、にせんごひゃくミリ。ぶざいビーは、せんはっぴゃくミリ。にゅうりょくした、ぎょうを、みかえします。", {"shinjin": "shinjin/s1-1", "shuna": "shuna/s1_1-4"},
+                     dict(note="キリドリの実際の画面（動作確認用の例）", foot="部材A 2,500mm／部材B 1,800mm",
+                          items=[dict(dir="screens", file="parts.png", w=820, crop=(0, 0.1, 1, 0.42), marks=[dict(x=0.0, y=0.27, w=1.0, h=0.27, at=70), dict(x=0.0, y=0.64, w=1.0, h=0.27, at=120)])])),
+                    ("shuna", "似ていても、\n同じとは限らないね", "にていても、おなじとは、かぎらないね。", {"shinjin": "shinjin/s1-3", "shuna": "shuna/s1_1-1"})]),
+    # 案1の後半（口が動く場面）。前半は make_opening.py の s1a（部材置き場の寄り）。ChatGPT台本の3つ目の問いかけ。
+    11: dict(title="先に出すの、いちばん下。（後半）", enter_end=0, scale=1.4,
+             enter={},
+             fixed={"kantoku": L_X, "shuna": R_X},
+             lines=[("shuna", "出す順番と置く順番、\nどう合わせていますか？", "だすじゅんばんと、おくじゅんばん、どう、あわせてますか？", {"kantoku": "kantoku/s1-1", "shuna": "shuna/s1_1-1"})]),
 }
 INSERT_NOTE = "ハリナビの実際の画面（動作確認用の例）"
 INSERT_FOOT = "一次照査の補助です。最終判断は専門家。"
@@ -108,7 +128,7 @@ def build(no):
     name = f"skit-{no}"
     out = ROOT / "public" / "audio" / name
     out.mkdir(parents=True, exist_ok=True)
-    ENTER_END = 50
+    ENTER_END = sk.get("enter_end", 50)
     t = ENTER_END + 6
     lines, starts = [], []
     for i, ln0 in enumerate(sk["lines"]):
@@ -127,7 +147,7 @@ def build(no):
         c = CAST[who]
         x = sk["enter"][who][2] if who in sk["enter"] else sk["fixed"][who]
         tracks = []
-        h = H[who]
+        h = round(H[who] * sk.get("scale", 1))
         if who in sk["enter"]:
             kind, file, _ = sk["enter"][who]
             if kind == "walk":
@@ -161,10 +181,18 @@ def build(no):
         prev_has = i > 0 and len(sk["lines"][i - 1]) > 4
         items = []
         for it in ln0[4]["items"]:
+            if isinstance(it, dict):  # キリドリなど：{"file", "w", "dir", "crop", "marks"}
+                d, f, w = it.get("dir", "screens-h"), it["file"], it["w"]
+                sw, sh = Image.open(ROOT / "public" / d / f).size
+                e = {"dir": d, "file": f, "srcW": sw, "srcH": sh, "width": w, "marks": it.get("marks", [])}
+                if "crop" in it:
+                    e["crop"] = dict(zip("xywh", it["crop"]))
+                items.append(e)
+                continue
             f, w = it[0], it[1]
             sw, sh = Image.open(ROOT / "public" / "screens-h" / f).size
             items.append({"dir": "screens-h", "file": f, "srcW": sw, "srcH": sh, "width": w, "marks": it[2] if len(it) > 2 else []})
-        inserts.append({"start": lines[i]["start"] + (0 if prev_has else 4), "end": end, "note": INSERT_NOTE, "foot": INSERT_FOOT, "items": items})
+        inserts.append({"start": lines[i]["start"] + (0 if prev_has else 4), "end": end, "note": ln0[4].get("note", INSERT_NOTE), "foot": ln0[4].get("foot", INSERT_FOOT), "items": items})
     props = {"actors": actors, "rigs": rigs, "sizes": SIZES, "lines": lines, "bg": "scene/bg_workshop.png", "bgm": "bgm-pop-long.wav", "bgmVolume": 0.26,
              "credit": sk.get("credit", "げんばアプリ工房｜音声：VOICEVOX Nemo"), "total": total, **({"inserts": inserts} if inserts else {})}
     (ROOT / "props" / f"{name}.json").write_text(json.dumps(props, ensure_ascii=False), encoding="utf-8")

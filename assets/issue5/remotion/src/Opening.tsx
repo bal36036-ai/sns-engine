@@ -8,7 +8,7 @@ import { COLORS, FONT } from "./theme";
 type Pose = { x: number; y: number; scale?: number; rot?: number; opacity?: number };
 export type OpLayer = { file: string; width: number; keys: { at: number; pose: Pose }[]; z?: number };
 export type OpText = { text: string; x: number; y: number; size: number; color?: string; rot?: number; z?: number };
-export type OpLine = { start: number; name: string; color: string; text: string; voice: string; lead: number; box?: { left: number; right: number; top?: number; bottom?: number } };
+export type OpLine = { start: number; name: string; color: string; text: string; voice: string; lead: number; size?: number; box?: { left: number; right: number; top?: number; bottom?: number } };
 export type OpeningProps = { bg: string; zoom: [number, number]; layers: OpLayer[]; texts: OpText[]; lines: OpLine[]; label?: string; total: number; credit: string };
 
 const ease = Easing.bezier(0.33, 1, 0.68, 1);
@@ -33,7 +33,7 @@ const Line: React.FC<{ l: OpLine }> = ({ l }) => {
   return (
     <div style={{ position: "absolute", left: l.box?.left ?? 70, right: l.box?.right ?? 70, ...(l.box?.top !== undefined ? { top: l.box.top } : { bottom: l.box?.bottom ?? 70 }), scale: `${s}`, opacity: interpolate(f, [0, 4], [0, 1], { extrapolateRight: "clamp" }), filter: "drop-shadow(0 10px 18px rgba(0,0,0,0.3))" }}>
       <div style={{ display: "inline-block", marginLeft: 24, padding: "6px 22px", borderRadius: "16px 16px 0 0", background: l.color, color: COLORS.white, fontFamily: FONT, fontSize: 34, fontWeight: 900 }}>{l.name}</div>
-      <div style={{ padding: "20px 34px", background: "rgba(255,255,255,0.96)", border: `5px solid ${l.color}`, borderRadius: 30, fontFamily: FONT, fontSize: 60, fontWeight: 900, color: COLORS.navy, textAlign: "center" }}>{l.text}</div>
+      <div style={{ padding: "20px 34px", background: "rgba(255,255,255,0.96)", border: `5px solid ${l.color}`, borderRadius: 30, fontFamily: FONT, fontSize: l.size ?? 60, fontWeight: 900, color: COLORS.navy, textAlign: "center", whiteSpace: "pre-line" }}>{l.text}</div>
       <Audio src={staticFile(`audio/${l.voice}`)} from={l.lead} volume={1} />
     </div>
   );

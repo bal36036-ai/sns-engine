@@ -60,6 +60,21 @@ SKITS = {
             lines=[("kantoku", "切りしろ、\nちゃんと見てる？", "きりしろ、ちゃんと、みてる？", {"kantoku": "kantoku/s1-1", "shinjin": "shinjin/s1-1"}),
                    ("shinjin", "…切りしろ？", "…きりしろ？", {"kantoku": "kantoku/s1-3", "shinjin": "shinjin/s1-3"}),
                    ("kantoku", "みなさんは、切りしろ（刃幅）、\nいくつで見ていますか？", "みなさんは、きりしろ、いくつで、みてますか？", {"kantoku": "kantoku/s1-1", "shinjin": "shinjin/s1-1"})]),
+    # 10/26〜11/8分（ChatGPT台本 S1・S2、Issue #5 2026-10-08。ばる承認）
+    6: dict(title="「戻したよ」。どこに？",
+            enter={"shinjin": ("slide", "shinjin/s2-1.png", L_X)},
+            fixed={"shuna": R_X},
+            work={"shuna": True},
+            lines=[("shinjin", "あの道具、\nどこに戻しました？", "あの、どうぐ、どこに、もどしました？", {"shinjin": "shinjin/s1-1", "shuna": "table"}),
+                   ("shuna", "いつもの…あ、\n決めてなかったね", "いつもの…あ、きめてなかったね", {"shinjin": "shinjin/s1-3", "shuna": "shuna/t-2"}),
+                   ("shuna", "みなさんは、道具の戻し場所、\nどう決めていますか？", "みなさんは、どうぐの、もどしばしょ、どう、きめてますか？", {"shinjin": "shinjin/s1-1", "shuna": "shuna/t-1"})]),
+    7: dict(title="終わったけど、伝わってる？",
+            enter={"kantoku": ("walk", None, L_X)},
+            fixed={"shuna": R_X},
+            work={"shuna": True},
+            lines=[("kantoku", "こっちの作業、\nもう終わりました？", "こっちの、さぎょう、もう、おわりました？", {"kantoku": "kantoku/s1-1", "shuna": "table"}),
+                   ("shuna", "終わったよ。\n伝えるの、忘れてた", "おわったよ。つたえるの、わすれてた", {"kantoku": "kantoku/s1-3", "shuna": "shuna/t-2"}),
+                   ("shuna", "みなさんは、作業が終わった合図、\nどうしていますか？", "みなさんは、さぎょうが、おわった、あいず、どうしてますか？", {"kantoku": "kantoku/s1-1", "shuna": "shuna/t-1"})]),
 }
 
 

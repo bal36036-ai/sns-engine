@@ -235,7 +235,68 @@ def scenes_v5():
     return s
 
 
-VIDEOS = {"v1": scenes_v1, "v2": scenes_v2, "v3": scenes_v3, "v4": scenes_v4, "v5": scenes_v5}
+# 10/26〜11/8分（ChatGPT企画 A1・A2、Issue #5 2026-10-08。ばる承認）
+def scenes_v6():
+    s = []
+
+    def s1(c):
+        sm = place(K("summary-auto.png", 900), 90, 300, 10)
+        sm.marks = [mk(M_YIELD, LEAD + 4)]
+        return [sm]
+
+    s.append(dict(headline="91.7%は、何の割合？", voice="このきゅうじゅういってんななパーセント、なんのわりあいでしょう。", caption="歩留まり91.7%。何の割合？", note=KIRI_NOTE, min=110, build=s1))
+    s.append(dict(headline="部材の合計は？", voice="どうさかくにんようのれいです。|ぶざいは、にせんごひゃく、せんはっぴゃく、せんにひゃくミリを、にほんずつ。|ごうけいは、いちまんせんミリ。", caption="部材の合計 11,000mm", note=KIRI_NOTE, min=150,
+                  build=lambda c: [place(K("conditions.png", 700), 190, 262, 10), place(K("parts.png", 700, crop=(0, 0, 1, 0.65)), 190, 462, c[0])]))
+
+    def s3(c):
+        its = [place(K("stock1-auto.png", 760), 160, 262, 10), place(K("stock2-auto.png", 760), 160, 498, 22)]
+        sm = place(K("summary-auto.png", 900), 90, 300, c[0] - 8)
+        for it in its:
+            it.hide = c[0] - 14
+        sm.marks = [mk(M_STOCKS, c[0]), mk(M_YIELD, c[1])]
+        return its + [sm]
+
+    s.append(dict(headline="自動で並べると", voice="じどうでは、ろくせんミリのていじゃくを、|にほん。|ぜんたいは、いちまんにせんミリです。", caption="定尺6,000mm×2本＝12,000mm", note=KIRI_NOTE, min=140, capdelay=lambda c: c[1], build=s3))
+
+    def s4(c):
+        sm = place(K("summary-inputorder.png", 900), 90, 300, 10)
+        sm.marks = [mk(M_STOCKS, c[0]), mk(M_YIELD, c[1])]
+        return [sm]
+
+    s.append(dict(headline="入力順で並べると", voice="おなじぶざいでも、にゅうりょくじゅんでは、|ていじゃくさんぼん。|ぶどまりは、ろくじゅういってんいちパーセント。", caption="入力順：定尺3本／61.1%", note=KIRI_NOTE, min=140, capdelay=lambda c: c[0] + 6, build=s4))
+    s.append(dict(headline="割合と、元の長さ", voice="ぶざいはおなじ。つかうていじゃくがかわると、このわりあいもかわります。ぶどまりと、もとのながさを、セットでかくにんします。", caption="11,000mm ÷ 12,000mm ≒ 91.7%\n11,000mm ÷ 18,000mm ≒ 61.1%", note=KIRI_NOTE, min=170,
+                  build=lambda c: row([K("summary-inputorder.png", 450, crop=LEFTCOL, label="入力順"), K("summary-auto.png", 450, crop=LEFTCOL, label="自動")], 280, gap=20)))
+    return s
+
+
+def scenes_v7():
+    s = []
+    s.append(dict(headline="比べる前に、条件", voice="たわみをくらべるまえに、にゅうりょくじょうけんを、かくにんします。", caption="比べる前に、入力条件", note=HARI_NOTE, min=120,
+                  build=lambda c: stack([H("input-support-simple.png", 780, label="単純支持"), H("input-support-fixed.png", 780, label="両端固定")], 322, gap=24)))
+
+    def s2(c):
+        its = stack([H("input-load.png", 800), H("input-span.png", 800), H("input-steel.png", 800)], 330)
+        for it, at in zip(its, [10] + c):
+            it.appear = at
+        return its
+
+    s.append(dict(headline="同じ荷重・長さ・断面", voice="どうさかくにんようのれいです。つりには、にトン。|スパンは、さんぜんミリ。|だんめんも、おなじです。", caption="吊り荷2t／スパン3,000mm／\nH-150×150×7×10", note=HARI_NOTE, min=150, build=s2))
+
+    def s3(c):
+        its = stack([H("check2-simple.png", 800, label="単純支持"), H("check2-fixed.png", 800, label="両端固定")], 322)
+        for it in its:
+            it.marks = [{"x": 0.0, "y": 0.36, "w": 0.46, "h": 0.30, "at": c[0]}]
+        return its
+
+    s.append(dict(headline="変えたのは支え方", voice="かえたのは、ささえかたのせってい。|けっかも、かわりました。", caption="たわみ 3.419mm／0.85mm", note=HARI_NOTE, min=130, capdelay=lambda c: c[0] + 4, build=s3))
+    s.append(dict(headline="実際の支え方は？", voice="ちいさいかずじをえらぶまえに、じっさいのささえかたを、かくにんします。", caption="小さい数字を選ぶ前に、\n実際の支え方を確認", note=HARI_NOTE, min=130,
+                  build=lambda c: stack([H("input-support-simple.png", 780, label="単純支持"), H("input-support-fixed.png", 780, label="両端固定")], 322, gap=24)))
+    s.append(dict(headline="条件と結果をセットで", voice="にゅうりょくじょうけんと、けっかを、セットでみかえします。いちじしょうさのほじょです。さいしゅうはんだんは、せんもんかです。", caption="一次照査の補助です。\n最終判断は専門家。", note=HARI_NOTE, min=160,
+                  build=lambda c: stack([H("check2-simple.png", 780, label="単純支持"), H("check2-fixed.png", 780, label="両端固定")], 322)))
+    return s
+
+
+VIDEOS = {"v1": scenes_v1, "v2": scenes_v2, "v3": scenes_v3, "v4": scenes_v4, "v5": scenes_v5, "v6": scenes_v6, "v7": scenes_v7}
 
 
 def build(name):

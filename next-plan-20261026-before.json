@@ -1,0 +1,871 @@
+[
+ {
+  "id": "ccdd100a-e74a-4680-bea3-f038d29c23d0",
+  "sns": "tiktok",
+  "topic_id": "cal-20261029-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-10-29T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "b401dc35-375c-420e-9673-e5f9875f46db",
+  "sns": "x",
+  "topic_id": "legacy-短文B",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-26T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "408d6244-55f6-4653-8f9e-309316a7b6e5",
+  "sns": "x",
+  "topic_id": "legacy-短文C",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-27T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "21cd5ba9-5fc7-4a5d-ad59-76dc0e81a8e1",
+  "sns": "threads",
+  "topic_id": "cal-20261105-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-05T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "296725c3-8d8d-4ee7-ba4a-8ceb79a21065",
+  "sns": "threads",
+  "topic_id": "cal-20261105-b",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-05T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "74f3628d-4128-4a9f-85c3-605c8f8516f2",
+  "sns": "tiktok",
+  "topic_id": "cal-20261105-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-05T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "4ac871ef-9d12-44d8-bafa-29346b6d560a",
+  "sns": "x",
+  "topic_id": "cal-20261105-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-05T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "8c0c352e-22b4-4d44-aa5b-a7abc4459833",
+  "sns": "x",
+  "topic_id": "cal-20261006-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-11-01T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": null,
+     "from": "2026-10-06T02:00:00.000Z",
+     "reason": "投稿経路が未接続のため、投稿予定時刻ではなく下書き候補として保持"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bc5faf16-ebc6-455d-a44c-648a54d33bae",
+  "sns": "x",
+  "topic_id": "cal-20261028-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-28T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "db8439ab-eb0f-4b3b-a0f1-88c375a778aa",
+  "sns": "x",
+  "topic_id": "cal-20261029-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-29T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "a2c18a85-5c1c-46b9-96b5-2560ca705102",
+  "sns": "threads",
+  "topic_id": "cal-20261030-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-30T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "4f53a76f-663a-45f6-9cad-d833a93d4a01",
+  "sns": "threads",
+  "topic_id": "cal-20261101-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-11-01T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "532c04a4-fd3f-454c-86ee-658e90ed2300",
+  "sns": "tiktok",
+  "topic_id": "cal-20261101-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-01T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "0ae0d037-a81d-48ae-97a9-32f6906d62ca",
+  "sns": "threads",
+  "topic_id": "cal-20261106-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-06T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "a6e5d08d-c6d9-493a-9907-81d4bc199ad7",
+  "sns": "threads",
+  "topic_id": "cal-20261106-b",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-06T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "74ca3e39-3cc4-4ab5-98c8-9d1c85366694",
+  "sns": "youtube",
+  "topic_id": "cal-20261106-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-06T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "cb3860da-dfa7-42be-92d8-9c1d06e76fa4",
+  "sns": "x",
+  "topic_id": "cal-20261106-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-06T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "3bcfde98-8239-4ff4-8107-1b363af54ce8",
+  "sns": "threads",
+  "topic_id": "cal-20261103-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-03T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "4a8a07f3-49da-4ecf-9d07-74e5735bd567",
+  "sns": "threads",
+  "topic_id": "cal-20261103-b",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-03T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "c09f59e0-8ce3-42a8-9f02-1bd54ca10948",
+  "sns": "tiktok",
+  "topic_id": "cal-20261103-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-03T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "065f5aad-885c-4857-8b9a-822b971dc6ac",
+  "sns": "x",
+  "topic_id": "cal-20261030-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-30T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "6ca51f30-191f-4e50-81e4-3f4fac7f919d",
+  "sns": "x",
+  "topic_id": "cal-20261103-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-03T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "9cc11b94-0643-4251-abd0-ce902e4f2b34",
+  "sns": "threads",
+  "topic_id": "cal-20261031-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-31T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "a48c19c4-9885-4653-8411-c3d1296aa0fe",
+  "sns": "tiktok",
+  "topic_id": "cal-20261031-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-10-31T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "ac5b41b1-1171-45e3-ac6c-24ddbc51c55c",
+  "sns": "threads",
+  "topic_id": "cal-20261031-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-31T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "5170dd71-79ba-4b9e-aa51-030ba8900f0c",
+  "sns": "threads",
+  "topic_id": "cal-20261101-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-11-01T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "c8319e66-8f9e-493c-a177-7d06d1c4fcae",
+  "sns": "x",
+  "topic_id": "cal-20261031-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-31T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "1a434f32-beda-493d-8a99-27ce59d525c2",
+  "sns": "threads",
+  "topic_id": "cal-20261006-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-30T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-07T00:30:00.000Z",
+     "from": "2026-10-06T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-07T08:00:00.000Z",
+     "from": "2026-10-07T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-08T00:30:00.000Z",
+     "from": "2026-10-07T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-08T08:00:00.000Z",
+     "from": "2026-10-08T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-09T00:30:00.000Z",
+     "from": "2026-10-08T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "b5db0bfb-fa3b-4520-83bc-5a1c3414acc3",
+  "sns": "threads",
+  "topic_id": "cal-20261102-b",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-02T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "870cbf3e-dd74-45e1-bc1a-11833b06d555",
+  "sns": "threads",
+  "topic_id": "cal-20261107-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-07T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "58506994-6343-47c8-903f-890ff650b9f4",
+  "sns": "threads",
+  "topic_id": "cal-20261107-b",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-07T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "fe6f610e-ea75-4728-9c2c-dcce11ba3fe6",
+  "sns": "threads",
+  "topic_id": "cal-20261102-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-02T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "f96c252d-c459-45c6-8991-83a3768210c1",
+  "sns": "tiktok",
+  "topic_id": "cal-20261107-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-07T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "7b4c26f9-c72d-4814-a747-89d44d673420",
+  "sns": "x",
+  "topic_id": "cal-20261107-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-07T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "03554db0-9d8d-4f3e-84f5-d74a36cad224",
+  "sns": "youtube",
+  "topic_id": "cal-20261102-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-02T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "30773cf4-bdf0-4602-8ce5-f5b6c0411ada",
+  "sns": "x",
+  "topic_id": "cal-20261102-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-02T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "607596ab-5f8a-42fe-b55e-83e7bbff357c",
+  "sns": "threads",
+  "topic_id": "cal-20261104-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-04T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "2997de40-5fcf-4e59-be65-a1c027924c26",
+  "sns": "threads",
+  "topic_id": "cal-20261104-b",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-04T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "d67a7bd9-221e-4e4b-aa69-a9da9c7f5106",
+  "sns": "youtube",
+  "topic_id": "cal-20261104-a",
+  "status": "draft",
+  "readiness_state": "waiting_media",
+  "scheduled_at": "2026-11-04T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "21c71bc3-ed65-4922-8042-21ee5814b4b6",
+  "sns": "x",
+  "topic_id": "cal-20261104-a",
+  "status": "draft",
+  "readiness_state": "needs_review",
+  "scheduled_at": "2026-11-04T03:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": null
+ },
+ {
+  "id": "df1cfc60-386c-4e28-8453-4ce8b4be57cd",
+  "sns": "threads",
+  "topic_id": "cal-20261028-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-29T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-29T00:30:00.000Z",
+     "from": "2026-10-28T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-29T08:00:00.000Z",
+     "from": "2026-10-29T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "519ca592-8b3f-4ec9-b438-bd02a89d2119",
+  "sns": "threads",
+  "topic_id": "cal-20261023-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-26T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-24T00:30:00.000Z",
+     "from": "2026-10-23T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-24T08:00:00.000Z",
+     "from": "2026-10-24T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-25T00:30:00.000Z",
+     "from": "2026-10-24T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-25T08:00:00.000Z",
+     "from": "2026-10-25T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-26T00:30:00.000Z",
+     "from": "2026-10-25T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "00f368a5-cbab-4ad0-80f1-c456e67e804d",
+  "sns": "threads",
+  "topic_id": "cal-20261023-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-26T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-24T08:00:00.000Z",
+     "from": "2026-10-23T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-25T00:30:00.000Z",
+     "from": "2026-10-24T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-25T08:00:00.000Z",
+     "from": "2026-10-25T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-26T00:30:00.000Z",
+     "from": "2026-10-25T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-26T08:00:00.000Z",
+     "from": "2026-10-26T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "ec6eee39-1468-425a-b380-1ff123912337",
+  "sns": "youtube",
+  "topic_id": "cal-20261023-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-26T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-25T11:15:00.000Z",
+     "from": "2026-10-23T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-26T11:15:00.000Z",
+     "from": "2026-10-25T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "a7b4440e-ee0a-4767-be3e-8a16db23de92",
+  "sns": "threads",
+  "topic_id": "cal-20261024-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-27T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-25T00:30:00.000Z",
+     "from": "2026-10-24T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-25T08:00:00.000Z",
+     "from": "2026-10-25T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-26T00:30:00.000Z",
+     "from": "2026-10-25T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-26T08:00:00.000Z",
+     "from": "2026-10-26T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-27T00:30:00.000Z",
+     "from": "2026-10-26T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "a2f04c5c-25a6-4169-93f6-80e7cb29ad6b",
+  "sns": "youtube",
+  "topic_id": "cal-20261026-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-30T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-28T11:15:00.000Z",
+     "from": "2026-10-26T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-30T11:15:00.000Z",
+     "from": "2026-10-28T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "778cfb88-c980-4c9c-81c2-963d2688dddc",
+  "sns": "threads",
+  "topic_id": "cal-20261024-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-27T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-25T08:00:00.000Z",
+     "from": "2026-10-24T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-26T00:30:00.000Z",
+     "from": "2026-10-25T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-26T08:00:00.000Z",
+     "from": "2026-10-26T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-27T00:30:00.000Z",
+     "from": "2026-10-26T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-27T08:00:00.000Z",
+     "from": "2026-10-27T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "d5a94998-4220-4bd1-bde6-0693506441c3",
+  "sns": "threads",
+  "topic_id": "cal-20261025-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-28T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-26T00:30:00.000Z",
+     "from": "2026-10-25T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-26T08:00:00.000Z",
+     "from": "2026-10-26T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-27T00:30:00.000Z",
+     "from": "2026-10-26T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-27T08:00:00.000Z",
+     "from": "2026-10-27T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-28T00:30:00.000Z",
+     "from": "2026-10-27T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "49c8ca65-f158-449e-a4e5-eec3cc397b3d",
+  "sns": "tiktok",
+  "topic_id": "cal-20261025-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-27T09:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-27T09:15:00.000Z",
+     "from": "2026-10-25T09:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "147b5b71-4757-42e9-93b2-a2edec194b31",
+  "sns": "threads",
+  "topic_id": "cal-20261025-b",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-28T08:00:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-24T23:05:28.855Z",
+     "to": "2026-10-26T08:00:00.000Z",
+     "from": "2026-10-25T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-25T15:24:08.074Z",
+     "to": "2026-10-27T00:30:00.000Z",
+     "from": "2026-10-26T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-26T01:22:43.334Z",
+     "to": "2026-10-27T08:00:00.000Z",
+     "from": "2026-10-27T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-28T00:30:00.000Z",
+     "from": "2026-10-27T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-28T08:00:00.000Z",
+     "from": "2026-10-28T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "864d7af1-83ee-4f01-9001-fd7acc1e21ed",
+  "sns": "threads",
+  "topic_id": "cal-20261028-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-29T00:30:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-28T08:00:00.000Z",
+     "from": "2026-10-28T00:30:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-29T00:30:00.000Z",
+     "from": "2026-10-28T08:00:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "63fc2fac-63b6-4187-87af-8e2b7decc0ec",
+  "sns": "youtube",
+  "topic_id": "cal-20261025-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-10-28T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-26T11:15:00.000Z",
+     "from": "2026-10-25T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-10-28T11:15:00.000Z",
+     "from": "2026-10-26T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ },
+ {
+  "id": "02162003-5955-48f6-8527-97156f43880f",
+  "sns": "youtube",
+  "topic_id": "cal-20261028-a",
+  "status": "ready",
+  "readiness_state": "ready_candidate",
+  "scheduled_at": "2026-11-01T11:15:00.000Z",
+  "guard_reason": null,
+  "scheduling_reason": {
+   "rolling_history": [
+    {
+     "at": "2026-09-27T22:39:54.361Z",
+     "to": "2026-10-30T11:15:00.000Z",
+     "from": "2026-10-28T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    },
+    {
+     "at": "2026-09-28T13:29:21.735Z",
+     "to": "2026-11-01T11:15:00.000Z",
+     "from": "2026-10-30T11:15:00.000Z",
+     "reason": "過去または埋まった枠から、媒体別の未来の空き枠へ繰り延べ"
+    }
+   ]
+  }
+ }
+]

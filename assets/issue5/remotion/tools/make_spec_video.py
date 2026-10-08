@@ -1,5 +1,5 @@
 """2026-10-10以降の動画（V1〜V5）の声と台本データ（props/*.json）を作る。
-- 声：ローカルの VOICEVOX Nemo 0.24.0（127.0.0.1:50121）、女声1・ノーマル（speaker 10005）。専門語はひらがなで書く（読み間違い防止）。
+- 声：ローカルの VOICEVOX Nemo 0.24.0（127.0.0.1:50121）、女声1・ノーマル（speaker 10005）。専門語はひらがなで書く（読み間違い防止）。小数はカタカナで1桁ずつ（「れいてんはち…」は「は」を「わ」と読まれた。2026-10-09）。
 - 画面：public/screens（キリドリ v66）・public/screens-h（ハリナビ V26.09.064）の実画面の切り抜き。
 - 声の中の「|」は、画面に枠や画像を出す時刻の目印（VOICEVOXの音の長さから時刻を計算する）。
 使い方：VOICEVOX Nemo を起動してから  python tools/make_spec_video.py [v1 v2 ...]
@@ -156,7 +156,7 @@ def scenes_v2():
                   build=lambda c: stack([H("input-load.png", 800), H("input-span.png", 800), H("input-steel.png", 800)], 330)))
     s.append(dict(headline="単純支持のとき", voice="たんじゅんしじでは、|たわみ、さんてんよんミリ。", caption="単純支持：たわみ3.4mm", note=HARI_NOTE, min=125,
                   build=lambda c: stack([H("input-support-simple.png", 780), H("check2-simple.png", 900, marks=[{"x": 0.0, "y": 0.36, "w": 0.46, "h": 0.30, "at": c[0]}])], 330, gap=24)))
-    s.append(dict(headline="両端固定のとき", voice="りょうたんこていでは、|たわみ、れいてんはちじゅうごミリです。", caption="両端固定：たわみ0.85mm", note=HARI_NOTE, min=125,
+    s.append(dict(headline="両端固定のとき", voice="りょうたんこていでは、|たわみ、レイテンハチゴミリです。", caption="両端固定：たわみ0.85mm", note=HARI_NOTE, min=125,
                   build=lambda c: stack([H("input-support-fixed.png", 780), H("check2-fixed.png", 900, marks=[{"x": 0.0, "y": 0.36, "w": 0.46, "h": 0.30, "at": c[0]}])], 330, gap=24)))
     s.append(dict(headline="支え方の設定を確認", voice="じっさいのささえかたにあうせっていを、かくにんします。いちじしょうさのほじょです。さいしゅうはんだんは、せんもんかです。", caption="一次照査の補助です。\n最終判断は専門家。", note=HARI_NOTE, min=150,
                   build=lambda c: stack([H("check2-simple.png", 780, label="単純支持"), H("check2-fixed.png", 780, label="両端固定")], 322)))
@@ -271,10 +271,14 @@ def scenes_v6():
     return s
 
 
+DIAG_NOTE = ["説明図（曲がりは大きく描いています）", "一次照査の補助です。最終判断は専門家。"]
+
+
 def scenes_v7():
+    """11/5 ハリナビ：梁が曲がるアニメの説明図＋実画面（2026-10-09 ばる「アニメーションで作ってよ」→「梁が曲がるアニメ図」）。"""
     s = []
-    s.append(dict(headline="比べる前に、条件", voice="たわみをくらべるまえに、にゅうりょくじょうけんを、かくにんします。", caption="比べる前に、入力条件", note=HARI_NOTE, min=120,
-                  build=lambda c: stack([H("input-support-simple.png", 780, label="単純支持"), H("input-support-fixed.png", 780, label="両端固定")], 322, gap=24)))
+    s.append(dict(headline="支え方で変わる？", voice="おなじはりに、おなじにもつ。ささえかたで、まがりかたは、かわるでしょうか。", caption="同じ梁、同じ荷物。\n支え方で変わる？", note=DIAG_NOTE, min=150,
+                  diagram={"mode": "both", "start": 8}, build=lambda c: []))
 
     def s2(c):
         its = stack([H("input-load.png", 800), H("input-span.png", 800), H("input-steel.png", 800)], 330)
@@ -283,25 +287,27 @@ def scenes_v7():
         return its
 
     s.append(dict(headline="同じ荷重・長さ・断面", voice="どうさかくにんようのれいです。つりには、にトン。|スパンは、さんぜんミリ。|だんめんも、おなじです。", caption="吊り荷2t／スパン3,000mm／\nH-150×150×7×10", note=HARI_NOTE, min=150, build=s2))
+    s.append(dict(headline="単純支持", voice="たんじゅんしじは、はしが、くるっとまわれる、ささえかた。|まんなかが、さがります。", caption="端は回れる。\n真ん中が下がる", note=DIAG_NOTE, min=150,
+                  diagram={"mode": "simple", "start": 8}, build=lambda c: []))
+    s.append(dict(headline="両端固定", voice="りょうたんこていは、はしが、まわらないように、とめるささえかた。|たんじゅんしじより、さがりかたは、ちいさくなります。", caption="端は回らない。\n下がり方は小さい", note=DIAG_NOTE, min=160,
+                  diagram={"mode": "fixed", "start": 8}, build=lambda c: []))
 
-    def s3(c):
+    def s6(c):
         its = stack([H("check2-simple.png", 800, label="単純支持"), H("check2-fixed.png", 800, label="両端固定")], 322)
         for it in its:
             it.marks = [{"x": 0.0, "y": 0.36, "w": 0.46, "h": 0.30, "at": c[0]}]
         return its
 
-    s.append(dict(headline="変えたのは支え方", voice="かえたのは、ささえかたのせってい。|けっかも、かわりました。", caption="たわみ 3.419mm／0.85mm", note=HARI_NOTE, min=130, capdelay=lambda c: c[0] + 4, build=s3))
-    s.append(dict(headline="実際の支え方は？", voice="ちいさいかずじをえらぶまえに、じっさいのささえかたを、かくにんします。", caption="小さい数字を選ぶ前に、\n実際の支え方を確認", note=HARI_NOTE, min=130,
+    s.append(dict(headline="ハリナビの計算では", voice="ハリナビのけいさんでは、|たわみ、サンテンヨンイチキュウミリと、レイテンハチゴミリでした。", caption="たわみ 3.419mm／0.85mm", note=HARI_NOTE, min=150, capdelay=lambda c: c[0] + 4, build=s6))
+    s.append(dict(headline="実際の支え方は？", voice="ちいさいかずじをえらぶまえに、じっさいのささえかたに、あうせっていか、かくにんします。いちじしょうさのほじょです。さいしゅうはんだんは、せんもんかです。", caption="一次照査の補助です。\n最終判断は専門家。", note=HARI_NOTE, min=170,
                   build=lambda c: stack([H("input-support-simple.png", 780, label="単純支持"), H("input-support-fixed.png", 780, label="両端固定")], 322, gap=24)))
-    s.append(dict(headline="条件と結果をセットで", voice="にゅうりょくじょうけんと、けっかを、セットでみかえします。いちじしょうさのほじょです。さいしゅうはんだんは、せんもんかです。", caption="一次照査の補助です。\n最終判断は専門家。", note=HARI_NOTE, min=160,
-                  build=lambda c: stack([H("check2-simple.png", 780, label="単純支持"), H("check2-fixed.png", 780, label="両端固定")], 322)))
     return s
 
 
 # 案内役のキャラクター（2026-10-09 ばる「ハリナビの動画もキャラクターいれようよ！」）。
 # 声はそのキャラの声で読み、口パクは声の大きさから作る。画面の切り抜きは左側（x 50〜740）に寄せ、右下にキャラを立たせる。
 GUIDES = {
-    "v7": dict(voice=10004, rigs=["sekkei/s2-3", "sekkei/s1-1", "sekkei/s1-4"], poses=["sekkei/s2-3", "sekkei/s1-1", "sekkei/s1-1", "sekkei/s1-4", "sekkei/s2-3"],
+    "v7": dict(voice=10004, rigs=["sekkei/s2-3", "sekkei/s1-1", "sekkei/s1-4"], poses=["sekkei/s2-3", "sekkei/s1-1", "sekkei/s1-1", "sekkei/s1-1", "sekkei/s1-1", "sekkei/s1-4"],
                x=885, feetY=1050, height=440, captionRight=330),
 }
 AREA = (50, 740)
@@ -371,6 +377,7 @@ def build(name):
             "captionDelay": min(frames - 40, sc["capdelay"](cues) if "capdelay" in sc else 40),
             "frames": frames, "lead": LEAD, "voice": f"{name}/voice-{i}.wav",
             **({"pose": guide["poses"][i], "mouth": mouth_env(out / f"voice-{i}.wav")} if guide else {}),
+            **({"diagram": sc["diagram"]} if "diagram" in sc else {}),
             "items": [
                 {"dir": it.dir, "file": it.file, "srcW": it.srcW, "srcH": it.srcH, **({"crop": {"x": it.crop[0], "y": it.crop[1], "w": it.crop[2], "h": it.crop[3]}} if it.crop else {}),
                  "left": it.left, "top": it.top, "width": it.width, "appear": it.appear, **({"hide": it.hide} if it.hide is not None else {}),

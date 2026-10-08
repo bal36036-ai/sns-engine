@@ -6,6 +6,7 @@ import { Headline } from "./Headline";
 import { SceneFrame } from "./SceneFrame";
 import { Mark } from "./Screen";
 import { PuppetDog, Rig } from "./PuppetDog";
+import { BeamDiagram, BeamDiagramSpec } from "./BeamDiagram";
 import { COLORS, FONT } from "./theme";
 
 // 台本のデータ（props/*.json。tools/make_spec_video.py が作る）から、実画面＋声＋字幕の動画を組み立てる。
@@ -37,6 +38,7 @@ export type SpecScene = {
   items: SpecItem[];
   pose?: string; // 案内役の絵（guide.rigs のキー）
   mouth?: number[]; // 案内役の口の開き（声の大きさ、1フレームごと）
+  diagram?: BeamDiagramSpec; // 梁が曲がるアニメの説明図（画面の切り抜きの代わり）
 };
 // 案内役のキャラクター（右下に立って、口パクしながら説明する）。無ければ今までどおり画面と字幕だけ
 export type SpecGuide = { x: number; feetY: number; height: number; captionRight: number; rigs: Record<string, Rig> };
@@ -113,6 +115,7 @@ const Scene: React.FC<{ scene: SpecScene; guide?: SpecGuide; offset: number }> =
     {scene.items.map((it, i) => (
       <Item key={i} it={it} index={i} />
     ))}
+    {scene.diagram ? <BeamDiagram spec={scene.diagram} /> : null}
     {guide ? <Guide g={guide} scene={scene} offset={offset} /> : null}
     <Caption text={scene.caption} delay={scene.captionDelay} right={guide?.captionRight} />
     <Audio src={staticFile(`audio/${scene.voice}`)} from={scene.lead} volume={1} />

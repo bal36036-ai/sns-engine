@@ -45,6 +45,20 @@ OPS = {
                 texts=[],
                 lines=[dict(who="kantoku", text="先に出すの、\nこれ。", voice="さきに、だすの、これ。", start=6, size=46, box=dict(left=620, right=30, bottom=60)),
                        dict(who="shuna", text="……いちばん\n下だね。", voice="……いちばん、した、だね。", start=66, size=46, box=dict(left=620, right=30, bottom=60))]),
+    # 案4の代案「同じ輪郭、穴は逆。」（前半）：①新人が部材の外周をなぞって「ぴったり。」②黒シュナの指が図の穴を指し、部材の穴へ動く「穴、反対側だよ。」。口が動く後半は skit-13
+    "s4a": dict(bg="scene/op/op4_bg.png", zoom=[1.0, 1.06], label="作業台", min=140,
+                layers=[
+                    dict(file="scene/op/op4_part.png", width=440, z=10, keys=[dict(at=0, pose=dict(x=290, y=650))]),
+                    dict(file="scene/op/op4_draw.png", width=440, z=11, keys=[dict(at=0, pose=dict(x=790, y=650))]),
+                    dict(file="scene/op/op3_paw.png", width=520, z=30, keys=[
+                        dict(at=0, pose=dict(x=-170, y=548)), dict(at=14, pose=dict(x=-30, y=548)), dict(at=34, pose=dict(x=150, y=548)),
+                        dict(at=46, pose=dict(x=150, y=560)), dict(at=70, pose=dict(x=-200, y=560))]),
+                    dict(file="scene/op/op2_point.png", width=600, z=40, keys=[
+                        dict(at=0, pose=dict(x=1500, y=690, rot=-8)), dict(at=44, pose=dict(x=1500, y=690, rot=-8)), dict(at=62, pose=dict(x=1170, y=690, rot=-8)),
+                        dict(at=94, pose=dict(x=1170, y=690, rot=-8)), dict(at=116, pose=dict(x=520, y=660, rot=-8)), dict(at=150, pose=dict(x=520, y=660, rot=-8))])],
+                texts=[],
+                lines=[dict(who="shinjin", text="ぴったり。", voice="ぴったり。", start=14, box=dict(left=70, right=70, bottom=40)),
+                       dict(who="shuna", text="穴、反対側だよ。", voice="あな、はんたいがわだよ。", start=66, box=dict(left=70, right=70, bottom=40))]),
     # 案3（本編の前半）：①新人「ここ、読めない。」→ ②設計がマグネットをずらす「……私が隠してた。」。口が動く後半は skit-9（make_skit_batch.py）
     "s3a": dict(bg="scene/op/op3_bg.png", zoom=[1.0, 1.06], label="作業台", min=150,
                 layers=[

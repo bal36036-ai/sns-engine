@@ -120,6 +120,11 @@ SKITS = {
                      dict(note="キリドリの実際の画面（動作確認用の例）", foot="部材A 2,500mm／部材B 1,800mm",
                           items=[dict(dir="screens", file="parts.png", w=820, crop=(0, 0.1, 1, 0.42), marks=[dict(x=0.0, y=0.27, w=1.0, h=0.27, at=50), dict(x=0.0, y=0.64, w=1.0, h=0.27, at=95)])])),
                     ("shuna", "似ていても、\n同じとは限らないね", "にていても、おなじとは、かぎらないね。", {"shinjin": "shinjin/s1-3", "shuna": "shuna/s1_1-1"})]),
+    # 案4の代案の後半（口が動く場面）。前半は make_opening.py の s4a（手元の寄り）。最後は問いかけではなく、気づきの一言（ChatGPT代案）。
+    13: dict(title="同じ輪郭、穴は逆。（後半）", enter_end=0, scale=1.4,
+             enter={},
+             fixed={"shinjin": L_X, "shuna": R_X},
+             lines=[("shinjin", "外側しか、\n見てなかった。", "そとがわ、しか、みてなかった。", {"shinjin": "shinjin/s1-3", "shuna": "shuna/s1_1-1"})]),
 }
 INSERT_NOTE = "ハリナビの実際の画面（動作確認用の例）"
 INSERT_FOOT = "一次照査の補助です。最終判断は専門家。"

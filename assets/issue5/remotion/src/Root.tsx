@@ -14,6 +14,7 @@ import { calcPuppetMetadata, PuppetDemo } from "./PuppetDemo";
 import { calcPuppetCastMetadata, PuppetCast } from "./PuppetCast";
 import { calcWorkshopCastMetadata, WorkshopCast } from "./WorkshopCast";
 import { calcWorkSceneMetadata, WorkScene } from "./WorkScene";
+import { calcVeoMetadata, VeoFinish } from "./VeoFinish";
 
 // 台本データ（props/*.json）から作る動画。render時に --props=props/<名前>.json を渡す。
 const EMPTY_SPEC = { scenes: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.37 };
@@ -67,6 +68,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="PuppetCast" component={PuppetCast} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ cast: {}, rigs: {}, lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.28, credit: "" }} calculateMetadata={calcPuppetCastMetadata} />
       <Composition id="WorkshopCast" component={WorkshopCast} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ cast: {}, rigs: {}, lines: [], bg: "scene/bg_workshop.png", bgm: "bgm-pop-long.wav", bgmVolume: 0.28, credit: "" }} calculateMetadata={calcWorkshopCastMetadata} />
       <Composition id="WorkScene" component={WorkScene} width={W} height={H} fps={FPS} durationInFrames={30} defaultProps={{ actors: {}, rigs: {}, sizes: {}, lines: [], bg: "scene/bg_workshop.png", bgm: "bgm-pop-long.wav", bgmVolume: 0.28, credit: "", total: 30 }} calculateMetadata={calcWorkSceneMetadata} />
+      <Composition id="VeoFinish" component={VeoFinish} width={1080} height={1920} fps={FPS} durationInFrames={30} defaultProps={{ clip: "veo/clip1.mp4", last: "veo/clip1-last.png", clipFrames: 300, total: 300, title: "", lines: [], bgm: "bgm-pop-long.wav", bgmVolume: 0.12, clipVolume: 0.6, credit: "" }} calculateMetadata={calcVeoMetadata} />
       <Composition id="SortOrderVideo" component={SortOrderVideo} width={W} height={H} fps={FPS} durationInFrames={TOTAL_FRAMES} />
     </>
   );

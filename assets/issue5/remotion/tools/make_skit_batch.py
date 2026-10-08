@@ -75,7 +75,25 @@ SKITS = {
             lines=[("kantoku", "こっちの作業、\nもう終わりました？", "こっちの、さぎょう、もう、おわりました？", {"kantoku": "kantoku/s1-1", "shuna": "table"}),
                    ("shuna", "終わったよ。\n伝えるの、忘れてた", "おわったよ。つたえるの、わすれてた", {"kantoku": "kantoku/s1-3", "shuna": "shuna/t-2"}),
                    ("shuna", "みなさんは、作業が終わった合図、\nどうしていますか？", "みなさんは、さぎょうが、おわった、あいず、どうしてますか？", {"kantoku": "kantoku/s1-1", "shuna": "shuna/t-1"})]),
+    # 11/5 ハリナビ（2026-10-09 ばる「会話劇と同じ見た目」「現場のハリが何トン持つとかそういうのがいいかな」）。
+    # 「何トンまで大丈夫」とは言わない（一次照査の補助まで。参考最大荷重は投稿で使わない）。2tを吊るときの照査を、実画面で見せる。
+    8: dict(title="この梁、何トンまで吊れる？", credit="げんばアプリ工房｜キャラクターの絵：AIで作成／音声：VOICEVOX Nemo",
+            enter={"kantoku": ("walk", None, L_X)},
+            fixed={"sekkei": R_X},
+            lines=[("kantoku", "この梁、\n何トンまで吊れる？", "このはり、なんトンまで、つれる？", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s1-1"}),
+                   ("sekkei", "梁の大きさと長さ、\n支え方で変わるんです", "はりの、おおきさと、ながさ、ささえかたで、かわるんです。", {"kantoku": "kantoku/s1-3", "sekkei": "sekkei/s2-3"}),
+                   ("kantoku", "じゃあ、\n2t吊るなら？", "じゃあ、にトン、つるなら？", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s2-3"}),
+                   ("sekkei", "ハリナビに条件を入れて、\n確かめます", "ハリナビに、じょうけんをいれて、たしかめます。どうさかくにんようのれいです。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s1-1"},
+                    dict(items=[("input-load.png", 680), ("input-span.png", 680), ("input-steel.png", 680), ("input-support-simple.png", 680)])),
+                   ("sekkei", "曲げとたわみを、\n許容値と比べます", "まげと、たわみを、きょようちと、くらべます。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s1-1"},
+                    dict(items=[("check1-simple.png", 820, [{"x": 0.0, "y": 0.36, "w": 0.46, "h": 0.30, "at": 14}]), ("check2-simple.png", 820, [{"x": 0.0, "y": 0.36, "w": 0.46, "h": 0.30, "at": 30}])])),
+                   ("kantoku", "数字で見ると、\n分かりやすいね", "かずじでみると、わかりやすいね。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s1-1"}),
+                   ("sekkei", "判定に入っていない項目も、\n画面で確認します", "はんていに、はいっていない、こうもくも、がめんで、かくにんします。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s1-4"},
+                    dict(items=[("judgement-simple.png", 820), ("unevaluated.png", 820)])),
+                   ("sekkei", "一次照査の補助です。\n最終判断は専門家。", "いちじしょうさの、ほじょです。さいしゅうはんだんは、せんもんかです。", {"kantoku": "kantoku/s1-1", "sekkei": "sekkei/s2-3"})]),
 }
+INSERT_NOTE = "ハリナビの実際の画面（動作確認用の例）"
+INSERT_FOOT = "一次照査の補助です。最終判断は専門家。"
 
 
 def rig(name):
@@ -93,10 +111,11 @@ def build(no):
     ENTER_END = 50
     t = ENTER_END + 6
     lines, starts = [], []
-    for i, (who, text, voice, poses) in enumerate(sk["lines"]):
+    for i, ln0 in enumerate(sk["lines"]):
+        who, text, voice, poses = ln0[:4]
         c = CAST[who]
         d, mouth = synth(voice, out / f"line-{i}.wav", c["voice"], c["pitch"])
-        frames = max(55, math.ceil((LEAD / FPS + d + TAIL) * FPS))
+        frames = max(135 if len(ln0) > 4 else 55, math.ceil((LEAD / FPS + d + TAIL) * FPS))  # 画面を見せる台詞は4.5秒以上
         lines.append({"start": t, "speaker": who, "text": text, "voice": f"{name}/line-{i}.wav", "lead": LEAD, "mouth": mouth, "frames": frames})
         starts.append(t)
         t += frames + 4
@@ -133,8 +152,21 @@ def build(no):
         for tr in a["tracks"]:
             if tr["kind"] == "rig" and tr["rig"] not in rigs:
                 rigs[tr["rig"]] = rig(tr["rig"])
+    inserts = []
+    for i, ln0 in enumerate(sk["lines"]):
+        if len(ln0) < 5:
+            continue
+        nxt_has = i + 1 < len(lines) and len(sk["lines"][i + 1]) > 4  # 続けて画面を見せるときは、枠を消さずに重ねて切り替える
+        end = (lines[i + 1]["start"] + (12 if nxt_has else -2)) if i + 1 < len(lines) else total - 10
+        prev_has = i > 0 and len(sk["lines"][i - 1]) > 4
+        items = []
+        for it in ln0[4]["items"]:
+            f, w = it[0], it[1]
+            sw, sh = Image.open(ROOT / "public" / "screens-h" / f).size
+            items.append({"dir": "screens-h", "file": f, "srcW": sw, "srcH": sh, "width": w, "marks": it[2] if len(it) > 2 else []})
+        inserts.append({"start": lines[i]["start"] + (0 if prev_has else 4), "end": end, "note": INSERT_NOTE, "foot": INSERT_FOOT, "items": items})
     props = {"actors": actors, "rigs": rigs, "sizes": SIZES, "lines": lines, "bg": "scene/bg_workshop.png", "bgm": "bgm-pop-long.wav", "bgmVolume": 0.26,
-             "credit": "げんばアプリ工房｜音声：VOICEVOX Nemo", "total": total}
+             "credit": sk.get("credit", "げんばアプリ工房｜音声：VOICEVOX Nemo"), "total": total, **({"inserts": inserts} if inserts else {})}
     (ROOT / "props" / f"{name}.json").write_text(json.dumps(props, ensure_ascii=False), encoding="utf-8")
     print(f"{name}「{sk['title']}」: {total / FPS:.1f}秒")
 

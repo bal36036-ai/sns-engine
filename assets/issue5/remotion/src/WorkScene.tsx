@@ -3,6 +3,7 @@ import { AbsoluteFill, Easing, Img, interpolate, Sequence, staticFile, useCurren
 import type { CalculateMetadataFunction } from "remotion";
 import { PuppetDog, Rig } from "./PuppetDog";
 import { WorkshopBg } from "./WorkshopBg";
+import { Mark } from "./Screen";
 import { COLORS, FONT } from "./theme";
 
 // 加工場で「作業している → 仲間が歩いてくる → 話す」を、時間の流れ（トラック）で動かす。
@@ -13,7 +14,41 @@ export type Track =
   | { kind: "rig"; start: number; end: number; rig: string; height: number; x?: number; tilt?: number };
 export type Actor = { name: string; color: string; x: number; tracks: Track[] };
 export type WLine = { start: number; speaker: string; text: string; voice: string; lead: number; mouth: number[]; frames: number };
-export type WorkSceneProps = { actors: Record<string, Actor>; rigs: Record<string, Rig>; sizes: Record<string, [number, number]>; lines: WLine[]; bg: string; bgm: string; bgmVolume: number; credit: string; total: number };
+// アプリの画面を、タブレット風の枠で大きく見せる（会話の途中で）。items は上から順に並べる。marks の at は枠が出てからのフレーム
+export type InsertItem = { dir: string; file: string; srcW: number; srcH: number; crop?: { x: number; y: number; w: number; h: number }; width: number; marks?: { x: number; y: number; w: number; h: number; at: number }[] };
+export type Insert = { start: number; end: number; note: string; foot: string; items: InsertItem[] };
+export type WorkSceneProps = { actors: Record<string, Actor>; rigs: Record<string, Rig>; sizes: Record<string, [number, number]>; lines: WLine[]; bg: string; bgm: string; bgmVolume: number; credit: string; total: number; inserts?: Insert[] };
+
+const InsertPanel: React.FC<{ ins: Insert }> = ({ ins }) => {
+  const frame = useCurrentFrame();
+  const dur = ins.end - ins.start;
+  const fade = interpolate(frame, [0, 8, dur - 8, dur], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const s = interpolate(frame, [0, 12], [0.9, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  return (
+    <>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,10,0.45)", opacity: fade }} />
+      <div style={{ position: "absolute", left: 80, right: 80, top: 330, opacity: fade, scale: `${s}`, padding: 16, borderRadius: 34, background: COLORS.navy, boxShadow: "0 24px 50px rgba(0,0,0,0.45)" }}>
+        <div style={{ borderRadius: 22, background: "#F8F4EC", padding: "16px 22px 18px", display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+          <div style={{ alignSelf: "stretch", fontFamily: FONT, fontSize: 30, fontWeight: 800, color: COLORS.muted }}>{ins.note}</div>
+          {ins.items.map((it, i) => {
+            const c = it.crop ?? { x: 0, y: 0, w: 1, h: 1 };
+            const sc = it.width / (c.w * it.srcW);
+            const h = Math.round(c.h * it.srcH * sc);
+            return (
+              <div key={i} style={{ position: "relative", width: it.width, height: h, overflow: "hidden", borderRadius: 14, border: `2px solid ${COLORS.line}`, background: COLORS.white }}>
+                <Img src={staticFile(`${it.dir}/${it.file}`)} style={{ position: "absolute", left: -c.x * it.srcW * sc, top: -c.y * it.srcH * sc, width: it.srcW * sc, height: it.srcH * sc }} />
+                {(it.marks ?? []).map((m, k) => (
+                  <Mark key={k} x={m.x} y={m.y} w={m.w} h={m.h} at={m.at} width={it.width} height={h} />
+                ))}
+              </div>
+            );
+          })}
+          <div style={{ alignSelf: "stretch", fontFamily: FONT, fontSize: 30, fontWeight: 900, color: COLORS.orange }}>{ins.foot}</div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const FEET_Y = 1015;
 
@@ -73,6 +108,11 @@ export const WorkScene: React.FC<WorkSceneProps> = (p) => (
     <WorkshopBg src={p.bg} />
     {Object.entries(p.actors).map(([id, a], n) => (
       <ActorView key={id} id={id} a={a} p={p} seed={n * 5} />
+    ))}
+    {(p.inserts ?? []).map((ins, i) => (
+      <Sequence key={`ins-${i}`} from={ins.start} durationInFrames={ins.end - ins.start} name={`画面 ${i + 1}`}>
+        <InsertPanel ins={ins} />
+      </Sequence>
     ))}
     <Audio src={staticFile(`audio/${p.bgm}`)} volume={(f) => p.bgmVolume * interpolate(f, [p.total - 30, p.total], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })} />
     {p.lines.map((l, i) => (

@@ -6,7 +6,7 @@ import { COLORS, FONT } from "./theme";
 // 会話劇の「最初の2秒」の試作（2026-10-09 ChatGPT企画 案2・案3）。手元の寄りの絵（背景）の上で、
 // メモ・指・マグネットなどの切り抜き（layers）を動かし、話す人の一言（line）を出す。数字はAIの絵に描かせず、文字（texts）で重ねる。
 type Pose = { x: number; y: number; scale?: number; rot?: number; opacity?: number };
-export type OpLayer = { file: string; width: number; keys: { at: number; pose: Pose }[]; z?: number };
+export type OpLayer = { file: string; width: number; keys: { at: number; pose: Pose }[]; z?: number; origin?: [number, number]; noShadow?: boolean; fadeStart?: boolean };
 export type OpText = { text: string; x: number; y: number; size: number; color?: string; rot?: number; z?: number };
 export type OpLine = { start: number; name: string; color: string; text: string; voice: string; lead: number; size?: number; box?: { left: number; right: number; top?: number; bottom?: number } };
 export type OpeningProps = { bg: string; zoom: [number, number]; layers: OpLayer[]; texts: OpText[]; lines: OpLine[]; label?: string; total: number; credit: string };
@@ -60,7 +60,8 @@ export const Opening: React.FC<OpeningProps> = (p) => {
             );
           }
           const ps = poseAt(it.l.keys, f);
-          return <Img key={i} src={staticFile(it.l.file)} style={{ position: "absolute", left: ps.x, top: ps.y, width: it.l.width, translate: "-50% -50%", scale: `${ps.scale ?? 1}`, rotate: `${ps.rot ?? 0}deg`, opacity: ps.opacity ?? 1, filter: "drop-shadow(0 8px 10px rgba(0,0,0,0.25))" }} />;
+          const [ox, oy] = it.l.origin ?? [0.5, 0.5]; // 回転・拡大の中心（腕なら肩＝袖の端）。ここが (x, y) に来る
+          return <Img key={i} src={staticFile(it.l.file)} style={{ position: "absolute", left: ps.x, top: ps.y, width: it.l.width, transformOrigin: `${ox * 100}% ${oy * 100}%`, translate: `${-ox * 100}% ${-oy * 100}%`, scale: `${ps.scale ?? 1}`, rotate: `${ps.rot ?? 0}deg`, opacity: ps.opacity ?? 1, ...(it.l.noShadow ? {} : { filter: "drop-shadow(0 8px 10px rgba(0,0,0,0.25))" }), ...(it.l.fadeStart ? { maskImage: `linear-gradient(${ox < 0.5 ? "to right" : "to left"}, transparent 0%, #000 16%)`, WebkitMaskImage: `linear-gradient(${ox < 0.5 ? "to right" : "to left"}, transparent 0%, #000 16%)` } : {}) }} />;
         })}
       </div>
       {p.label ? <div style={{ position: "absolute", left: 40, top: 36, padding: "8px 20px", borderRadius: 12, background: "rgba(31,45,61,0.8)", color: COLORS.white, fontFamily: FONT, fontSize: 34, fontWeight: 800 }}>{p.label}</div> : null}

@@ -76,6 +76,44 @@ OPS = {
 }
 
 
+def s3b():
+    """案3の改善版（ChatGPT修正依頼）：腕を肩から伸ばし（袖の端を肩に固定して回す）、新人が数字の場所を目で追う → 指が止まる → 設計が気づいて（表情）腕を伸ばしてマグネットをずらす → 数字が見えたあと、2匹が目を合わせる。
+    表情は、元の絵の頭の部分だけを差し替える（public/scene/op/op3p_*.png、prep_op3_variants.py）。"""
+    pub = ROOT / "public" / "scene" / "op"
+    A_C = (150, 440)  # 新人の肩（画面左側）
+    A_P = (600, 445)  # 設計の肩（画面左側）
+    layers = [
+        dict(file="scene/op/op3_magnet.png", width=150, z=20, keys=[
+            dict(at=0, pose=dict(x=540, y=718)), dict(at=86, pose=dict(x=540, y=718)), dict(at=114, pose=dict(x=735, y=722, rot=40))]),
+        # 新人の腕：肩 → 寸法線の左 → 真ん中のすき間へなぞって止まる
+        dict(file="scene/op/op3_paw.png", width=560, z=30, origin=[0.0, 0.5], noShadow=True, fadeStart=True, keys=[
+            dict(at=0, pose=dict(x=A_C[0], y=A_C[1], rot=84, scale=0.3, opacity=0)), dict(at=8, pose=dict(x=A_C[0], y=A_C[1], rot=78, scale=0.5, opacity=1)),
+            dict(at=34, pose=dict(x=A_C[0], y=A_C[1], rot=44.5, scale=0.7, opacity=1)), dict(at=120, pose=dict(x=A_C[0], y=A_C[1], rot=44.5, scale=0.7, opacity=1)),
+            dict(at=140, pose=dict(x=A_C[0], y=A_C[1], rot=60, scale=0.45, opacity=0))]),
+        # 設計の腕：肩から下へ伸ばして、マグネットを右へずらす
+        dict(file="scene/op/op3_paw2.png", width=560, z=40, origin=[1.0, 0.5], noShadow=True, fadeStart=True, keys=[
+            dict(at=0, pose=dict(x=A_P[0], y=A_P[1], rot=-80, scale=0.3, opacity=0)), dict(at=58, pose=dict(x=A_P[0], y=A_P[1], rot=-80, scale=0.3, opacity=0)),
+            dict(at=72, pose=dict(x=A_P[0], y=A_P[1], rot=-77.6, scale=0.5, opacity=1)), dict(at=86, pose=dict(x=A_P[0], y=A_P[1], rot=-77.6, scale=0.5, opacity=1)),
+            dict(at=114, pose=dict(x=A_P[0], y=A_P[1], rot=-116, scale=0.55, opacity=1)), dict(at=132, pose=dict(x=A_P[0], y=A_P[1], rot=-100, scale=0.35, opacity=0))]),
+    ]
+    def patch(name, a, b, c, d):  # a→b で出して、c→d で消す（頭の差分）
+        f = pub / f"op3p_{name}.png"
+        if f.exists():
+            layers.append(dict(file=f"scene/op/op3p_{name}.png", width=1080, z=5, noShadow=True, keys=[
+                dict(at=0, pose=dict(x=540, y=540, opacity=0)), dict(at=a, pose=dict(x=540, y=540, opacity=0)), dict(at=b, pose=dict(x=540, y=540, opacity=1)),
+                dict(at=c, pose=dict(x=540, y=540, opacity=1)), dict(at=d, pose=dict(x=540, y=540, opacity=0 if d < 9999 else 1))]))
+    patch("p_notice", 46, 54, 104, 114)   # 設計が気づく（指のあたりを見て、眉が上がる）
+    patch("p_sorry", 108, 118, 9998, 9999)  # 数字が出たあと、新人を見て照れる
+    patch("c_relief", 120, 130, 9998, 9999)  # 新人がほっとして設計を見る
+    return dict(bg="scene/op/op3_bg.png", zoom=[1.0, 1.04], label="作業台", min=150, layers=layers,
+                texts=[dict(text="3,000", x=540, y=708, size=46, z=10)],
+                lines=[dict(who="shinjin", text="ここ、読めない。", voice="ここ、よめない。", start=12),
+                       dict(who="sekkei", text="……私が隠してた。", voice="……わたしが、かくしてた。", start=72)])
+
+
+OPS["s3b"] = s3b()
+
+
 def build(name):
     op = OPS[name]
     out = ROOT / "public" / "audio" / name

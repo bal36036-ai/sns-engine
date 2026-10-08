@@ -1,0 +1,173 @@
+{
+ "scenes": [
+  {
+   "headline": "「OK」はどこまで？",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "OKと、対象外の表示を並べて見る",
+   "captionDelay": 40,
+   "frames": 113,
+   "lead": 14,
+   "voice": "v5/voice-0.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "judgement-simple.png",
+     "srcW": 1036,
+     "srcH": 234,
+     "left": 160,
+     "top": 322,
+     "width": 760,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "unevaluated.png",
+     "srcW": 1036,
+     "srcH": 350,
+     "left": 160,
+     "top": 510,
+     "width": 760,
+     "appear": 24,
+     "marks": []
+    }
+   ]
+  },
+  {
+   "headline": "計算した項目の判定",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "入力・計算済みの項目についての判定",
+   "captionDelay": 40,
+   "frames": 143,
+   "lead": 14,
+   "voice": "v5/voice-1.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "check1-simple.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 230,
+     "top": 322,
+     "width": 620,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "check2-simple.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 230,
+     "top": 491,
+     "width": 620,
+     "appear": 24,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "check4-simple.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 230,
+     "top": 660,
+     "width": 620,
+     "appear": 38,
+     "marks": []
+    }
+   ]
+  },
+  {
+   "headline": "判定に含まれない項目",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "判定に含まれない項目も、画面に表示",
+   "captionDelay": 40,
+   "frames": 218,
+   "lead": 14,
+   "voice": "v5/voice-2.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "unevaluated.png",
+     "srcW": 1036,
+     "srcH": 350,
+     "left": 90,
+     "top": 330,
+     "width": 900,
+     "appear": 10,
+     "marks": [
+      {
+       "x": 0.01,
+       "y": 0.22,
+       "w": 0.98,
+       "h": 0.46,
+       "at": 20
+      },
+      {
+       "x": 0.01,
+       "y": 0.69,
+       "w": 0.98,
+       "h": 0.3,
+       "at": 105
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "結果と範囲をセットで",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "一次照査の補助です。\n最終判断は専門家。",
+   "captionDelay": 40,
+   "frames": 249,
+   "lead": 14,
+   "voice": "v5/voice-3.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "judgement-simple.png",
+     "srcW": 1036,
+     "srcH": 234,
+     "left": 160,
+     "top": 322,
+     "width": 760,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "unevaluated.png",
+     "srcW": 1036,
+     "srcH": 350,
+     "left": 160,
+     "top": 510,
+     "width": 760,
+     "appear": 24,
+     "marks": []
+    }
+   ]
+  }
+ ],
+ "bgm": "bgm-pop-long.wav",
+ "bgmVolume": 0.37
+}

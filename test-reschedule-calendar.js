@@ -19,9 +19,10 @@ test("過去の下書きを先に移し、未来の下書きも空き枠へ順�
   const plan = planReschedule(rows, now);
   assert.equal(plan.overdue, 1);
   assert.deepEqual(plan.changes.map((change) => [change.id, change.to]), [
-    ["old", "2026-09-25T00:30:00.000Z"],
-    ["today", "2026-09-26T00:30:00.000Z"],
-    ["next", "2026-09-26T08:00:00.000Z"],
+    // 2026-10-08 ばる決定：Threadsは1日1本（9:30のみ）。9/25は固定のlegacyで埋まっているので9/26から1日1本ずつ
+    ["old", "2026-09-26T00:30:00.000Z"],
+    ["today", "2026-09-27T00:30:00.000Z"],
+    ["next", "2026-09-28T00:30:00.000Z"],
   ]);
   assert.ok(plan.changes.every((change) => change.id !== "legacy"));
 });

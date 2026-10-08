@@ -1,0 +1,227 @@
+{
+ "scenes": [
+  {
+   "headline": "支え方で、たわみは？",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "たわみ3.4mm／0.85mm。何を変えた？",
+   "captionDelay": 40,
+   "frames": 110,
+   "lead": 14,
+   "voice": "v2/voice-0.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "check2-simple.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 140,
+     "top": 372,
+     "width": 800,
+     "appear": 10,
+     "label": "単純支持",
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "check2-fixed.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 140,
+     "top": 640,
+     "width": 800,
+     "appear": 24,
+     "label": "両端固定",
+     "marks": []
+    }
+   ]
+  },
+  {
+   "headline": "同じ梁、同じ荷重",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "吊り荷2t／スパン3,000mm／\nH-150×150×7×10",
+   "captionDelay": 40,
+   "frames": 140,
+   "lead": 14,
+   "voice": "v2/voice-1.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "input-load.png",
+     "srcW": 984,
+     "srcH": 214,
+     "left": 140,
+     "top": 330,
+     "width": 800,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "input-span.png",
+     "srcW": 984,
+     "srcH": 152,
+     "left": 140,
+     "top": 520,
+     "width": 800,
+     "appear": 24,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "input-steel.png",
+     "srcW": 984,
+     "srcH": 156,
+     "left": 140,
+     "top": 660,
+     "width": 800,
+     "appear": 38,
+     "marks": []
+    }
+   ]
+  },
+  {
+   "headline": "単純支持のとき",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "単純支持：たわみ3.4mm",
+   "captionDelay": 40,
+   "frames": 125,
+   "lead": 14,
+   "voice": "v2/voice-2.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "input-support-simple.png",
+     "srcW": 984,
+     "srcH": 152,
+     "left": 150,
+     "top": 330,
+     "width": 780,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "check2-simple.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 90,
+     "top": 474,
+     "width": 900,
+     "appear": 24,
+     "marks": [
+      {
+       "x": 0.0,
+       "y": 0.36,
+       "w": 0.46,
+       "h": 0.3,
+       "at": 41
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "両端固定のとき",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "両端固定：たわみ0.85mm",
+   "captionDelay": 40,
+   "frames": 139,
+   "lead": 14,
+   "voice": "v2/voice-3.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "input-support-fixed.png",
+     "srcW": 984,
+     "srcH": 152,
+     "left": 150,
+     "top": 330,
+     "width": 780,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "check2-fixed.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 90,
+     "top": 474,
+     "width": 900,
+     "appear": 24,
+     "marks": [
+      {
+       "x": 0.0,
+       "y": 0.36,
+       "w": 0.46,
+       "h": 0.3,
+       "at": 42
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "支え方の設定を確認",
+   "note": [
+    "ハリナビの実際の画面（V26.09.064・動作確認用の例）",
+    "一次照査の補助です。最終判断は専門家。"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": true,
+   "caption": "一次照査の補助です。\n最終判断は専門家。",
+   "captionDelay": 40,
+   "frames": 245,
+   "lead": 14,
+   "voice": "v2/voice-4.wav",
+   "items": [
+    {
+     "dir": "screens-h",
+     "file": "check2-simple.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 150,
+     "top": 372,
+     "width": 780,
+     "appear": 10,
+     "label": "単純支持",
+     "marks": []
+    },
+    {
+     "dir": "screens-h",
+     "file": "check2-fixed.png",
+     "srcW": 1036,
+     "srcH": 262,
+     "left": 150,
+     "top": 635,
+     "width": 780,
+     "appear": 24,
+     "label": "両端固定",
+     "marks": []
+    }
+   ]
+  }
+ ],
+ "bgm": "bgm-pop-long.wav",
+ "bgmVolume": 0.37
+}

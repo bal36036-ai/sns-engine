@@ -12,7 +12,7 @@ const TZ_OFFSET = 9 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const FIRST_DAY = Date.UTC(2026, 8, 24);
 const ACTIVE = new Set(["draft", "ready", "scheduled", "sent"]);
-const TIMES = { threads: ["09:30", "17:00"], instagram: ["12:45"], tiktok: ["18:15"], youtube: ["20:15"], x: ["12:15"] };
+const TIMES = { threads: ["09:30"], instagram: ["12:45"], tiktok: ["18:15"], youtube: ["20:15"], x: ["12:15"] };
 
 function jstKey(date) {
   return new Date(date.getTime() + TZ_OFFSET).toISOString().slice(0, 10);
@@ -29,10 +29,12 @@ function dateAt(key, time) {
 function targets(key) {
   const dow = new Date(`${key}T00:00:00Z`).getUTCDay();
   const all = {
-    threads: 2,
+    // 2026-10-08 ばる決定「減らして質を上げる」：Threads・Xは1日1本。動画（TikTok・YouTube Shorts、同じ動画を週2〜3本）は、
+    // 素材のない定型の下書きを毎晩作らず、ChatGPTの2週間企画（Remotionで制作）から入れる。そのため動画はここでは補充しない。
+    threads: 1,
     instagram: [0, 1, 2, 3, 4].includes(dow) ? 1 : 0,
-    tiktok: [0, 2, 4, 6].includes(dow) ? 1 : 0,
-    youtube: [0, 1, 3, 5].includes(dow) ? 1 : 0,
+    tiktok: 0,
+    youtube: 0,
     x: 1,
   };
   // 自動投稿の対象（buffer-channels.js：Instagramは一時停止中、XはチャンネルID登録後）だけ補充する

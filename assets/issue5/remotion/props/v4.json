@@ -1,0 +1,224 @@
+{
+ "scenes": [
+  {
+   "headline": "追加です。どうなる？",
+   "note": [
+    "キリドリの実際の画面（v66・動作確認用の例）"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": false,
+   "caption": "部材Aの数量は、今は2本",
+   "captionDelay": 40,
+   "frames": 125,
+   "lead": 14,
+   "voice": "v4/voice-0.wav",
+   "items": [
+    {
+     "dir": "screens",
+     "file": "parts.png",
+     "srcW": 1032,
+     "srcH": 764,
+     "left": 220,
+     "top": 290,
+     "width": 640,
+     "appear": 10,
+     "marks": [
+      {
+       "x": 0.765,
+       "y": 0.21,
+       "w": 0.13,
+       "h": 0.12,
+       "at": 38
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "変更前は、定尺2本",
+   "note": [
+    "キリドリの実際の画面（v66・動作確認用の例）"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": false,
+   "caption": "A2,500mm×2／定尺2本／歩留まり91.7%",
+   "captionDelay": 40,
+   "frames": 224,
+   "lead": 14,
+   "voice": "v4/voice-1.wav",
+   "items": [
+    {
+     "dir": "screens",
+     "file": "summary-auto.png",
+     "srcW": 1032,
+     "srcH": 460,
+     "left": 90,
+     "top": 300,
+     "width": 900,
+     "appear": 10,
+     "marks": [
+      {
+       "x": 0.005,
+       "y": 0.005,
+       "w": 0.49,
+       "h": 0.305,
+       "at": 57
+      },
+      {
+       "x": 0.505,
+       "y": 0.345,
+       "w": 0.49,
+       "h": 0.305,
+       "at": 110
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "Aの数量だけ、2→4",
+   "note": [
+    "キリドリの実際の画面（v66・動作確認用の例）"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": false,
+   "caption": "変えるのはAの数量だけ",
+   "captionDelay": 40,
+   "frames": 136,
+   "lead": 14,
+   "voice": "v4/voice-2.wav",
+   "items": [
+    {
+     "dir": "screens",
+     "file": "parts.png",
+     "srcW": 1032,
+     "srcH": 764,
+     "crop": {
+      "x": 0,
+      "y": 0.12,
+      "w": 1,
+      "h": 0.38
+     },
+     "left": 220,
+     "top": 340,
+     "width": 640,
+     "appear": 10,
+     "label": "変更前",
+     "marks": []
+    },
+    {
+     "dir": "screens",
+     "file": "parts-qty4.png",
+     "srcW": 1032,
+     "srcH": 764,
+     "crop": {
+      "x": 0,
+      "y": 0.12,
+      "w": 1,
+      "h": 0.38
+     },
+     "left": 220,
+     "top": 592,
+     "width": 640,
+     "appear": 24,
+     "label": "変更後",
+     "marks": [
+      {
+       "x": 0.765,
+       "y": 0.24,
+       "w": 0.13,
+       "h": 0.3,
+       "at": 61
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "変更後は、定尺3本",
+   "note": [
+    "キリドリの実際の画面（v66・動作確認用の例）"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": false,
+   "caption": "定尺3本／歩留まり88.9%",
+   "captionDelay": 40,
+   "frames": 170,
+   "lead": 14,
+   "voice": "v4/voice-3.wav",
+   "items": [
+    {
+     "dir": "screens",
+     "file": "summary-qty4.png",
+     "srcW": 1032,
+     "srcH": 460,
+     "left": 90,
+     "top": 300,
+     "width": 900,
+     "appear": 10,
+     "marks": [
+      {
+       "x": 0.005,
+       "y": 0.005,
+       "w": 0.49,
+       "h": 0.305,
+       "at": 29
+      },
+      {
+       "x": 0.505,
+       "y": 0.345,
+       "w": 0.49,
+       "h": 0.305,
+       "at": 55
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "headline": "数量を変えたら全体も",
+   "note": [
+    "キリドリの実際の画面（v66・動作確認用の例）"
+   ],
+   "noteTop": 208,
+   "noteAccentLast": false,
+   "caption": "数量を変えたら、全体も見直す",
+   "captionDelay": 40,
+   "frames": 138,
+   "lead": 14,
+   "voice": "v4/voice-4.wav",
+   "items": [
+    {
+     "dir": "screens",
+     "file": "parts-qty4.png",
+     "srcW": 1032,
+     "srcH": 764,
+     "crop": {
+      "x": 0,
+      "y": 0.12,
+      "w": 1,
+      "h": 0.2
+     },
+     "left": 190,
+     "top": 280,
+     "width": 700,
+     "appear": 10,
+     "marks": []
+    },
+    {
+     "dir": "screens",
+     "file": "summary-qty4.png",
+     "srcW": 1032,
+     "srcH": 460,
+     "left": 160,
+     "top": 408,
+     "width": 760,
+     "appear": 24,
+     "marks": []
+    }
+   ]
+  }
+ ],
+ "bgm": "bgm-pop-long.wav",
+ "bgmVolume": 0.37
+}

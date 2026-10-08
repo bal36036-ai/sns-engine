@@ -6,6 +6,7 @@
 使い方：python tools/make_bgm_trendy.py
 """
 import math
+import os
 import re
 import wave
 from pathlib import Path
@@ -19,6 +20,9 @@ rng = np.random.default_rng(20261008)
 
 timing = (ROOT / "src" / "audioTiming.ts").read_text(encoding="utf-8")
 TOTAL_SEC = int(re.search(r"TOTAL_AUDIO_FRAMES = (\d+)", timing).group(1)) / 30 + 0.6
+# 環境変数 BGM_SEC（秒）と BGM_ONLY=pop を指定すると、長い曲（bgm-pop-long.wav）だけを作る（複数の動画で共用）
+if os.environ.get("BGM_SEC"):
+    TOTAL_SEC = float(os.environ["BGM_SEC"])
 
 
 def hz(m):
@@ -180,8 +184,9 @@ def pop():
         tr.add(epiano(notes, bar * 0.9, 0.05), t0)  # うしろで薄く和音
         i += 1
     mix = lowpass(tr.buf, 7000) + 0.85 * drums.buf
-    write(finish(mix), "bgm-pop.wav")
+    write(finish(mix), "bgm-pop-long.wav" if os.environ.get("BGM_SEC") else "bgm-pop.wav")
 
 
-lofi()
+if not os.environ.get("BGM_ONLY"):
+    lofi()
 pop()

@@ -9,7 +9,7 @@ const MIN_GAP_MS = 3 * 3_600_000;
 const MIN_LEAD_MS = 60 * 60_000;
 // 自動投稿の対象は buffer-channels.js（Instagramは一時停止中、XはチャンネルID登録後に対象になる）
 const CONNECTED = AUTOMATED_SNS;
-const TIMES = { threads: ["09:30", "17:00"], instagram: ["12:45"], tiktok: ["18:15"], youtube: ["20:15"], x: ["12:15"] };
+const TIMES = { threads: ["09:30"], instagram: ["12:45"], tiktok: ["18:15"], youtube: ["20:15"], x: ["12:15"] };
 
 function jstDay(date) {
   return new Date(date.getTime() + JST_MS).toISOString().slice(0, 10);
@@ -21,10 +21,10 @@ function addDays(day, count) {
 
 function dailyTarget(sns, day) {
   const dow = new Date(`${day}T00:00:00Z`).getUTCDay();
-  if (sns === "threads") return 2;
+  if (sns === "threads") return 1; // 2026-10-08 ばる決定：Threads・Xは1日1本、動画は週2本（火・金）
   if (sns === "instagram") return [0, 1, 2, 3, 4].includes(dow) ? 1 : 0;
-  if (sns === "tiktok") return [0, 2, 4, 6].includes(dow) ? 1 : 0;
-  if (sns === "youtube") return [0, 1, 3, 5].includes(dow) ? 1 : 0;
+  if (sns === "tiktok") return [2, 5].includes(dow) ? 1 : 0;
+  if (sns === "youtube") return [2, 5].includes(dow) ? 1 : 0;
   if (sns === "x") return 1;
   return 0;
 }

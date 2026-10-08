@@ -5,6 +5,7 @@ import { Caption } from "./Caption";
 import { Headline } from "./Headline";
 import { SceneFrame } from "./SceneFrame";
 import { Mark } from "./Screen";
+import { PuppetDog, Rig } from "./PuppetDog";
 import { COLORS, FONT } from "./theme";
 
 // 台本のデータ（props/*.json。tools/make_spec_video.py が作る）から、実画面＋声＋字幕の動画を組み立てる。
@@ -34,8 +35,12 @@ export type SpecScene = {
   lead: number; // 声が始まるまでのフレーム
   voice: string; // public/audio 以下のファイル
   items: SpecItem[];
+  pose?: string; // 案内役の絵（guide.rigs のキー）
+  mouth?: number[]; // 案内役の口の開き（声の大きさ、1フレームごと）
 };
-export type SpecProps = { scenes: SpecScene[]; bgm: string; bgmVolume: number };
+// 案内役のキャラクター（右下に立って、口パクしながら説明する）。無ければ今までどおり画面と字幕だけ
+export type SpecGuide = { x: number; feetY: number; height: number; captionRight: number; rigs: Record<string, Rig> };
+export type SpecProps = { scenes: SpecScene[]; bgm: string; bgmVolume: number; guide?: SpecGuide };
 
 const itemHeight = (it: SpecItem) => {
   const c = it.crop ?? { x: 0, y: 0, w: 1, h: 1 };
@@ -81,7 +86,21 @@ const Item: React.FC<{ it: SpecItem; index: number }> = ({ it, index }) => {
   );
 };
 
-const Scene: React.FC<{ scene: SpecScene }> = ({ scene }) => (
+const Guide: React.FC<{ g: SpecGuide; scene: SpecScene; offset: number }> = ({ g, scene, offset }) => {
+  const frame = useCurrentFrame();
+  const local = frame - scene.lead;
+  const mouth = scene.mouth ?? [];
+  const m = local >= 0 && local < mouth.length ? mouth[local] : 0;
+  const rig = g.rigs[scene.pose ?? Object.keys(g.rigs)[0]];
+  return (
+    <>
+      <div style={{ position: "absolute", left: g.x - 110, top: g.feetY - 14, width: 220, height: 26, borderRadius: "50%", background: "rgba(31,45,61,0.22)", filter: "blur(6px)" }} />
+      <PuppetDog rig={rig} height={g.height} x={g.x} feetY={g.feetY} mouth={m} talking={local >= 0 && local < mouth.length} offset={offset} />
+    </>
+  );
+};
+
+const Scene: React.FC<{ scene: SpecScene; guide?: SpecGuide; offset: number }> = ({ scene, guide, offset }) => (
   <SceneFrame>
     <Headline lines={[scene.headline]} size={84} />
     <div style={{ position: "absolute", left: 80, right: 80, top: scene.noteTop, fontFamily: FONT, fontSize: 34, fontWeight: 700, lineHeight: 1.3, color: COLORS.muted }}>
@@ -94,12 +113,13 @@ const Scene: React.FC<{ scene: SpecScene }> = ({ scene }) => (
     {scene.items.map((it, i) => (
       <Item key={i} it={it} index={i} />
     ))}
-    <Caption text={scene.caption} delay={scene.captionDelay} />
+    {guide ? <Guide g={guide} scene={scene} offset={offset} /> : null}
+    <Caption text={scene.caption} delay={scene.captionDelay} right={guide?.captionRight} />
     <Audio src={staticFile(`audio/${scene.voice}`)} from={scene.lead} volume={1} />
   </SceneFrame>
 );
 
-export const SpecVideo: React.FC<SpecProps> = ({ scenes, bgm, bgmVolume }) => {
+export const SpecVideo: React.FC<SpecProps> = ({ scenes, bgm, bgmVolume, guide }) => {
   const total = scenes.reduce((a, s) => a + s.frames, 0);
   return (
     <>
@@ -107,7 +127,7 @@ export const SpecVideo: React.FC<SpecProps> = ({ scenes, bgm, bgmVolume }) => {
       <Series>
         {scenes.map((s, i) => (
           <Series.Sequence key={i} name={`Scene ${i + 1}`} durationInFrames={s.frames}>
-            <Scene scene={s} />
+            <Scene scene={s} guide={guide} offset={scenes.slice(0, i).reduce((a, x) => a + x.frames, 0)} />
           </Series.Sequence>
         ))}
       </Series>

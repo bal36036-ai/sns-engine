@@ -2,7 +2,7 @@ import { Interactive, interpolate, useCurrentFrame, Easing } from "remotion";
 import { COLORS, FONT, SAFE_BOTTOM, SAFE_X } from "./theme";
 
 // 画面下の字幕。44px以上、左右80px・下100pxの余白の内側に置く
-export const Caption: React.FC<{ text: string; delay?: number }> = ({ text, delay = 20 }) => {
+export const Caption: React.FC<{ text: string; delay?: number; right?: number }> = ({ text, delay = 20, right = SAFE_X }) => {
   const frame = useCurrentFrame();
   return (
     <Interactive.Div
@@ -10,7 +10,7 @@ export const Caption: React.FC<{ text: string; delay?: number }> = ({ text, dela
       style={{
         position: "absolute",
         left: SAFE_X,
-        right: SAFE_X,
+        right,
         bottom: SAFE_BOTTOM,
         padding: "18px 28px",
         borderRadius: 18,

@@ -12,6 +12,8 @@ import urllib.request
 import wave
 from pathlib import Path
 
+import numpy as np
+
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -296,10 +298,57 @@ def scenes_v7():
     return s
 
 
+# 案内役のキャラクター（2026-10-09 ばる「ハリナビの動画もキャラクターいれようよ！」）。
+# 声はそのキャラの声で読み、口パクは声の大きさから作る。画面の切り抜きは左側（x 50〜740）に寄せ、右下にキャラを立たせる。
+GUIDES = {
+    "v7": dict(voice=10004, rigs=["sekkei/s2-3", "sekkei/s1-1", "sekkei/s1-4"], poses=["sekkei/s2-3", "sekkei/s1-1", "sekkei/s1-1", "sekkei/s1-4", "sekkei/s2-3"],
+               x=885, feetY=1050, height=440, captionRight=330),
+}
+AREA = (50, 740)
+
+
+def fit_left(items):
+    """画面の切り抜きを、左側の枠（AREA）に収まるよう縮めて寄せる（縦の並びも同じ割合で詰める）。"""
+    if not items:
+        return items
+    l0 = min(i.left for i in items)
+    r0 = max(i.left + i.width for i in items)
+    t0 = min(i.top for i in items)
+    span = AREA[1] - AREA[0]
+    k = min(1.0, span / (r0 - l0))
+    pad = (span - (r0 - l0) * k) / 2
+    for i in items:
+        i.left = round(AREA[0] + pad + (i.left - l0) * k)
+        i.top = round(t0 + (i.top - t0) * k)
+        i.width = round(i.width * k)
+    return items
+
+
+def mouth_env(path):
+    with wave.open(str(path), "rb") as w:
+        sr = w.getframerate()
+        a = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(float) / 32768
+    step = sr // FPS
+    rms = np.array([np.sqrt(np.mean(a[i:i + step] ** 2)) for i in range(0, len(a) - step + 1, step)])
+    m = np.clip(rms / (np.percentile(rms[rms > 0], 90) if (rms > 0).any() else 1), 0, 1)
+    m = np.where(m < 0.12, 0, m)
+    return [round(float(v) * (0.75 if i % 2 else 1.0), 3) for i, v in enumerate(m)]
+
+
+def rig(name):
+    r = json.loads((PUB / "rig" / name / "rig.json").read_text(encoding="utf-8"))
+    r.pop("align", None)
+    r["dir"] = f"rig/{name}"
+    return r
+
+
 VIDEOS = {"v1": scenes_v1, "v2": scenes_v2, "v3": scenes_v3, "v4": scenes_v4, "v5": scenes_v5, "v6": scenes_v6, "v7": scenes_v7}
 
 
 def build(name):
+    global VOICE
+    guide = GUIDES.get(name)
+    VOICE = guide["voice"] if guide else 10005
     out = PUB / "audio" / name
     out.mkdir(parents=True, exist_ok=True)
     scenes = []
@@ -313,12 +362,15 @@ def build(name):
         cues = [LEAD + round(x * FPS) - 3 for x in starts]  # 声が言い始める少し前
         frames = max(sc["min"], math.ceil((LEAD / FPS + d + TAIL) * FPS))
         items = sc["build"](cues)
+        if guide:
+            fit_left(items)
         note = sc["note"]
         accent = len(note) > 1
         scenes.append({
             "headline": sc["headline"], "note": note, "noteTop": 208, "noteAccentLast": accent, "caption": sc["caption"],
             "captionDelay": min(frames - 40, sc["capdelay"](cues) if "capdelay" in sc else 40),
             "frames": frames, "lead": LEAD, "voice": f"{name}/voice-{i}.wav",
+            **({"pose": guide["poses"][i], "mouth": mouth_env(out / f"voice-{i}.wav")} if guide else {}),
             "items": [
                 {"dir": it.dir, "file": it.file, "srcW": it.srcW, "srcH": it.srcH, **({"crop": {"x": it.crop[0], "y": it.crop[1], "w": it.crop[2], "h": it.crop[3]}} if it.crop else {}),
                  "left": it.left, "top": it.top, "width": it.width, "appear": it.appear, **({"hide": it.hide} if it.hide is not None else {}),
@@ -329,6 +381,8 @@ def build(name):
         print(f"{name} 場面{i + 1}: 声 {d:.2f}秒 → {frames}フレーム cues={cues}", flush=True)
     total = sum(s["frames"] for s in scenes)
     props = {"scenes": scenes, "bgm": "bgm-pop-long.wav", "bgmVolume": 0.37}
+    if guide:
+        props["guide"] = {k: guide[k] for k in ("x", "feetY", "height", "captionRight")} | {"rigs": {r: rig(r) for r in guide["rigs"]}}
     (ROOT / "props").mkdir(exist_ok=True)
     (ROOT / "props" / f"{name}.json").write_text(json.dumps(props, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{name}: 合計 {total}フレーム（{total / FPS:.1f}秒）")

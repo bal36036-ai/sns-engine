@@ -42,20 +42,24 @@ const pages = {
 <h1>切りしろって、<em>何？</em></h1>
 <div class="sub" style="font-size:36px;margin-top:22px">6mの材料から、1.5mを何本取れる？<br>答え合わせを、図でやり直します</div></div>`, `<div class="foot"><span>げんばアプリ工房｜開発中の道具の話</span><span>@genba_apps</span></div>`),
 
-  "01-fig-4pieces": page(1280, 640, `
+  "01-fig-4pieces": page(1280, 790, `
 <h1 style="font-size:44px">4本取ろうとすると、<em>9mm足りない</em></h1>
-<div class="lab">6,000mmの材料 <small>（1.5m×4本ほしい）</small></div>
-<div class="track" style="width:${W6}px">
- <div class="part" style="width:${P}px">1.5m</div><div class="kerf"></div>
- <div class="part" style="width:${P}px">1.5m</div><div class="kerf"></div>
- <div class="part" style="width:${P}px">1.5m</div><div class="kerf"></div>
- <div class="part" style="width:${P - 42}px;background:#8A94A0">1.5m</div>
- <div style="width:0;border-left:6px dashed #C0392B;height:130px;margin-top:-17px"></div>
+<div class="lab">6,000mmの材料に、1.5m×4本を取りたい</div>
+<div style="position:relative;width:${W6}px;height:96px;margin-top:52px">
+ <div class="track" style="width:${W6}px">
+  <div class="part" style="width:${P}px">1.5m</div><div class="kerf"></div>
+  <div class="part" style="width:${P}px">1.5m</div><div class="kerf"></div>
+  <div class="part" style="width:${P}px">1.5m</div><div class="kerf"></div>
+  <div class="part" style="width:${W6 - 3 * P - 3 * 14}px;background:#7C8896">4本目</div>
+ </div>
+ <div style="position:absolute;left:${W6}px;top:0;width:44px;height:96px;border:4px dashed #C0392B;border-left:none;background:rgba(192,57,43,.14)"></div>
+ <div style="position:absolute;left:${W6 - 150}px;top:-46px;font-size:26px;font-weight:800;color:#1F2D3D;white-space:nowrap">材料の端（6,000mm）▼</div>
+ <div style="position:absolute;left:${W6 - 120}px;top:106px;font-size:30px;font-weight:900;color:#C0392B;white-space:nowrap">▲ はみ出す 9mm</div>
 </div>
-<div class="note">オレンジの線 ＝ 切るたびに消える、刃の厚み分（切りしろ）。ここでは<b>1回3mm</b>。図では見やすいように、切りしろも不足分も大きく描いています。</div>
-<div class="box">1.5m×4本＝6.000m ＋ 切りしろ 3回×3mm＝0.009m<br>→ <span class="ng">6.009m が必要。6mでは9mm足りない</span></div>`, FOOT),
+<div class="box" style="margin-top:70px;font-size:30px">部材の合計：1,500mm×4本＝6,000mm<br>切りしろの合計：3mm×3回＝9mm<br>必要な長さ：6,000mm＋9mm＝<span class="ng">6,009mm</span>　→　6,000mmでは<span class="ng">9mm足りない</span></div>
+<div class="note">オレンジの線 ＝ 切るたびに消える、刃の厚み分（切りしろ）。切りしろもはみ出しも、見やすいように大きく描いています。切りしろ3mmは、この問題で決めた条件です（刃や機械で変わります）。</div>`, FOOT),
 
-  "02-fig-3pieces": page(1280, 640, `
+  "02-fig-3pieces": page(1280, 700, `
 <h1 style="font-size:44px">3本なら取れて、<em>1.491m</em>残る</h1>
 <div class="lab">6,000mmの材料 <small>（1.5m×3本）</small></div>
 <div class="track" style="width:${W6}px">
@@ -65,7 +69,8 @@ const pages = {
  <div class="rest" style="width:${W6 - 3 * P - 3 * 14}px">残り 1.491m</div>
 </div>
 <div class="note">切る回数は<b>3回</b>（部材を3本切り離すため）。切りしろは3回分で 9mm。</div>
-<div class="box">6.000m − 1.5m×3本（4.500m）− 切りしろ 0.009m ＝ <b>1.491m</b></div>`, FOOT),
+<div class="box" style="font-size:30px">6,000mm − 部材 1,500mm×3本（4,500mm）− 切りしろ 3mm×3回（9mm）＝ <b>1,491mm</b></div>
+<div class="note">切りしろも、見やすいように大きく描いています。切りしろ3mmは、この問題で決めた条件です（刃や機械で変わります）。</div>`, FOOT),
 };
 
 (async () => {

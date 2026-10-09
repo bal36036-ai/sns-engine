@@ -5,9 +5,9 @@ const https = require("https");
 const { getMe, listRecentPosts, getMediaDetail } = require("./threads-client");
 
 const APPLY = process.env.APPLY === "1";
+// 1回目（10/9 朝）の2件は投稿済み。2回目（10/9 note公開後、ばる「いいよ」）：10/6のコメントの下に、noteの記事を案内する返信を1本だけ。
 const REPLIES = [
-  { commentShort: "DeF3KlyElQY", text: "コメントありがとうございます。ここでの「幅」は、材料の幅ではなく、切るときに刃が削る厚み（切りしろ）のことでした。説明が足りず、すみません。図にして、あらためて投稿しますね。" },
-  { commentShort: "DeJ2Ab8EgMT", text: "分かりにくくてすみません。長さの話なので、材料の幅は出てきません。切るたびに、刃の厚み分（3mm）が材料から消えます。6mを1.5mずつ4本に切ると、6.0mに加えて切りしろ（3回×3mm＝9mm）が要るので、6.009mが必要です。6mでは9mm足りない、という話でした。図にして、あらためて投稿します。" },
+  { commentShort: "DeJ2Ab8EgMT", text: "お待たせしました。切りしろの説明を、図つきの記事にしました。6mから1.5mを何本取れるかの答え合わせです。\nhttps://note.com/genba_apps/n/n45d668093a93\nまだ分かりにくいところがあれば、教えてください。" },
 ];
 const COMMENTER = "hongfushixiaochu";
 

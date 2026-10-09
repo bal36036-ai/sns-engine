@@ -1,0 +1,49 @@
+name: Threads Comment Alert
+
+# 2026-10-09 ばる「iPhoneに通知が来るように」：3時間おきに、Threadsの新しいコメントを読み取り専用で確認し、
+# 新しいコメントがあれば Issue #6 に書き込む（ばるの iPhone の GitHub アプリに通知が届く）。返信・投稿・削除はしない。
+# 手動実行で test を true にすると、接続テストの通知を1件出す。
+on:
+  schedule:
+    - cron: "11 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "true で接続テストの通知を1件出す"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: threads-comment-alert
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Check new Threads comments
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALERT_ISSUE: "6"
+          TEST_ALERT: ${{ github.event.inputs.test == 'true' && '1' || '0' }}
+        run: node alert-threads-comments.js
+      - name: Warn if this check failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 6,
+              body: "@bal36036-ai ⚠️ Threadsのコメント確認の自動実行が失敗しました。Threadsの鍵（THREADS_ACCESS_TOKEN）の期限切れなどが考えられます。Claude に「コメント見て」と言えば、原因を確認します。",
+            });

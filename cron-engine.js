@@ -262,7 +262,13 @@ async function processThreadsPublish(client, post) {
     const containerId = await threadsClient.createContainer(me.id, containerParams);
     await threadsClient.waitForContainerReady(containerId);
     const mediaId = await threadsClient.publishContainer(me.id, containerId);
-    const detail = await threadsClient.getMediaDetail(mediaId);
+    // ここから先は公開済み。詳細が読めなくても「失敗」にしない（失敗にすると、出し直しで二重投稿になる）。
+    let detail = {};
+    try {
+      detail = await threadsClient.getMediaDetail(mediaId);
+    } catch (e) {
+      detail = { error: e.message };
+    }
 
     let insights = null;
     try {

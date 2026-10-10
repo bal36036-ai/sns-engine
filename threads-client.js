@@ -106,10 +106,20 @@ async function findDuplicateText(threadsUserId, text) {
 }
 
 // コンテナがFINISHEDになるまで待機(動画は処理に時間がかかるため)
+// 作った直後のコンテナは、まだ読めず「The requested resource does not exist (code: 24)」が返ることがある（2026-10-10 9:30 の失敗）。
+// そのため、最初に少し待ち、code 24 のあいだは待機を続ける。
 async function waitForContainerReady(containerId, maxWaitMs = 60000) {
   const start = Date.now();
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   while (Date.now() - start < maxWaitMs) {
-    const status = await getContainerStatus(containerId);
+    let status;
+    try {
+      status = await getContainerStatus(containerId);
+    } catch (e) {
+      if (!/code: 24\b/.test(e.message)) throw e;
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      continue;
+    }
     if (status.status === "FINISHED") return true;
     if (status.status === "ERROR") throw new Error(`コンテナ作成エラー: ${status.error_message || "詳細不明"}`);
     await new Promise((resolve) => setTimeout(resolve, 3000));

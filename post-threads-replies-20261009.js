@@ -5,9 +5,9 @@ const https = require("https");
 const { getMe, listRecentPosts, getMediaDetail } = require("./threads-client");
 
 const APPLY = process.env.APPLY === "1";
-// 1回目（10/9 朝）の2件は投稿済み。2回目（10/9 note公開後、ばる「いいよ」）：10/6のコメントの下に、noteの記事を案内する返信を1本だけ。
+// 1・2回目（10/9）は投稿済み。3回目（10/10、ばる「返信いいよ」）：「アプリ限定のThreadsですか？」への返信を1本だけ。
 const REPLIES = [
-  { commentShort: "DeJ2Ab8EgMT", text: "お待たせしました。切りしろの説明を、図つきの記事にしました。6mから1.5mを何本取れるかの答え合わせです。\nhttps://note.com/genba_apps/n/n45d668093a93\nまだ分かりにくいところがあれば、教えてください。" },
+  { commentShort: "DeTtM-QFHUv", text: "コメントありがとうございます。アプリを使っている方だけの場所ではありません。建設の現場で数字や材料を扱う方なら、どなたでも気軽に答えてもらえたらうれしいです。お使いでなくても大丈夫です。" },
 ];
 const COMMENTER = "hongfushixiaochu";
 

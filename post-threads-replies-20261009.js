@@ -5,9 +5,9 @@ const https = require("https");
 const { getMe, listRecentPosts, getMediaDetail } = require("./threads-client");
 
 const APPLY = process.env.APPLY === "1";
-// 1・2回目（10/9）は投稿済み。3回目（10/10、ばる「返信いいよ」）：「アプリ限定のThreadsですか？」への返信を1本だけ。
+// 1〜3回目（10/9・10/10）は投稿済み。4回目（10/11、ばる「返信もしてください」）：「質問の内容が理解しにくい」へのお礼と今後の改善を1本だけ。
 const REPLIES = [
-  { commentShort: "DeTtM-QFHUv", text: "コメントありがとうございます。アプリを使っている方だけの場所ではありません。建設の現場で数字や材料を扱う方なら、どなたでも気軽に答えてもらえたらうれしいです。お使いでなくても大丈夫です。" },
+  { commentShort: "DeT2NQ8FF9o", text: "具体的なご意見をありがとうございます。おっしゃる通り、何の梁の何の数字かが書かれておらず、読む側に伝わりにくかったと思います。投稿の書き方を見直して、これから出す投稿には、最初の1文で何の話かを書くようにしました。また分かりにくい点があれば教えてください。" },
 ];
 const COMMENTER = "hongfushixiaochu";
 

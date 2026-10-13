@@ -64,3 +64,7 @@ YouTube公開チャンネル全18本で対象タイトルなし。Bufferチャ�
 - 表示はID一致の実公開証拠がある場合に「投稿済み」と「公開ページ確認済み／Buffer照合不可」を併記。証拠がないNOT_FOUNDは「過去記録・照合不可」。未確認を公開成功へ昇格しない。実際の新しいerrorは失敗を維持。
 - 16回帰テスト、画面9テスト、本番ビルド成功。実Postgres SELECT/CTEで、有効媒体・進行中・本当の失敗・新規ID・期限到来が選択され、停止中の古い参照だけ除外されることを確認。
 - 5件の元post_result各キーが保存前後で一致することを読戻し確認。即時の再確認はsynced/unverified/errorsすべて空。登録・retry・削除は一切なし。認証・旧接続の再設定・DBスキーマ/権限変更なし。
+
+最終通常運用検証：[2026-10-13 17:37 JSTのrun 38370472066](https://github.com/bal36036-ai/sns-engine/actions/runs/38370472066) が `6270141` で全step成功。dryRun false、processed/synced/unverified/errorsすべて空。手動起動なし。公開APIで5件の公開証拠が保持され、buffer_lookup.checked_atが17:21時点のまま（再確認待ちで読んでいない）、回復済みYouTube/TikTokの同ID・sent・error nullを確認。
+
+画面の最終コードは `b2a5e78`（公開Version `0aea4a07-f747-4730-bda5-93995d5ac18c`）。照合不可を未投稿にも推測分類しないフィルターを含む。公開JSをテストブラウザ内だけのサンプル応答で実動確認し、未知状態が投稿済み/未投稿どちらにも分類されないことを確認（実データ書込み0）。公開APIと実画面の5件・復旧2件の確認も成功。iPhone/iPad実機は未確認。

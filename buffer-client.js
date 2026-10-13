@@ -108,4 +108,15 @@ async function deletePost(id) {
   return data.deletePost;
 }
 
-module.exports = { callBufferApi, findDuplicatePost, createPost, deletePost, ORGANIZATION_ID };
+// 読み取り専用。受付後の配信状態を確認する（再投稿・retryは行わない）。
+async function getPost(id) {
+  const data = await callBufferApi(
+    `query($input: PostInput!) {
+      post(input: $input) { id channelId status sentAt externalLink error { message } }
+    }`,
+    { input: { id } }
+  );
+  return data.post;
+}
+
+module.exports = { callBufferApi, findDuplicatePost, createPost, deletePost, getPost, ORGANIZATION_ID };

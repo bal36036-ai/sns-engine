@@ -10,9 +10,9 @@
 
 const https = require("https");
 const { getPool } = require("./db-client");
-const { findDuplicatePost, createPost, ORGANIZATION_ID } = require("./buffer-client");
+const { findDuplicatePost, createPost, getPost } = require("./buffer-client");
 const threadsClient = require("./threads-client");
-const { ACTIVE_BUFFER_MAP, TEXT_ONLY_SNS, AUTOMATED_SNS } = require("./buffer-channels");
+const { CHANNEL_MAP, ACTIVE_BUFFER_MAP, TEXT_ONLY_SNS, AUTOMATED_SNS } = require("./buffer-channels");
 
 // Buffer経由の3媒体(instagram/tiktok/youtube)は無条件で有効。
 // threadsはガード・重複チェックまでは常に動かすが、実際のライブ登録は
@@ -44,6 +44,7 @@ async function claimCandidates(client, runId, limit) {
   const { rows } = await client.query(
     `SELECT id FROM sns.posts
      WHERE status IN ('ready', 'scheduled')
+       AND external_post_id IS NULL
        AND (scheduled_at IS NULL OR scheduled_at <= now())
        AND (claimed_at IS NULL OR claimed_at < now() - interval '${CLAIM_STALE_MINUTES} minutes')
      ORDER BY created_at
@@ -92,6 +93,12 @@ async function setStatus(client, id, status, extra = {}) {
 
 async function processOne(client, post, { dryRun }) {
   const log = { id: post.id, target_sns: post.target_sns };
+
+  // 登録済みは再送も遅延・重複による状態変更もせず、配信状態の同期だけで扱う。
+  if (post.external_post_id) {
+    await releaseClaim(client, post.id);
+    return { ...log, result: "skipped", reason: "既にexternal_post_id設定済み(二重投稿防止)" };
+  }
 
   // --- 安全ガード再確認(アプリ側でも二重にチェック。DBトリガーは書き込み時のみ発動するため) ---
   // GitHub Actionsのscheduleは秒単位で厳密でないだけでなく、負荷等でCron自体が
@@ -220,16 +227,73 @@ async function processOne(client, post, { dryRun }) {
       metadata,
       mode: "shareNow",
     });
-    await setStatus(client, post.id, "sent", {
+    const delivery = bufferDelivery(created);
+    await setStatus(client, post.id, delivery.status, {
       external_service: "buffer",
       external_post_id: created.id,
-      post_result: { status: created.status, registeredAt: new Date().toISOString() },
+      error_detail: delivery.error,
+      post_result: { status: created.status, delivery_status: delivery.deliveryStatus, registeredAt: new Date().toISOString() },
     });
-    return { ...log, result: "sent", new_status: "sent", external_post_id: created.id };
+    return { ...log, result: delivery.deliveryStatus, new_status: delivery.status, external_post_id: created.id };
   } catch (e) {
     await setStatus(client, post.id, "failed", { error_detail: `Buffer登録エラー: ${e.message}` });
     return { ...log, result: "stopped", reason: `Buffer登録エラー: ${e.message}`, new_status: "failed" };
   }
+}
+
+// DBのenumや安全トリガーは変更しない。受付/処理中はready＋外部IDで保持する。
+// 外部ID付きはclaimCandidatesから除外されるため、readyでも再登録されない。
+function bufferDelivery(remote) {
+  switch (remote.status) {
+    case "sent": return { status: "sent", deliveryStatus: "published", error: null };
+    case "sending": return { status: "ready", deliveryStatus: "processing", error: null };
+    case "scheduled": return { status: "ready", deliveryStatus: "accepted", error: null };
+    case "error": return { status: "failed", deliveryStatus: "failed", error: `Buffer配信エラー: ${remote.error?.message || "配信失敗（詳細未取得）"}` };
+    default: return { status: "needs_review", deliveryStatus: "unknown", error: `Bufferの配信状態を確認してください: ${remote.status || "不明"}` };
+  }
+}
+
+async function syncBufferPost(client, post) {
+  if (post.external_service !== "buffer" || !post.external_post_id || post.is_historical) {
+    throw new Error("Buffer登録済みの通常投稿だけを同期できます");
+  }
+  const remote = await getPost(post.external_post_id);
+  if (!remote || remote.id !== post.external_post_id || remote.channelId !== CHANNEL_MAP[post.target_sns]) {
+    throw new Error("Buffer投稿IDまたは投稿先の照合に失敗しました（再送はしません）");
+  }
+  const delivery = bufferDelivery(remote);
+  await setStatus(client, post.id, delivery.status, {
+    error_detail: delivery.error,
+    matched_external_link: remote.status === "sent" ? remote.externalLink || null : null,
+    matched_posted_at: remote.status === "sent" ? remote.sentAt || null : null,
+    post_result: {
+      status: remote.status,
+      delivery_status: delivery.deliveryStatus,
+      statusCheckedAt: new Date().toISOString(),
+      sentAt: remote.sentAt || null,
+      externalLink: remote.externalLink || null,
+      error: remote.error?.message || null,
+    },
+  });
+  return { id: post.id, external_post_id: remote.id, buffer_status: remote.status, new_status: delivery.status, delivery_status: delivery.deliveryStatus };
+}
+
+async function syncBufferStatuses(client, limit = 50) {
+  const { rows } = await client.query(
+    `SELECT * FROM sns.posts
+     WHERE external_service = 'buffer' AND external_post_id IS NOT NULL AND is_historical = false
+       AND (status IN ('ready', 'scheduled', 'failed', 'needs_review')
+            OR post_result->>'status' IS DISTINCT FROM 'sent'
+            OR matched_external_link IS NULL)
+     ORDER BY post_result->>'statusCheckedAt' NULLS FIRST, created_at
+     LIMIT $1`, [limit]
+  );
+  const report = { synced: [], errors: [] };
+  for (const post of rows) {
+    try { report.synced.push(await syncBufferPost(client, post)); }
+    catch (e) { report.errors.push({ id: post.id, error: e.message }); }
+  }
+  return report;
 }
 
 // Threads公式API経由での本番登録。
@@ -298,9 +362,15 @@ async function runCronEngine({ dryRun = true, limit = 10 } = {}) {
   const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const pool = getPool();
   const client = await pool.connect();
-  const report = { runId, dryRun, processed: [], due_drafts: 0, errors: [] };
+  const report = { runId, dryRun, processed: [], synced: [], due_drafts: 0, errors: [] };
 
   try {
+    // 既存の定期live実行で最終状態を反映する。手動dry-runの経路は維持する。
+    if (!dryRun) {
+      const sync = await syncBufferStatuses(client);
+      report.synced = sync.synced;
+      report.errors.push(...sync.errors);
+    }
     await client.query("BEGIN");
     const candidates = await claimCandidates(client, runId, limit);
     await client.query("COMMIT");
@@ -333,7 +403,7 @@ async function runCronEngine({ dryRun = true, limit = 10 } = {}) {
 
 // 予定時刻前に指定投稿だけを確認する専用入口からも、同じ安全ガードを使う。
 // 本番Cronの候補抽出とlive経路は変更しない。
-module.exports = { runCronEngine, processOne };
+module.exports = { runCronEngine, processOne, syncBufferPost, syncBufferStatuses };
 
 if (require.main === module) {
   const dryRun = !process.argv.includes("--live");

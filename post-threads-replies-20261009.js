@@ -5,11 +5,10 @@ const https = require("https");
 const { getMe, listRecentPosts, getMediaDetail } = require("./threads-client");
 
 const APPLY = process.env.APPLY === "1";
-// 1〜4回目（10/9・10/10・10/11）は投稿済み。5回目（10/12、ばる「コメントの返信もお願い」）：@hongfushixiaochu の新しいコメント2件へ。
-// 文案は 反応記録/コメント記録.md の2026-10-12。1本目は、実際に投稿の本文を直した（10/12）ので、過去形にした。
+// 2026-10-13本人承認：DeZRV89lBuzへの返信1件のみ。本文・対象は承認済み。
+// 認証、apply制御、ワークフローは既存のものを使う。
 const REPLIES = [
-  { commentShort: "DeX8GEckiu_", text: "具体的に教えていただき、ありがとうございます。何の切断か（木材か金属か）が書かれておらず、読む側が答えにくい投稿でした。木材では使う部位によって元末や裏表が変わる、というお話は勉強になります。準備していた投稿の最初の1文に、何の話かを入れる直しをしました。鴨居の長さ取りの例も、もう少し聞かせてもらえるとうれしいです。" },
-  { commentShort: "DeWBsQKkez-", text: "ありがとうございます！また分かりやすい形でクイズを出しますので、よろしくお願いします。" },
+  { commentShort: "DeZRV89lBuz", text: "鴨居の例、くわしく教えてくださってありがとうございます。仕口や木表・木裏、節の位置、元末まで見て材料を選ぶので、長さの組み合わせだけでは木取りの代わりにならない、というのがよく分かりました。とても勉強になりました。" },
 ];
 const COMMENTER = "hongfushixiaochu";
 
@@ -35,18 +34,20 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {
   const me = await getMe();
+  if (me.username !== "genba_apps") throw new Error("投稿アカウントがgenba_appsと一致しません。送信中止");
   const posts = await listRecentPosts(me.id, 40);
   const conv = [];
   for (const p of posts) {
     try {
       const r = await call("GET", `/${p.id}/conversation`, { fields: "id,text,username,timestamp,permalink" });
-      for (const x of r.data || []) conv.push({ ...x, root: p.permalink });
+      for (const x of r.data || []) conv.push({ ...x, root: p.permalink, rootId: p.id });
     } catch (e) { /* 返信がない投稿は飛ばす */ }
   }
   console.log(`モード：${APPLY ? "投稿する" : "確認だけ（投稿しない）"}／返信を ${conv.length} 件取得`);
   for (const r of REPLIES) {
     const target = conv.find((x) => x.username === COMMENTER && (x.permalink || "").endsWith(`/${r.commentShort}`));
     if (!target) { console.log(`✗ ${r.commentShort}：対象のコメントが見つかりません。中止`); process.exitCode = 1; continue; }
+    if (target.root !== "https://www.threads.com/@genba_apps/post/DeWMUwClr5z") throw new Error("対象コメントの親投稿が一致しません。送信中止");
     const already = conv.find((x) => x.username === me.username && (x.text || "").trim() === r.text.trim());
     console.log(`\n対象：@${target.username} 「${(target.text || "").replace(/\n/g, " ").slice(0, 40)}…」 ${target.permalink}\n  元の投稿：${target.root}\n  返信の本文（${[...r.text].length}字）：${r.text}`);
     if (already) { console.log("  → 同じ本文の返信が既にあります。スキップ"); continue; }
@@ -56,7 +57,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await sleep(6000);
     const pub = await call("POST", `/${me.id}/threads_publish`, { creation_id: c.id });
     const d = await getMediaDetail(pub.id);
-    console.log(`  → 投稿しました：${d.permalink}`);
+    if (d.text !== r.text) throw new Error("送信結果の本文が一致しません。再送せず確認してください");
+    console.log(`  → 投稿しました：${d.permalink}\n  投稿ID：${pub.id}／返信先ID：${target.id}／親投稿ID：${target.rootId}\n  実投稿本文：${d.text}`);
     await sleep(3000);
   }
 })().catch((e) => { console.error("NG:", e.message); process.exit(1); });

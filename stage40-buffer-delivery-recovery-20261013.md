@@ -43,3 +43,24 @@ YouTube公開チャンネル全18本で対象タイトルなし。Bufferチャ�
 - 認証情報抽出・表示・認証設定・権限変更・DBスキーマ変更なし。既存プロセス環境変数と正規クライアントだけ使用。
 
 初回の通常sandboxでは対象Git作業ツリーへアクセスできず、対象・承認根拠を明示して正規のrequire_escalatedを使用し承認された。承認審査の拒否なし。ブラウザツールはruntime起動エラーのため、既存Puppeteer/Edgeでログインせず公開ページを検証した。
+
+## 追加：旧Instagram参照と表示を安全に整理
+
+本人承認済み「配信結果に合う状態表示」の追加委任により最小修正。16:52/17:07の通常Cronで同じNOT_FOUND5件が繰り返された。元登録Cronログと既存資料を確認し、10/1に本人がInstagramをBufferから接続解除した記録、現在は旧チャンネル自体もNOT_FOUNDであることを確認。実配信失敗とは扱わない。
+
+ログインなしの公開プロフィールから対象5件を特定し、公開ページの全文・time datetimeをDB本文と照合。17:20〜21 JSTに再照合して、既存post_resultへ外部ID一致・本文ハッシュ・公開URL・公開時刻・確認時刻・caption_matchedを持つpublic_verificationを保存した。
+
+| DB ID先頭 | Instagram公開URL |
+|---|---|
+| d7c23289 | https://www.instagram.com/genba_apps/p/DdliKHcIALD/ |
+| 1e1df461 | https://www.instagram.com/genba_apps/reel/DdoG9rUmLCT/ |
+| 562b701f | https://www.instagram.com/genba_apps/p/DdxrwB9AKSV/ |
+| fd0eb894 | https://www.instagram.com/genba_apps/p/Dd21o0zETE0/ |
+| 45538d66 | https://www.instagram.com/genba_apps/p/Dd5abCnlfNX/ |
+
+- 元DB status、元Buffer結果（sent1件・sending4件）、登録時刻、dry-run記録、エラー、本文・素材を保持。新しい公開証拠とBuffer照合結果は別属性。照合不可だけでsent/failedへ変更しない。
+- buffer-clientのGraphQLエラーを構造化したcodeで判別。NOT_FOUNDはbuffer_lookupに記録し、Cronのunverifiedへ分類。通信・認証・その他のエラーは引き続きerrorsへ報告。
+- 24時間の再確認間隔はPAUSED_SNSに含まれる媒体の24時間以上前の登録IDだけ。新規投稿、有効媒体、本当の失敗、ID変更、確認期限到来を止めない。新しい実状態が読めた場合は照合不可属性をavailableへ更新する。
+- 表示はID一致の実公開証拠がある場合に「投稿済み」と「公開ページ確認済み／Buffer照合不可」を併記。証拠がないNOT_FOUNDは「過去記録・照合不可」。未確認を公開成功へ昇格しない。実際の新しいerrorは失敗を維持。
+- 16回帰テスト、画面9テスト、本番ビルド成功。実Postgres SELECT/CTEで、有効媒体・進行中・本当の失敗・新規ID・期限到来が選択され、停止中の古い参照だけ除外されることを確認。
+- 5件の元post_result各キーが保存前後で一致することを読戻し確認。即時の再確認はsynced/unverified/errorsすべて空。登録・retry・削除は一切なし。認証・旧接続の再設定・DBスキーマ/権限変更なし。

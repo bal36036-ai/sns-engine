@@ -33,7 +33,9 @@ function callBufferApi(query, variables) {
           try {
             const parsed = JSON.parse(data);
             if (parsed.errors) {
-              reject(new Error(`Buffer APIエラー: ${JSON.stringify(parsed.errors)}`));
+              const error = new Error(`Buffer APIエラー: ${JSON.stringify(parsed.errors)}`);
+              if (parsed.errors.length === 1) error.code = parsed.errors[0].extensions?.code;
+              reject(error);
               return;
             }
             resolve(parsed.data);

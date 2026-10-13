@@ -12,7 +12,7 @@ const https = require("https");
 const { getPool } = require("./db-client");
 const { findDuplicatePost, createPost, getPost } = require("./buffer-client");
 const threadsClient = require("./threads-client");
-const { CHANNEL_MAP, ACTIVE_BUFFER_MAP, TEXT_ONLY_SNS, AUTOMATED_SNS } = require("./buffer-channels");
+const { CHANNEL_MAP, ACTIVE_BUFFER_MAP, PAUSED_SNS, TEXT_ONLY_SNS, AUTOMATED_SNS } = require("./buffer-channels");
 
 // Buffer経由の3媒体(instagram/tiktok/youtube)は無条件で有効。
 // threadsはガード・重複チェックまでは常に動かすが、実際のライブ登録は
@@ -257,7 +257,25 @@ async function syncBufferPost(client, post) {
   if (post.external_service !== "buffer" || !post.external_post_id || post.is_historical) {
     throw new Error("Buffer登録済みの通常投稿だけを同期できます");
   }
-  const remote = await getPost(post.external_post_id);
+  let remote;
+  try {
+    remote = await getPost(post.external_post_id);
+  } catch (e) {
+    if (e.code !== "NOT_FOUND") throw e;
+    const now = Date.now();
+    const registeredAt = Date.parse(post.post_result?.registeredAt);
+    // 接続停止中の古いIDだけ24時間後に再確認。進行中・有効な媒体は通常頻度を維持。
+    const archived = PAUSED_SNS.includes(post.target_sns) && Number.isFinite(registeredAt) && now - registeredAt >= 86400000;
+    const lookup = { state: "not_found", external_post_id: post.external_post_id,
+      checked_at: new Date(now).toISOString(), next_check_after: now + (archived ? 86400000 : 0) };
+    // 見つからないことは配信失敗でも成功でもない。元status/結果/公開証拠を保持する。
+    await client.query(
+      `UPDATE sns.posts SET post_result = COALESCE(post_result, '{}'::jsonb) || $2::jsonb
+       WHERE id = $1 AND external_post_id = $3`,
+      [post.id, JSON.stringify({ buffer_lookup: lookup }), post.external_post_id]
+    );
+    return { id: post.id, external_post_id: post.external_post_id, lookup_status: "not_found", next_check_after: lookup.next_check_after };
+  }
   if (!remote || remote.id !== post.external_post_id || remote.channelId !== CHANNEL_MAP[post.target_sns]) {
     throw new Error("Buffer投稿IDまたは投稿先の照合に失敗しました（再送はしません）");
   }
@@ -273,6 +291,7 @@ async function syncBufferPost(client, post) {
       sentAt: remote.sentAt || null,
       externalLink: remote.externalLink || null,
       error: remote.error?.message || null,
+      buffer_lookup: { state: "available", external_post_id: remote.id, checked_at: new Date().toISOString() },
     },
   });
   return { id: post.id, external_post_id: remote.id, buffer_status: remote.status, new_status: delivery.status, delivery_status: delivery.deliveryStatus };
@@ -282,15 +301,24 @@ async function syncBufferStatuses(client, limit = 50) {
   const { rows } = await client.query(
     `SELECT * FROM sns.posts
      WHERE external_service = 'buffer' AND external_post_id IS NOT NULL AND is_historical = false
+       AND (target_sns <> ALL($2::text[])
+            OR post_result->'buffer_lookup'->>'state' IS DISTINCT FROM 'not_found'
+            OR post_result->'buffer_lookup'->>'external_post_id' IS DISTINCT FROM external_post_id
+            OR CASE WHEN jsonb_typeof(post_result->'buffer_lookup'->'next_check_after') = 'number'
+                    THEN (post_result->'buffer_lookup'->>'next_check_after')::numeric ELSE 0 END <= EXTRACT(EPOCH FROM now()) * 1000)
        AND (status IN ('ready', 'scheduled', 'failed', 'needs_review')
             OR post_result->>'status' IS DISTINCT FROM 'sent'
             OR matched_external_link IS NULL)
      ORDER BY post_result->>'statusCheckedAt' NULLS FIRST, created_at
-     LIMIT $1`, [limit]
+     LIMIT $1`, [limit, PAUSED_SNS]
   );
-  const report = { synced: [], errors: [] };
+  const report = { synced: [], unverified: [], errors: [] };
   for (const post of rows) {
-    try { report.synced.push(await syncBufferPost(client, post)); }
+    try {
+      const result = await syncBufferPost(client, post);
+      if (result.lookup_status === "not_found") report.unverified.push(result);
+      else report.synced.push(result);
+    }
     catch (e) { report.errors.push({ id: post.id, error: e.message }); }
   }
   return report;
@@ -362,13 +390,14 @@ async function runCronEngine({ dryRun = true, limit = 10 } = {}) {
   const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const pool = getPool();
   const client = await pool.connect();
-  const report = { runId, dryRun, processed: [], synced: [], due_drafts: 0, errors: [] };
+  const report = { runId, dryRun, processed: [], synced: [], unverified: [], due_drafts: 0, errors: [] };
 
   try {
     // 既存の定期live実行で最終状態を反映する。手動dry-runの経路は維持する。
     if (!dryRun) {
       const sync = await syncBufferStatuses(client);
       report.synced = sync.synced;
+      report.unverified = sync.unverified;
       report.errors.push(...sync.errors);
     }
     await client.query("BEGIN");

@@ -16,6 +16,10 @@ function setup({ createdStatus = 'sending', duplicate = null, remote, lookupErro
   const queries = [];
   const client = { release() {}, async query(sql, values = []) {
     queries.push({ sql, values });
+    if (sql.startsWith('UPDATE sns.posts SET post_result')) {
+      assert.equal(values[2], row.external_post_id);
+      row.post_result = { ...row.post_result, ...JSON.parse(values[1]) };
+    }
     if (sql.startsWith('UPDATE sns.posts SET status')) {
       row.status = values[1];
       if (sql.includes('post_result =')) {
@@ -38,11 +42,11 @@ function setup({ createdStatus = 'sending', duplicate = null, remote, lookupErro
       } };
       if (name === './db-client') return { getPool() { return { connect: async () => client, end: async () => {} }; } };
       if (name === './threads-client') return {};
-      if (name === './buffer-channels') return { CHANNEL_MAP: { youtube: 'channel-youtube' }, ACTIVE_BUFFER_MAP: { youtube: 'channel-youtube' }, TEXT_ONLY_SNS: [], AUTOMATED_SNS: ['youtube'] };
+      if (name === './buffer-channels') return { CHANNEL_MAP: { youtube: 'channel-youtube', instagram: 'channel-instagram' }, ACTIVE_BUFFER_MAP: { youtube: 'channel-youtube' }, PAUSED_SNS: ['instagram'], TEXT_ONLY_SNS: [], AUTOMATED_SNS: ['youtube'] };
       if (name === './buffer-client') return {
         findDuplicatePost: async () => duplicate,
         createPost: async () => { creates++; return { id: 'buffer-123', status: createdStatus }; },
-        getPost: async () => { if (lookupError) throw new Error('Read unavailable'); return remote; },
+        getPost: async () => { if (lookupError) throw lookupError instanceof Error ? lookupError : new Error('Read unavailable'); return remote; },
       };
       throw new Error(`Unexpected require: ${name}`);
     },
@@ -60,6 +64,93 @@ test('Buffer sending must remain unposted and preserve history', async () => {
   assert.deepEqual(s.row.post_result.failure_history, ['keep']);
   assert.equal(result.result, 'processing');
   assert.equal(s.creates(), 1);
+});
+
+test('NOT_FOUND records unavailable separately without changing publication or history', async () => {
+  const missing = Object.assign(new Error('Post not found'), { code: 'NOT_FOUND' });
+  const s = setup({ lookupError: missing });
+  Object.assign(s.row, { status: 'sent', external_service: 'buffer', external_post_id: 'buffer-123',
+    error_detail: 'Original record', matched_external_link: 'https://www.instagram.com/p/existing/' });
+  const result = await s.engine.syncBufferPost(s.client, s.row);
+  assert.equal(result.lookup_status, 'not_found');
+  assert.equal(s.row.status, 'sent');
+  assert.equal(s.row.error_detail, 'Original record');
+  assert.equal(s.row.matched_external_link, 'https://www.instagram.com/p/existing/');
+  assert.equal(s.row.post_result.buffer_lookup.state, 'not_found');
+  assert.equal(s.row.post_result.buffer_lookup.external_post_id, 'buffer-123');
+  assert.deepEqual(s.row.post_result.failure_history, ['keep']);
+  assert.equal(s.creates(), 0);
+});
+
+test('NOT_FOUND never promotes an unverified ready post to sent or failed', async () => {
+  const s = setup({ lookupError: Object.assign(new Error('Post not found'), { code: 'NOT_FOUND' }) });
+  Object.assign(s.row, { external_service: 'buffer', external_post_id: 'buffer-123' });
+  await s.engine.syncBufferPost(s.client, s.row);
+  assert.equal(s.row.status, 'ready');
+  assert.equal(s.row.post_result.buffer_lookup.state, 'not_found');
+  assert.equal(s.creates(), 0);
+});
+
+test('only old paused channel references get a 24 hour recheck interval', async () => {
+  for (const [sns, registeredAt, deferred] of [
+    ['instagram', '2026-09-22T10:35:39Z', true],
+    ['instagram', new Date().toISOString(), false],
+    ['youtube', '2026-09-22T10:35:39Z', false],
+  ]) {
+    const s = setup({ lookupError: Object.assign(new Error('Post not found'), { code: 'NOT_FOUND' }) });
+    Object.assign(s.row, { target_sns: sns, external_service: 'buffer', external_post_id: 'buffer-123' });
+    s.row.post_result.registeredAt = registeredAt;
+    await s.engine.syncBufferPost(s.client, s.row);
+    const delay = s.row.post_result.buffer_lookup.next_check_after - Date.now();
+    assert.equal(delay > 23 * 3600000, deferred, sns + registeredAt);
+    assert.equal(s.row.status, 'ready');
+  }
+});
+
+test('real Buffer failure clears unavailable lookup and keeps separate public evidence', async () => {
+  const s = setup({ remote: { id: 'buffer-123', channelId: 'channel-youtube', status: 'error', sentAt: null,
+    externalLink: null, error: { message: 'New failure' } } });
+  Object.assign(s.row, { external_service: 'buffer', external_post_id: 'buffer-123' });
+  s.row.post_result.buffer_lookup = { state: 'not_found', external_post_id: 'buffer-123', next_check_after: Date.now() + 86400000 };
+  s.row.post_result.public_verification = { evidence: 'keep' };
+  await s.engine.syncBufferPost(s.client, s.row);
+  assert.equal(s.row.status, 'failed');
+  assert.match(s.row.error_detail, /New failure/);
+  assert.equal(s.row.post_result.buffer_lookup.state, 'available');
+  assert.equal(s.row.post_result.public_verification.evidence, 'keep');
+  assert.equal(s.creates(), 0);
+});
+
+test('NOT_FOUND is reported as unverified, not a successful sync or a publishing failure', async () => {
+  const s = setup({ lookupError: Object.assign(new Error('Post not found'), { code: 'NOT_FOUND' }) });
+  Object.assign(s.row, { external_service: 'buffer', external_post_id: 'buffer-123' });
+  const query = s.client.query.bind(s.client);
+  s.client.query = async (sql, values) => {
+    if (sql.startsWith('SELECT * FROM sns.posts')) {
+      assert.match(sql, /target_sns <> ALL\(\$2::text\[\]\)/);
+      assert.deepEqual(Array.from(values[1]), ['instagram']);
+      return { rows: [s.row] };
+    }
+    return query(sql, values);
+  };
+  const result = await s.engine.syncBufferStatuses(s.client);
+  assert.equal(result.synced.length, 0);
+  assert.equal(result.unverified.length, 1);
+  assert.equal(result.errors.length, 0);
+  assert.equal(s.creates(), 0);
+});
+
+test('Buffer client exposes structured NOT_FOUND and keeps other error codes distinct', async () => {
+  for (const code of ['NOT_FOUND', 'UNAUTHORIZED']) {
+    const context = { module: { exports: {} }, process: { env: { BUFFER_API_KEY: 'test-value' } }, Buffer,
+      require() { return { request(url, options, done) { return { on() {}, write() {}, end() {
+        const handlers = {}; done({ on(event, callback) { handlers[event] = callback; } });
+        handlers.data(JSON.stringify({ errors: [{ message: 'Read failed', path: ['post'], extensions: { code } }] }));
+        handlers.end();
+      } }; } }; } };
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'buffer-client.js'), 'utf8'), context);
+    await assert.rejects(() => context.module.exports.getPost('buffer-123'), e => e.code === code);
+  }
 });
 
 test('Buffer scheduled is accepted, sent is published, error is failed', async () => {

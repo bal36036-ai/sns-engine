@@ -35,7 +35,37 @@ export type WorkSceneProps = {
   badge?: string;
   next?: { text: string; frames: number };
   depth?: { cam: CamKey[]; actorZ: Record<string, number> };
+  pile?: { x: number; start: number; end: number }; // 端材の山（単純な図形）。start〜end の間だけ見せる
+  captions?: { start: number; end: number; text: string }[]; // 画面下の字幕（条件の明示など）
 };
+
+// 端材の山：長さのちがう灰色の棒を積んだだけの図形（動作確認用の例ではなく、場面の小道具）
+const Pile: React.FC<{ x: number; start: number; end: number }> = ({ x, start, end }) => {
+  const frame = useCurrentFrame();
+  const o = interpolate(frame, [start, start + 6, end - 10, end], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  if (o <= 0) return null;
+  const bars: React.ReactNode[] = [];
+  for (let r = 0; r < 6; r++) {
+    const n = 7 - r;
+    for (let k = 0; k < n; k++) {
+      const len = 230 + random(`pl${r}-${k}`) * 200;
+      const rot = (random(`pr${r}-${k}`) - 0.5) * 30;
+      const bx = x - (n * 70) / 2 + k * 70 + (random(`pj${r}-${k}`) - 0.5) * 26;
+      const by = 1000 - r * 34 - random(`py${r}-${k}`) * 8;
+      const g = 110 + Math.round(random(`pg${r}-${k}`) * 70);
+      bars.push(
+        <div key={`${r}-${k}`} style={{ position: "absolute", left: bx - len / 2, top: by - 26, width: len, height: 26, borderRadius: 4, rotate: `${rot}deg`, background: `linear-gradient(rgb(${g + 30},${g + 34},${g + 40}), rgb(${g - 50},${g - 46},${g - 40}))`, boxShadow: "0 3px 6px rgba(0,0,0,0.45)" }} />,
+      );
+    }
+  }
+  return <div style={{ position: "absolute", inset: 0, opacity: o }}>{bars}</div>;
+};
+
+const CaptionBar: React.FC<{ text: string }> = ({ text }) => (
+  <div style={{ position: "absolute", left: 40, right: 40, bottom: 70, textAlign: "center" }}>
+    <span style={{ display: "inline-block", padding: "8px 24px", borderRadius: 16, background: "rgba(20,16,10,0.78)", fontFamily: FONT, fontSize: 40, fontWeight: 800, color: COLORS.white, lineHeight: 1.3, whiteSpace: "pre-line" }}>{text}</span>
+  </div>
+);
 // 2.5D のカメラの通り道（f：フレーム、x：横移動 px、z：前へ進む px、yaw：左右の向き 度）
 export type CamKey = { f: number; x: number; z: number; yaw: number };
 
@@ -219,6 +249,7 @@ const Scene3D: React.FC<{ p: WorkSceneProps }> = ({ p }) => {
         <AbsoluteFill style={{ transform: `translateZ(${BG_Z}px) scale(${((P3 - BG_Z) / P3) * 1.22})`, filter: `blur(${bgBlur}px)` }}>
           <WorkshopBg src={p.bg} panFrom={0} panTo={0} zoomFrom={1} zoomTo={1.03} />
         </AbsoluteFill>
+        {p.pile ? <Pile x={p.pile.x} start={p.pile.start} end={p.pile.end} /> : null}
         {/* キャラは前後の位置だけ変える（画面いっぱいの板を回すと、Chromeの描画でキャラが消えることがあった） */}
         {Object.entries(p.actors).map(([id, a], n) => (
           <AbsoluteFill key={id} style={{ transform: `translateZ(${d.actorZ[id] ?? 0}px)` }}>
@@ -239,6 +270,7 @@ export const WorkScene: React.FC<WorkSceneProps> = (p) => (
     ) : (
       <Camera cuts={p.cuts}>
         <WorkshopBg src={p.bg} />
+        {p.pile ? <Pile x={p.pile.x} start={p.pile.start} end={p.pile.end} /> : null}
         {Object.entries(p.actors).map(([id, a], n) => (
           <ActorView key={id} id={id} a={a} p={p} seed={n * 5} />
         ))}
@@ -254,6 +286,11 @@ export const WorkScene: React.FC<WorkSceneProps> = (p) => (
       <Sequence key={i} from={l.start} durationInFrames={l.frames} name={`${i + 1} ${p.actors[l.speaker].name}`}>
         <Bubble text={l.text} name={p.actors[l.speaker].name} color={p.actors[l.speaker].color} tailX={p.actors[l.speaker].x} />
         <Audio src={staticFile(`audio/${l.voice}`)} from={l.lead} volume={1} />
+      </Sequence>
+    ))}
+    {(p.captions ?? []).map((c, i) => (
+      <Sequence key={`cap-${i}`} from={c.start} durationInFrames={c.end - c.start} name={`字幕 ${i + 1}`}>
+        <CaptionBar text={c.text} />
       </Sequence>
     ))}
     {p.hook ? (

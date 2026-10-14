@@ -30,7 +30,7 @@ HOLD = 66
 # present：start＝最初からいる／("enter", 何番目の台詞の前に, "walk"|"slide")＝そのとき現れる
 EPISODES = {
     1: dict(
-        title="端材の山", badge="クロの鉄骨工房 第1話", hook="端材の山、\n全部で何ミリ？", next="次回\n6mから、4本は取れない？",
+        title="端材の山", badge="クロの鉄骨工房 第1話", pile=dict(x=560, start=0, end=640), pile_open=True, hook="長さ不明の端材、\n30本", next="次回\n6mから、4本は取れない？",
         present={"shinjin": "start", "shuna": "start", "kantoku": (3, "walk"), "sekkei": (8, "slide")},
         acting={
             0: {"shuna": "act:shuna_act-2"},
@@ -57,24 +57,24 @@ EPISODES = {
             ("shuna", "測れば分かる", "はかれば、わかる", {}, {}),
             ("shinjin", "三十本\nありますよ！？", "さんじゅっぽん、ありますよ！？", {"shinjin": "shinjin/s1-3", "kantoku": "kantoku/s1-3"}, dict(wide=True)),
             ("kantoku", "三十本…\nあしたまでに…", "さんじゅっぽん…あしたまでに…", {"kantoku": "kantoku/s1-3", "shinjin": "shinjin/s1-3"}, {}),
-            ("sekkei", "その端材、切る前に\n残りの長さが分かりますよ", "そのハザイ、きるまえに、のこりの、ながさが、わかりますよ", {}, dict(wide=True)),
-            ("shinjin", "切る前に！？", "きるまえに！？", {"shinjin": "shinjin/s1-3"}, {}),
+            ("sekkei", "この30本は、まず測りましょう。\n次からは、切る前に残りの長さを計算して、\n端材に書いておけます。", "このさんじゅっぽんは、まず、はかりましょう。つぎからは、きるまえに、のこりの、ながさを、けいさんして、ハザイに、かいておけます。", {}, dict(wide=True)),
+            ("shinjin", "書いておくんですね！", "かいておくんですね！", {"shinjin": "shinjin/s1-3"}, {}),
             ("sekkei", "キリドリで切り出し図を作ると、\n一本ずつの残りが出ます", "キリドリで、きりだしずを、つくると、いっぽんずつの、のこりが、でます。どうさかくにんようの、れいです。", {"sekkei": "sekkei/s2-3"},
-             dict(insert=dict(note=NOTE, foot="定尺6,000mm・刃幅5mm・部材6本（動作確認用の例）", items=[
+             dict(insert=dict(note="キリドリの実際の画面｜定尺6,000mm・刃幅5mm・部材6本", foot="切り出し図で、残りの長さを先に計算（動作確認用の例）", items=[
                  dict(dir="screens", file="stock1-auto.png", w=860, marks=[dict(x=0.86, y=0.36, w=0.13, h=0.34, at=40)]),
                  dict(dir="screens", file="stock2-auto.png", w=860, marks=[dict(x=0.86, y=0.36, w=0.13, h=0.34, at=70)])]))),
             ("sekkei", "この例では、2本で\n合計端材は970mmです", "この、れいでは、にほんで、ごうけいハザイは、きゅうひゃくななじゅうミリです。", {"sekkei": "sekkei/s1-1"},
-             dict(insert=dict(note=NOTE, foot="定尺6,000mm・刃幅5mm・部材6本（動作確認用の例）", items=[
+             dict(insert=dict(note="キリドリの実際の画面｜定尺6,000mm・刃幅5mm・部材6本", foot="切り出し図で、残りの長さを先に計算（動作確認用の例）", items=[
                  dict(dir="screens", file="summary-auto.png", w=860, marks=[dict(x=0.0, y=0.68, w=0.5, h=0.3, at=20)])]))),
-            ("kantoku", "おお、\n先に分かるのか！", "おお、さきに、わかるのか！", {"kantoku": "kantoku/s1-1"}, dict(wide=True)),
+            ("kantoku", "次から、\n切る前に分かるのか！", "つぎから、きるまえに、わかるのか！", {"kantoku": "kantoku/s1-1"}, dict(wide=True)),
             ("shuna", "…悪くない", "…わるくない", {}, {}),
             ("shinjin", "クロさんが、\nほめた！", "クロさんが、ほめた！", {"shinjin": "shinjin/s1-1"}, dict(wide=True)),
             ("shinjin", "クロさん、\nその手帳、なんですか？", "クロさん、その、てちょう、なんですか？", {"shinjin": "shinjin/s1-3"}, dict(wide=True)),
-            ("shuna", "…なんでもない", "…なんでもない", {"shuna": "shuna/s1_1-3"}, {}),
+            ("shuna", "…なんでもない", "…なんでもない", {"shuna": "shuna/s1_1-3"}, dict(closeup=True)),
         ],
     ),
     2: dict(
-        title="6mから4本は取れない", badge="クロの鉄骨工房 第2話", hook="6mから1.5mを\n4本。取れる？", next="次回\n並べ順で、材料が1本減る！？",
+        title="6mから4本は取れない", badge="クロの鉄骨工房 第2話", caption_lines={6: "例：刃幅3mmの場合"}, hook="6mから1.5mを\n4本。取れる？", next="次回\n並べ順で、材料が1本減る！？",
         present={"shinjin": "start", "shuna": "start", "kantoku": (3, "walk"), "sekkei": (6, "slide")},
         acting={
             0: {"shuna": "act:shuna_act-2"},
@@ -98,13 +98,13 @@ EPISODES = {
             ("sekkei", "刃の厚み3mmで、3回切ると9mm。\n6mでは足りません", "ハの、あつみ、さんミリで、さんかい、きると、きゅうミリ。ろくメートルでは、たりません。", {"sekkei": "sekkei/s2-3"}, dict(wide=True)),
             ("shinjin", "9mm！\nそれだけで！？", "きゅうミリ！それだけで！？", {"shinjin": "shinjin/s1-3"}, {}),
             ("kantoku", "9mmで、\n4本目が取れないのか！", "きゅうミリで、よんほんめが、とれないのか！", {"kantoku": "kantoku/s1-3"}, {}),
-            ("sekkei", "キリドリには、切りしろ（刃幅）の\n欄があります。例では5mmです", "キリドリには、きりしろの、らんが、あります。れいでは、ごミリです。", {"sekkei": "sekkei/s1-1"},
-             dict(insert=dict(note=NOTE, foot="動作確認用の例（定尺6,000mm）", items=[
+            ("sekkei", "ここからは、別の動作確認例です。\n刃幅5mmで見てみます", "ここからは、べつの、どうさかくにんの、れいです。きりしろ、ごミリで、みてみます。", {"sekkei": "sekkei/s1-1"},
+             dict(insert=dict(note="キリドリの実際の画面｜別の動作確認例", foot="さっきの3mmの例とは、別の条件です", items=[
                  dict(dir="screens", file="conditions.png", w=860, marks=[dict(x=0.52, y=0.4, w=0.46, h=0.5, at=40)])]))),
             ("sekkei", "切りしろを入れると、\n刃幅ロスも別に数えます", "きりしろを、いれると、はばロスも、べつに、かぞえます。", {"sekkei": "sekkei/s1-1"},
-             dict(insert=dict(note=NOTE, foot="上：刃幅0mm／下：刃幅5mm（動作確認用の例）", items=[
-                 dict(dir="screens", file="summary-kerf0.png", w=820, crop=(0, 0.68, 1, 0.32), marks=[dict(x=0.5, y=0.1, w=0.5, h=0.8, at=25)]),
-                 dict(dir="screens", file="summary-auto.png", w=820, crop=(0, 0.68, 1, 0.32), marks=[dict(x=0.5, y=0.1, w=0.5, h=0.8, at=70)])]))),
+             dict(insert=dict(note="キリドリの実際の画面｜上：刃幅0mm／下：刃幅5mm", foot="別の動作確認例：刃幅5mm・実切断6回・刃幅ロス30mm", items=[
+                 dict(dir="screens", file="summary-kerf0.png", w=780, crop=(0, 0.36, 1, 0.64), marks=[dict(x=0.0, y=0.02, w=0.5, h=0.46, at=20), dict(x=0.5, y=0.52, w=0.5, h=0.46, at=40)]),
+                 dict(dir="screens", file="summary-auto.png", w=780, crop=(0, 0.36, 1, 0.64), marks=[dict(x=0.0, y=0.02, w=0.5, h=0.46, at=60), dict(x=0.5, y=0.52, w=0.5, h=0.46, at=80)])]))),
             ("shinjin", "入れ忘れると、条件が\n変わっちゃうんですね", "いれわすれると、じょうけんが、かわっちゃうんですね", {"shinjin": "shinjin/s1-3"}, dict(wide=True)),
             ("shuna", "だから俺は、\nまず、刃を見る", "だから、おれは、まず、はを、みる", {"shuna": "shuna/s1_1-1"}, {}),
             ("shinjin", "クロさん、\nかっこいい…！", "クロさん、かっこいい…！", {"shinjin": "shinjin/s1-1"}, dict(wide=True)),
@@ -165,7 +165,15 @@ def build(no):
         e = lines[i + 1]["start"] if i + 1 < len(lines) else total
         if i + 1 in pre_of:
             e = pre_of[i + 1]
-        if opt.get("wide") or "insert" in opt:
+        if i == 0 and ep.get("pile_open"):
+            # 冒頭：端材の山へ寄って始め、引いて2人を見せる
+            mid = min(e, s + 66)
+            cuts.append({"start": s, "end": mid, "z0": 1.75, "z1": 1.2, "ox": ep["pile"]["x"], "oy": 1015, "pile": True})
+            cuts.append({"start": mid, "end": e, "z0": 1.0, "z1": 1.05, "ox": 540, "oy": 1015})
+        elif opt.get("closeup"):
+            # クロの手元（手帳）へ、大きく寄る
+            cuts.append({"start": s, "end": e, "z0": 1.6, "z1": 2.05, "ox": X[ln["speaker"]], "oy": 850, "close": True})
+        elif opt.get("wide") or "insert" in opt:
             cuts.append({"start": s, "end": e, "z0": 1.0, "z1": 1.05, "ox": 540, "oy": 1015})
         else:
             z0, z1 = 1.38, 1.5
@@ -247,7 +255,9 @@ def build(no):
         inserts.append({"start": lines[i]["start"] + (0 if prev_has else 4), "end": end, "note": ins["note"], "foot": ins["foot"], "items": items})
 
     props = {"actors": actors, "rigs": rigs, "sizes": SIZES, "lines": lines, "bg": "scene/bg_workshop.png", "bgm": "bgm-pop-long.wav", "bgmVolume": 0.24,
-             "credit": CREDIT, "total": total, "cuts": cuts, "hook": {"text": ep["hook"], "frames": 50}, "badge": ep["badge"], "next": {"text": ep["next"], "frames": NEXT_FRAMES},
+             "credit": CREDIT, "total": total, "cuts": cuts,
+             **({"pile": ep["pile"]} if "pile" in ep else {}),
+             **({"captions": [{"start": lines[i]["start"], "end": lines[i]["start"] + lines[i]["frames"], "text": tx} for i, tx in ep["caption_lines"].items()]} if "caption_lines" in ep else {}), "hook": {"text": ep["hook"], "frames": 50}, "badge": ep["badge"], "next": {"text": ep["next"], "frames": NEXT_FRAMES},
              **({"inserts": inserts} if inserts else {})}
     (ROOT / "props" / f"{name}.json").write_text(json.dumps(props, ensure_ascii=False), encoding="utf-8")
     print(f"{name}「{ep['title']}」: {total / FPS:.1f}秒", flush=True)

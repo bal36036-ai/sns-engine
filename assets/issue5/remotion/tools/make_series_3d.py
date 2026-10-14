@@ -13,6 +13,11 @@ MOVE = 16  # カメラが次の位置へ動く長さ（フレーム）
 
 
 def target(cut, speaker_x):
+    if cut.get("pile"):  # 冒頭：端材の山へ寄って始め、引いていく
+        return {"x": 0, "z": 420, "yaw": 0}, -420
+    if cut.get("close"):  # 手帳の手元へ寄る
+        off = speaker_x - 540
+        return {"x": round(off * 0.6), "z": 380, "yaw": round(-off / 540 * 5, 2)}, 110
     if cut["z0"] <= 1.01:  # 引き
         return {"x": 0, "z": 0, "yaw": 0}, 40
     off = speaker_x - 540

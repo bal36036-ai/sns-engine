@@ -8,7 +8,7 @@ const APPLY = process.env.APPLY === "1";
 // 2026-10-13本人承認：DeZRV89lBuzへの返信1件のみ。本文・対象は承認済み。
 // 認証、apply制御、ワークフローは既存のものを使う。
 const REPLIES = [
-  { commentShort: "DeZRV89lBuz", text: "鴨居の例、くわしく教えてくださってありがとうございます。仕口や木表・木裏、節の位置、元末まで見て材料を選ぶので、長さの組み合わせだけでは木取りの代わりにならない、というのがよく分かりました。とても勉強になりました。" },
+  { commentShort: "DebrTE8lGFA", text: "そうですね、教えていただいた鴨居のように、木の性質や使いどころまで見られるようになると、ぐっと実用的なものになりそうです。" },
 ];
 const COMMENTER = "hongfushixiaochu";
 

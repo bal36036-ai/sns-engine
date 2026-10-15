@@ -23,6 +23,8 @@ DEFAULT = {"shuna": "shuna/s1_1-1", "kantoku": "kantoku/s1-1", "sekkei": "sekkei
 CREDIT = "架空のキャラクターの会話｜絵：AIで作成｜音声：VOICEVOX Nemo｜げんばアプリ工房"
 NOTE = "キリドリの実際の画面（動作確認用の例）"
 GAP = 4
+CHORUS_FRAMES = 54  # 最後の「ご安全に！」（4匹そろって）
+CHORUS_ACT = {"shuna": "shuna_act-4", "kantoku": "kantoku_act-4", "sekkei": "sekkei_act-4", "shinjin": "shinjin_act-4"}
 PRE = 34  # 登場の歩き・すべり込みに使う、しゃべらない間
 NEXT_FRAMES = 78
 HOLD = 66
@@ -100,7 +102,7 @@ EPISODES = {
             ("kantoku", "9mmで、\n4本目が取れないのか！", "きゅうミリで、よんほんめが、とれないのか！", {"kantoku": "kantoku/s1-3"}, {}),
             ("sekkei", "ここからは、別の動作確認例です。\n刃幅5mmで見てみます", "ここからは、べつの、どうさかくにんの、れいです。きりしろ、ごミリで、みてみます。", {"sekkei": "sekkei/s1-1"},
              dict(insert=dict(note="キリドリの実際の画面｜別の動作確認例", foot="さっきの3mmの例とは、別の条件です", items=[
-                 dict(dir="screens", file="conditions.png", w=860, marks=[dict(x=0.52, y=0.4, w=0.46, h=0.5, at=40)])]))),
+                 dict(dir="screens", file="conditions.png", w=860, crop=(0, 0, 1, 0.235), marks=[dict(x=0.5, y=0.58, w=0.48, h=0.4, at=40)])]))),
             ("sekkei", "切りしろを入れると、\n刃幅ロスも別に数えます", "きりしろを、いれると、はばロスも、べつに、かぞえます。", {"sekkei": "sekkei/s1-1"},
              dict(insert=dict(note="キリドリの実際の画面｜上：刃幅0mm／下：刃幅5mm", foot="別の動作確認例：刃幅5mm・実切断6回・刃幅ロス30mm", items=[
                  dict(dir="screens", file="summary-kerf0.png", w=780, crop=(0, 0.36, 1, 0.64), marks=[dict(x=0.0, y=0.02, w=0.5, h=0.46, at=20), dict(x=0.5, y=0.52, w=0.5, h=0.46, at=40)]),
@@ -156,13 +158,14 @@ def build(no):
         lines.append({"start": t, "speaker": who, "text": text, "voice": f"{name}/line-{i}.wav", "lead": LEAD, "mouth": mouth, "frames": frames})
         print(f"{name} {i + 1:2d} {NAMES[who]}: {d:.2f}秒", flush=True)
         t += frames + GAP
-    total = t + HOLD
+    chorus_start = t
+    total = chorus_start + CHORUS_FRAMES + 40
     # 画面の寄り引き：話す人を画面の中央へ。wide の台詞と、画面を見せる台詞は引き
     cuts = []
     for i, ln in enumerate(lines):
         opt = ep["lines"][i][4]
         s = ln["start"]
-        e = lines[i + 1]["start"] if i + 1 < len(lines) else total
+        e = lines[i + 1]["start"] if i + 1 < len(lines) else chorus_start
         if i + 1 in pre_of:
             e = pre_of[i + 1]
         if i == 0 and ep.get("pile_open"):
@@ -182,6 +185,7 @@ def build(no):
             cuts.append({"start": s, "end": e, "z0": z0, "z1": z1, "ox": round(ox), "oy": 1015})
         if i in pre_of:  # 登場の間は引き
             cuts.append({"start": pre_of[i], "end": ln["start"], "z0": 1.0, "z1": 1.0, "ox": 540, "oy": 1015})
+    cuts.append({"start": chorus_start, "end": total, "z0": 1.0, "z1": 1.05, "ox": 540, "oy": 1015})
     cuts = [c for c in cuts if c["end"] > c["start"]]
     # 同じ時間の重なりは、あとのものを優先して整理
     cuts.sort(key=lambda c: (c["start"], -c["end"]))
@@ -212,7 +216,7 @@ def build(no):
                 tracks.append({"kind": "cycle", "start": pre_of[idx], "end": begin, "files": ["sekkei/s2-2.png"], "fps": 1, "x0": 1300, "x1": X[who], "height": h, "bob": 10})
         for i, ln in enumerate(lines):
             s0 = max(0 if i == 0 else ln["start"], begin)
-            e0 = lines[i + 1]["start"] if i + 1 < len(lines) else total
+            e0 = lines[i + 1]["start"] if i + 1 < len(lines) else chorus_start
             if e0 <= s0:
                 continue
             pose = {**ep["lines"][i][3], **ep.get("acting", {}).get(i, {})}.get(who, DEFAULT[who])
@@ -224,6 +228,10 @@ def build(no):
                 tracks.append({"kind": "cycle", "start": s0, "end": e0, "files": [file], "fps": 1, "height": hh})
             else:
                 tracks.append({"kind": "rig", "start": s0, "end": e0, "rig": pose, "height": h})
+        # 最後の「ご安全に！」：4匹そろって演技の絵
+        cf = f"actions/{CHORUS_ACT[who]}.png"
+        cref = f"actions/{CHORUS_ACT[who].rsplit('-', 1)[0]}-1.png"
+        tracks.append({"kind": "cycle", "start": chorus_start, "end": total, "files": [cf], "fps": 1, "height": round(h * SIZES[cf][1] / SIZES[cref][1])})
         # 登場の間（しゃべらない間）：すでにいる子は、直前の絵のまま（すき間をふさぐ）
         tracks.sort(key=lambda k: (k["start"], 0 if k["kind"] == "cycle" else 1))
         for a, b in zip(tracks, tracks[1:]):
@@ -254,8 +262,34 @@ def build(no):
             items.append(e)
         inserts.append({"start": lines[i]["start"] + (0 if prev_has else 4), "end": end, "note": ins["note"], "foot": ins["foot"], "items": items})
 
+    # 「ご安全に！」の声：4匹の声をそれぞれ作って、重ねる
+    import wave
+
+    import numpy as np
+
+    parts = []
+    for who in ORDER:
+        c = CAST[who]
+        wp = out / f"chorus-{who}.wav"
+        d, _ = voice("ごあんぜんに！", wp, c["voice"], c["pitch"])
+        with wave.open(str(wp), "rb") as w:
+            sr = w.getframerate()
+            parts.append(np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(float) / 32768)
+    n = max(len(a) for a in parts)
+    mix = np.zeros(n)
+    for a in parts:
+        mix[: len(a)] += a
+    mix = mix / max(1e-6, np.max(np.abs(mix))) * 0.9
+    with wave.open(str(out / "chorus.wav"), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sr)
+        w.writeframes((mix * 32767).astype("<i2").tobytes())
+
     props = {"actors": actors, "rigs": rigs, "sizes": SIZES, "lines": lines, "bg": "scene/bg_workshop.png", "bgm": "bgm-pop-long.wav", "bgmVolume": 0.24,
              "credit": CREDIT, "total": total, "cuts": cuts,
+             "logo": {"text": "クロの鉄骨工房", "frames": 34, "sound": "series-jingle.wav"},
+             "chorus": {"start": chorus_start, "frames": CHORUS_FRAMES, "text": "ご安全に！", "voice": f"{name}/chorus.wav"},
              **({"pile": ep["pile"]} if "pile" in ep else {}),
              **({"captions": [{"start": lines[i]["start"], "end": lines[i]["start"] + lines[i]["frames"], "text": tx} for i, tx in ep["caption_lines"].items()]} if "caption_lines" in ep else {}), "hook": {"text": ep["hook"], "frames": 50}, "badge": ep["badge"], "next": {"text": ep["next"], "frames": NEXT_FRAMES},
              **({"inserts": inserts} if inserts else {})}

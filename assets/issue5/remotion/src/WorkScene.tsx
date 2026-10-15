@@ -38,6 +38,8 @@ export type WorkSceneProps = {
   pile?: { x: number; start: number; end: number }; // 端材の山（単純な図形）。start〜end の間だけ見せる
   captions?: { start: number; end: number; text: string }[]; // 画面下の字幕（条件の明示など）
   bgVideo?: string; // 3D（Blender）で書き出した背景の映像。指定すると、背景の絵の代わりに使う
+  logo?: { text: string; frames: number; sound: string }; // 冒頭1秒のシリーズのロゴ＋ジングル（事件の一言と重ねる）
+  chorus?: { start: number; frames: number; text: string; voice: string }; // 最後の「ご安全に！」（4匹そろって）
   track?: Record<string, { x: number[]; y: number[]; s: number[] }>; // Blenderのカメラに合わせた、4匹の足元の位置（x,y）と大きさ（s）
 };
 
@@ -77,6 +79,34 @@ const Camera: React.FC<{ cuts?: Cut[]; children: React.ReactNode }> = ({ cuts, c
   const z = c ? interpolate(frame, [c.start, c.end], [c.z0, c.z1]) : 1;
   const punch = c ? interpolate(frame, [c.start, c.start + 5], [1.05, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : 1;
   return <AbsoluteFill style={{ transformOrigin: c ? `${c.ox}px ${c.oy}px` : "50% 100%", scale: `${z * punch}` }}>{children}</AbsoluteFill>;
+};
+
+
+// 冒頭1秒のシリーズのロゴ（事件の一言と重ねて出す。前置きにしない）
+const SeriesLogo: React.FC<{ text: string; frames: number }> = ({ text, frames }) => {
+  const frame = useCurrentFrame();
+  const pop = interpolate(frame, [0, 8], [0.6, 1], { extrapolateRight: "clamp", easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const fade = interpolate(frame, [frames - 8, frames], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, top: 0, textAlign: "center", opacity: fade, scale: `${pop}`, transformOrigin: "50% 0%" }}>
+      <span style={{ display: "inline-block", padding: "2px 40px 6px", background: "rgba(20,16,10,0.9)", borderBottom: `7px solid ${COLORS.orange}`, borderRadius: "0 0 18px 18px", fontFamily: FONT, fontSize: 50, fontWeight: 900, color: "#FFD23F", letterSpacing: 4, boxShadow: "0 8px 20px rgba(0,0,0,0.45)" }}>{text}</span>
+    </div>
+  );
+};
+
+// 最後の「ご安全に！」（建設現場の本物のあいさつ。4匹の声が重なる）
+const Chorus: React.FC<{ text: string; frames: number; voice: string }> = ({ text, frames, voice }) => {
+  const frame = useCurrentFrame();
+  const pop = interpolate(frame, [0, 8], [0.5, 1], { extrapolateRight: "clamp", easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const out = interpolate(frame, [frames - 6, frames], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 150, textAlign: "center", opacity: out, scale: `${pop}`, rotate: "-3deg" }}>
+        <span style={{ display: "inline-block", padding: "10px 44px 16px", background: "#FFD23F", border: `9px solid ${COLORS.navy}`, borderRadius: 30, fontFamily: FONT, fontSize: 132, fontWeight: 900, color: COLORS.navy, boxShadow: "0 16px 34px rgba(0,0,0,0.45)" }}>{text}</span>
+      </div>
+      <Audio src={staticFile(`audio/${voice}`)} volume={1} />
+    </>
+  );
 };
 
 const Hook: React.FC<{ text: string; frames: number }> = ({ text, frames }) => {
@@ -309,7 +339,23 @@ export const WorkScene: React.FC<WorkSceneProps> = (p) => (
         <Hook text={p.hook.text} frames={p.hook.frames} />
       </Sequence>
     ) : null}
-    {p.badge ? <div style={{ position: "absolute", right: 34, top: 14, padding: "4px 16px", borderRadius: 14, background: "rgba(20,16,10,0.62)", fontFamily: FONT, fontSize: 28, fontWeight: 800, color: "#FFD23F" }}>{p.badge}</div> : null}
+    {p.logo ? (
+      <Sequence from={0} durationInFrames={p.logo.frames} name="シリーズのロゴ">
+        <SeriesLogo text={p.logo.text} frames={p.logo.frames} />
+        <Audio src={staticFile(`audio/${p.logo.sound}`)} volume={0.55} />
+      </Sequence>
+    ) : null}
+    {p.badge && p.logo ? (
+      <Sequence from={p.logo.frames} name="話数">
+        <div style={{ position: "absolute", right: 34, top: 14, padding: "4px 16px", borderRadius: 14, background: "rgba(20,16,10,0.62)", fontFamily: FONT, fontSize: 28, fontWeight: 800, color: "#FFD23F" }}>{p.badge}</div>
+      </Sequence>
+    ) : null}
+    {p.chorus ? (
+      <Sequence from={p.chorus.start} durationInFrames={p.chorus.frames} name="ご安全に">
+        <Chorus text={p.chorus.text} frames={p.chorus.frames} voice={p.chorus.voice} />
+      </Sequence>
+    ) : null}
+    {p.badge ? <div style={{ opacity: p.logo ? 0 : 1, position: "absolute", right: 34, top: 14, padding: "4px 16px", borderRadius: 14, background: "rgba(20,16,10,0.62)", fontFamily: FONT, fontSize: 28, fontWeight: 800, color: "#FFD23F" }}>{p.badge}</div> : null}
     {p.next ? (
       <Sequence from={p.total - p.next.frames} durationInFrames={p.next.frames} name="つづく">
         <NextCard text={p.next.text} frames={p.next.frames} />

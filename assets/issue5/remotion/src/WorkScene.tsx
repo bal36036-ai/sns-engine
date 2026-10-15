@@ -38,6 +38,7 @@ export type WorkSceneProps = {
   pile?: { x: number; start: number; end: number }; // 端材の山（単純な図形）。start〜end の間だけ見せる
   captions?: { start: number; end: number; text: string }[]; // 画面下の字幕（条件の明示など）
   bgVideo?: string; // 3D（Blender）で書き出した背景の映像。指定すると、背景の絵の代わりに使う
+  track?: Record<string, { x: number[]; y: number[]; s: number[] }>; // Blenderのカメラに合わせた、4匹の足元の位置（x,y）と大きさ（s）
 };
 
 // 端材の山：長さのちがう灰色の棒を積んだだけの図形（動作確認用の例ではなく、場面の小道具）
@@ -162,26 +163,35 @@ const ActorView: React.FC<{ id: string; a: Actor; p: WorkSceneProps; seed: numbe
   const talking = !!(speaking && line && local >= line.lead && local < line.lead + line.mouth.length);
   // 切り替わりの瞬間を少し重ねる（パッと変わらないように）
   const fadeIn = interpolate(frame, [tr.start, tr.start + 5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // Blenderのカメラの動きに合わせる（足元の位置と大きさ）。登場の歩き・すべり込みの間は、元の動きのまま
+  const tk = p.track?.[id];
+  const ti = Math.max(0, Math.min((tk?.x.length ?? 1) - 1, frame));
+  const walking = tr.kind === "cycle" && tr.x0 !== undefined;
+  const useTk = !!tk && !walking;
+  const fy = useTk ? tk!.y[ti] : FEET_Y;
+  const sc = useTk ? tk!.s[ti] : 1;
+  const fx = useTk ? tk!.x[ti] : undefined;
   if (tr.kind === "cycle") {
     const t = frame - tr.start;
     const i = Math.floor((t * tr.fps) / 30) % tr.files.length;
     const file = tr.files[i];
     const [w, h] = p.sizes[file];
-    const width = (w * tr.height) / h;
-    const x = tr.x0 !== undefined && tr.x1 !== undefined ? interpolate(frame, [tr.start, tr.end], [tr.x0, tr.x1], { extrapolateRight: "clamp" }) : a.x;
+    const hh = tr.height * sc;
+    const width = (w * hh) / h;
+    const x = fx ?? (tr.x0 !== undefined && tr.x1 !== undefined ? interpolate(frame, [tr.start, tr.end], [tr.x0, tr.x1], { extrapolateRight: "clamp" }) : a.x);
     const bob = tr.bob ? -Math.abs(Math.sin((t * Math.PI * tr.fps) / 60)) * tr.bob : 0;
     return (
       <div style={{ opacity: fadeIn }}>
-        <div style={{ position: "absolute", left: x - 115, top: FEET_Y - 14, width: 230, height: 30, borderRadius: "50%", background: "rgba(25,18,10,0.35)", filter: "blur(6px)" }} />
-        <Img src={staticFile(`chara/${file}`)} style={{ position: "absolute", left: x - width / 2, top: FEET_Y - tr.height + bob, width, height: tr.height }} />
+        <div style={{ position: "absolute", left: x - 115 * sc, top: fy - 14 * sc, width: 230 * sc, height: 30 * sc, borderRadius: "50%", background: "rgba(25,18,10,0.35)", filter: "blur(6px)" }} />
+        <Img src={staticFile(`chara/${file}`)} style={{ position: "absolute", left: x - width / 2, top: fy - hh + bob, width, height: hh }} />
       </div>
     );
   }
-  const x = tr.x ?? a.x;
+  const x = fx ?? tr.x ?? a.x;
   return (
     <div style={{ opacity: fadeIn }}>
-      <div style={{ position: "absolute", left: x - 115, top: FEET_Y - 14, width: 230, height: 30, borderRadius: "50%", background: "rgba(25,18,10,0.35)", filter: "blur(6px)" }} />
-      <PuppetDog rig={p.rigs[tr.rig]} height={tr.height} x={x} feetY={FEET_Y} mouth={m} talking={talking} tilt={interpolate(frame, [tr.start, tr.start + 14], [0, tr.tilt ?? 0], { extrapolateRight: "clamp" })} seed={seed} offset={0} />
+      <div style={{ position: "absolute", left: x - 115 * sc, top: fy - 14 * sc, width: 230 * sc, height: 30 * sc, borderRadius: "50%", background: "rgba(25,18,10,0.35)", filter: "blur(6px)" }} />
+      <PuppetDog rig={p.rigs[tr.rig]} height={tr.height * sc} x={x} feetY={fy} mouth={m} talking={talking} tilt={interpolate(frame, [tr.start, tr.start + 14], [0, tr.tilt ?? 0], { extrapolateRight: "clamp" })} seed={seed} offset={0} />
     </div>
   );
 };

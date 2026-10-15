@@ -195,11 +195,10 @@ con.track_axis = "TRACK_NEGATIVE_Z"
 con.up_axis = "UP_Y"
 
 keys = [
-    # フレーム, カメラの位置, 見る先
-    (1, (0.5, -2.2, 0.55), (0.0, 0.6, 0.45)),
-    (66, (0.2, -5.6, 1.3), (0.0, 3.0, 1.2)),
-    (150, (-0.4, -8.2, 1.7), (0.3, 6.0, 1.6)),
-    (300, (-0.9, -8.8, 1.8), (0.6, 6.0, 1.65)),
+    # フレーム, カメラの位置, 見る先（4匹が画面に入る距離から、ゆっくり引く）
+    (1, (0.0, -3.9, 1.15), (0.0, 1.0, 1.9)),
+    (120, (0.0, -4.4, 1.45), (0.0, 1.0, 2.2)),
+    (300, (0.3, -4.8, 1.5), (0.0, 1.0, 2.2)),
 ]
 for f, p, t in keys:
     cam.location = p
@@ -210,12 +209,36 @@ for fc in list(cam.animation_data.action.fcurves) + list(tgt.animation_data.acti
     for kp in fc.keyframe_points:
         kp.interpolation = "BEZIER"
 
+# ---------- 4匹の足元を、画面の位置と大きさに直して書き出す（Remotionで使う） ----------
+from bpy_extras.object_utils import world_to_camera_view
+import json
+
+CHARS = {"shinjin": (-1.7, 0.0), "kantoku": (-0.55, 0.15), "sekkei": (0.6, 0.15), "shuna": (1.7, 0.0)}
+
+
+def export_track(path):
+    tr = {k: {"x": [], "y": [], "d": []} for k in CHARS}
+    for f in range(1, FRAMES + 1):
+        scene.frame_set(f)
+        for k, (cx, cy) in CHARS.items():
+            c = world_to_camera_view(scene, cam, Vector((cx, cy, 0.0)))
+            tr[k]["x"].append(round(c.x * 1080, 1))
+            tr[k]["y"].append(round((1 - c.y) * 1080, 1))
+            tr[k]["d"].append(c.z)
+    for k in tr:
+        d_end = tr[k]["d"][-1]
+        tr[k]["s"] = [round(d_end / d, 4) for d in tr[k].pop("d")]
+    with open(path, "w", encoding="utf-8") as fp:
+        json.dump(tr, fp)
+
+
 if MODE == "still":
     scene.frame_set(int(args[1]))
     scene.render.filepath = args[2]
     bpy.ops.render.render(write_still=True)
 else:
     scene.render.image_settings.file_format = "PNG"
+    export_track(args[1] + "_track.json")
     scene.render.filepath = args[1] + "/f"
     bpy.ops.render.render(animation=True)
 print("DONE", MODE)

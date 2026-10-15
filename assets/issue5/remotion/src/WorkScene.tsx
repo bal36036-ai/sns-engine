@@ -1,4 +1,4 @@
-import { Audio } from "@remotion/media";
+import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, Easing, Img, interpolate, random, Sequence, staticFile, useCurrentFrame } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { PuppetDog, Rig } from "./PuppetDog";
@@ -37,6 +37,7 @@ export type WorkSceneProps = {
   depth?: { cam: CamKey[]; actorZ: Record<string, number> };
   pile?: { x: number; start: number; end: number }; // 端材の山（単純な図形）。start〜end の間だけ見せる
   captions?: { start: number; end: number; text: string }[]; // 画面下の字幕（条件の明示など）
+  bgVideo?: string; // 3D（Blender）で書き出した背景の映像。指定すると、背景の絵の代わりに使う
 };
 
 // 端材の山：長さのちがう灰色の棒を積んだだけの図形（動作確認用の例ではなく、場面の小道具）
@@ -269,8 +270,8 @@ export const WorkScene: React.FC<WorkSceneProps> = (p) => (
       <Scene3D p={p} />
     ) : (
       <Camera cuts={p.cuts}>
-        <WorkshopBg src={p.bg} />
-        {p.pile ? <Pile x={p.pile.x} start={p.pile.start} end={p.pile.end} /> : null}
+        {p.bgVideo ? <Video src={staticFile(p.bgVideo)} muted style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} /> : <WorkshopBg src={p.bg} />}
+        {p.pile && !p.bgVideo ? <Pile x={p.pile.x} start={p.pile.start} end={p.pile.end} /> : null}
         {Object.entries(p.actors).map(([id, a], n) => (
           <ActorView key={id} id={id} a={a} p={p} seed={n * 5} />
         ))}

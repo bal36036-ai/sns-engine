@@ -1,13 +1,15 @@
 # SNS運用エンジン 現在地
 
-更新：2026-10-18（隔離コピー。以下の節約変更は本番未適用）
+更新：2026-10-18（GitHub保存・本番DB適用済み。通常投稿の公開確認を追跡中）
 
-- 実装・ローカル検証：投稿候補もBuffer配信同期候補もない回だけ、Vault読取前にdispatchを省略する移行SQLと切戻しSQLを用意。候補条件は既存JSと同じ。
-- 検証：PGlite 56件・既存Buffer回帰16件に加え、通常のPostgreSQL 17.6で同じ56件と複数プロセス競合4件、計60件が成功。実投稿・実dispatch・本番DB書込・push・Actions実行なし。
+- 本番適用：本人の追加承認に基づき、投稿候補もBuffer配信同期候補もない回だけVault読取前にdispatchを省略する移行を適用。mainへ検証済みコミットd433e6fまでpush済み。候補条件は既存JSと同じ。
+- 検証：PGlite 56件・既存Buffer回帰16件に加え、通常のPostgreSQL 17.6で同じ56件と複数プロセス競合4件、計60件が成功。手動投稿・手動dispatch・手動Actions起動なし。本番書込は承認済み移行のみ。
 - レビュー：Codex自己レビュー済み。Claude Codeの限定読取レビューでブロッカーなし。追加テストは自己レビュー。
 - 本番読取確認：正規Supabaseコネクタで所有者postgres・SECURITY DEFINER・BYPASSRLS・テーブル所有者を確認。記録済み本文とDB内の指紋比較が一致（本文・Vault値は取得なし）。
-- 未完了：本番適用・pushは別承認待ち。正本の既存差分は要整理のため変更せず、このタスク専用コピーで実装。予備scheduleは無変更で、無料枠内は保証しない。
-- 詳細・次の作業：`stage41-idle-dispatch-gate-20261018.md` の本番前注意を確認して適用可否を判断する。
+- 適用後確認：追加ゲートあり・元の関数本文の残り一致・所有者/ACL/SECURITY DEFINER/search_path維持をDB内比較で確認。課金・権限・認証・15分cron・予備schedule・投稿内容は無変更。
+- 空振り省略：08:37 JST自然cron runid1914が成功。両候補0・HTTP待ち0・pg_netレスポンスID増加なし・新規repository_dispatchなしを確認。
+- 未完了：次の通常投稿（10/18 09:30 JST Threads）とBuffer配信同期の公開確認。09:42 JSTから読取だけの追跡タスクを登録済み。正本の既存差分は要整理のため変更せず、このタスク専用コピーで実装。無料枠内は保証しない。
+- 詳細・次の作業：`stage41-idle-dispatch-gate-20261018.md` の本番確認記録を参照し、自然実行による公開結果を追記する。
 
 - 正本：GitHub `bal36036-ai/sns-engine` / `main`（Private）。
 - 実行：既存GitHub ActionsのscheduleとSupabaseからのcron-live。手動実行はdry-run。

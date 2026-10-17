@@ -1,6 +1,6 @@
 # 空の定期確認だけ GitHub への合図を省略する変更
 
-状態：実装・ローカル検証用。本番未適用、push なし。
+状態：2026-10-18 08:34:12 JSTに本番DB適用済み、GitHub保存済み。08:37自然cronの空振り省略を確認。次の通常投稿の自然実行を追跡中。
 
 ## 目的と承認範囲
 
@@ -13,8 +13,8 @@
 - 適用指示：`C:\新しいフォルダー\OneDrive\AI作成\AGENTS.md`。SNS集客・エンジン配下に独自 AGENTS.md はない。
 - 正本には既存差分があるため、正本を fetch/pull/編集せず、GitHub からタスク内の専用 sparse clone を作成した。
 - 隔離作業：`C:\Users\sdk_y\Documents\Codex\2026-10-18\task-2\sns-engine-dispatch-guard`、ブランチ `codex/skip-idle-dispatch`。
-- 実装・mock/ローカルDB検証・レビューのみ承認済み。本番適用、push、課金、予備経路変更は未承認。
-- 実投稿・実dispatch・本番DB書込・Issue送信・Actions起動は実施しない。秘密は取得・出力しない。別のキリドリ作業は変更しない。
+- 当初は実装・mock/ローカルDB検証・レビューだけの承認。追加で本人がGitHub保存・push・本番適用・次の通常投稿追跡を承認（返信メッセージID `Sentinel_40f3ffecc93081919549e83aa25a1574`、委任元による記録）。課金・予備経路変更は対象外。
+- 手動の実投稿・dispatch・再送・Actions起動・Issue送信は行わない。本番書込は承認済みの移行だけ。既存の通常予定投稿を読取追跡する。秘密は取得・出力しない。別のキリドリ作業は変更しない。
 
 ## 変更ファイル
 
@@ -94,7 +94,7 @@ node --test test-buffer-status.js
 - 競合追加4：候補2件・limit 1で2プロセスが行ロックを同時保持し、別々の投稿を取得。各1回のmock投稿・異なる外部ID2件を確認。
 - 既存GitHub concurrencyとJS claim処理は無変更。実GitHubイベントは送らず、DBの同時起動を通常より厳しい並列条件で試した。
 - 後片付け確認：テスト用postgresプロセス0、一時DBディレクトリ0。
-- 実cron、実Buffer、実投稿、本番負荷は未検証。追加依頼に従い本番への接続は以下の読取だけを実施。
+- 実Buffer、実投稿、本番負荷は未検証。検証段階は以下の読取だけを実施し、その後の追加承認で本番移行を適用。自然cronの空振り省略は本番確認欄に記録。
 
 ## 本番の非秘密・読取確認（2026-10-18 JST）
 
@@ -123,9 +123,23 @@ node --test test-buffer-status.js
 - 任意提案の外側BEGIN/COMMIT除去を反映。DO文自体の原子性を使い、外側の移行トランザクションとの干渉を避けた。変更後も新規56件が成功。運用コードを変更していないため、既存16件の成功結果はそのまま有効。
 - 原本レビュー出力と送信した限定bundleは、この隔離コピー外の `..\claude-readonly-review\` に保存。レビュー対象SQLの後続差分はBEGIN/COMMIT除去のみ。
 
-## 本番前の注意
+## 本番適用と追跡（2026-10-18 JST）
 
-本番適用・pushは別承認が必要。今回の作業で消費分数は減っていない。
+- 適用前に最新mainをfetchし、`02e623c`から検証済み2コミットだけ進んでいることを確認。正本の既存未保存差分は編集・pullせず保持。
+- GitHub mainへ `86b298a`、`d433e6f` を通常のfast-forward pushで保存。
+- 正規Supabaseコネクタで `sns_skip_idle_cron_dispatch` を適用しsuccess=true。移行履歴version `20261017233412`（2026-10-18 08:34:12 JST）。手動でdispatch関数を呼んでいない。
+- 08:35:02 JSTの読取でゲートの全文一致、除去後の既存本文の指紋一致、所有者postgres・ACL `{postgres=X/postgres}`・SECURITY DEFINER・search_path維持を確認。投稿候補0、Buffer同期候補0。
+- 08:37自然cron runid1914が08:37:00.060〜00.069 JSTに成功。08:37:44 JSTの読取で両候補0・対象URLへのHTTP送信待ち0・pg_netレスポンス最大ID1865のまま・新規repository_dispatch起動なし。移行前の最終dispatchは08:22 JSTのGitHub run39078745573。これらを合わせて空振り省略を確認した。cronログは関数のNULL戻り値そのものを保存しないため、戻り値を直接読み取ったわけではない。
+- 次の通常投稿は09:30 JST Threads `2e78aeed-d762-4059-825f-b15bdad32478`。続く12:15 X、12:30 TikTok、12:45 YouTubeでBufferの状態同期を確認する。
+- 追跡タスク「SNS通常投稿の公開確認」を09:42 JST開始で登録。読み取りと公開ページ確認だけを行い、公開成功時にURLと根拠を報告。通常投稿・同期を確認したら停止する。ローカルheartbeatはこのクラウド実行では非対応のため、接続確認済みのクラウドタスクを使用。
+- GitHub CLIは未ログインなので再認証せず、正規GitHubコネクタを使う。GitHub Fetchの応答本文は `structuredContent.content` にあるJSONを必要項目へ絞る。
+- 親セッションへのCodexアプリ内メッセージはthread not foundだったため、適用速報はこの委任の返答で報告する。
+
+切戻しは `supabase/rollbacks/sns_skip_idle_cron_dispatch.sql`。対象関数に想定外の変更があれば停止し、現在の本文を出力せず指紋と承認範囲を確認してから判断する。切戻し後は無条件dispatchへ戻り消費も戻る。
+
+## 本番運用上の注意
+
+本番適用・pushは追加承認に基づき実施済み。課金設定や予備経路の変更は承認範囲外。
 予備のGitHub scheduleは毎15分のままなので、候補なしでもそのscheduleからActionsは起動する。毎日96回のscheduleがすべて実行されると、ジョブ最低1分という委任時の前提では30日で2,880分になる。
 この変更が減らすのは、候補なしのSupabase発dispatch分だけ。予備scheduleの実行頻度・欠落・両経路の重なりにより実削減量は変わる。無料2,000分以内や7〜8割削減は保証しない。予備経路変更・課金は今回の承認範囲外。
 判定直後に候補ができた場合は次の15分確認または既存予備scheduleで拾う。GitHub待機中や他実行が先に処理した場合は空のジョブが残ることもある。

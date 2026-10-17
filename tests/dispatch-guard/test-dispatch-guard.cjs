@@ -4,7 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
-const { PGlite } = require('@electric-sql/pglite');
+const Database = process.env.SNS_TEST_NATIVE === '1'
+  ? require('./native-postgres.cjs') : require('@electric-sql/pglite').PGlite;
 
 const root = path.resolve(__dirname, '../..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
@@ -111,7 +112,7 @@ test('migration must add the idle gate before vault lookup', () => {
 });
 
 test('real local PostgreSQL: gate, unchanged selector equivalence, side effects and rollback', async t => {
-  const db = new PGlite();
+  const db = new Database();
   try {
     await db.exec(schema);
     await db.exec(baselineFunction);
@@ -271,6 +272,9 @@ test('real local PostgreSQL: gate, unchanged selector equivalence, side effects 
       await db.exec(migration);
       assert.equal(await call(db), null);
     });
+    if (db.native) {
+      await require('./test-native-concurrency.cjs')({ db, t, root, fixture, call, callKinds, metadata });
+    }
     await t.test('unrecognized function body aborts apply and rollback without changing it', async () => {
       await db.exec("CREATE OR REPLACE FUNCTION sns.dispatch_cron_engine() RETURNS bigint LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN RETURN 456; END $$;");
       for (const sql of [migration, rollback()]) {

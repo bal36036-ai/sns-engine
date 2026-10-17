@@ -3,8 +3,9 @@
 更新：2026-10-18（隔離コピー。以下の節約変更は本番未適用）
 
 - 実装・ローカル検証：投稿候補もBuffer配信同期候補もない回だけ、Vault読取前にdispatchを省略する移行SQLと切戻しSQLを用意。候補条件は既存JSと同じ。
-- 検証：ローカルPostgreSQL 56件と既存Buffer回帰16件が成功。実投稿・実dispatch・本番DB書込・push・Actions実行なし。
-- レビュー：Codex自己レビュー済み。Claude Codeの限定読取レビューでブロッカーなし。本番前の参照権限・本文一致確認は未実施。
+- 検証：PGlite 56件・既存Buffer回帰16件に加え、通常のPostgreSQL 17.6で同じ56件と複数プロセス競合4件、計60件が成功。実投稿・実dispatch・本番DB書込・push・Actions実行なし。
+- レビュー：Codex自己レビュー済み。Claude Codeの限定読取レビューでブロッカーなし。追加テストは自己レビュー。
+- 本番読取確認：正規Supabaseコネクタで所有者postgres・SECURITY DEFINER・BYPASSRLS・テーブル所有者を確認。記録済み本文とDB内の指紋比較が一致（本文・Vault値は取得なし）。
 - 未完了：本番適用・pushは別承認待ち。正本の既存差分は要整理のため変更せず、このタスク専用コピーで実装。予備scheduleは無変更で、無料枠内は保証しない。
 - 詳細・次の作業：`stage41-idle-dispatch-gate-20261018.md` の本番前注意を確認して適用可否を判断する。
 

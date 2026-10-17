@@ -23,6 +23,8 @@
 | `supabase/migrations/20261017224441_sns_skip_idle_cron_dispatch.sql` | 既存本文を照合し、先頭に2つの EXISTS 判定を追加 |
 | `supabase/rollbacks/sns_skip_idle_cron_dispatch.sql` | 追加部分だけ除去し、元の無条件送信へ戻す |
 | `tests/dispatch-guard/test-dispatch-guard.cjs` | 既存JavaScriptが発行するSQLとの同値性、ローカルPostgreSQL、権限、切戻しの回帰テスト |
+| `tests/dispatch-guard/native-postgres.cjs` / `run-native-tests.cjs` | 一時PostgreSQL 17.6の起動・停止・安全な後片付けと、同じSQLテストの実行 |
+| `tests/dispatch-guard/native-engine-worker.cjs` / `test-native-concurrency.cjs` | 独立Nodeプロセスと別DBバックエンドによるclaim競合・同時起動試験。外部送信はmock |
 | `tests/dispatch-guard/package.json` / `package-lock.json` | テスト専用PGliteの固定版。ルートの運用依存は変更しない |
 | `STATUS.md` | 本番未適用の作業状態 |
 | このファイル | 運用説明・検証結果・レビュー記録 |
@@ -56,14 +58,15 @@ CRLFと前後空白を正規化した既存本文の指紋は `c49a3bc4b80c815f4
 既存の履歴が記録用ファイルなので、検討せず `supabase db push` で一括適用しない。移行SQL自体はdispatch関数を呼ばない。
 移行と切戻しは各1つのDO文で、途中失敗時に変更が一括で戻る。明示的なBEGIN/COMMITは持たせず、移行ツールの外側トランザクションを早期確定しない。切戻しも切戻しSQLだけを実行する。
 
-適用前に、関数所有者から `sns.posts` の候補行がJS接続ロールと同等に見えることを確認する。RLS（行単位の参照制限）やFORCE RLSで関数所有者から行が隠れると、権限エラーにならず候補なしと判定されうる。所有者がスーパーユーザー/BYPASSRLSか、RLSなし/非強制RLSのテーブル所有者かを確認し、そうでなければ両ロールの候補件数を同一時刻で比較する。権限・ポリシーは今回変更しない。この前提が確認できるまで本番適用しない。
+適用前に、関数所有者から `sns.posts` の候補行がJS接続ロール以上に見えることを確認する。RLS（行単位の参照制限）やFORCE RLSで関数所有者から行が隠れると、権限エラーにならず候補なしと判定されうる。所有者がスーパーユーザー/BYPASSRLSか、RLSなし/非強制RLSのテーブル所有者かを確認し、そうでなければ両ロールの候補件数を同一時刻で比較する。権限・ポリシーは今回変更しない。この前提が確認できるまで本番適用しない。今回の追加読取ではBYPASSRLSとテーブル所有を確認済み。適用までに設定が変わった場合は再確認する。
 
 適用後の確認は、既存cronの自然実行の範囲で、対象なしの時刻にdispatch由来のActionsが減ること、候補ありの時刻は処理が進むこと、`cron.job_run_details` に判定エラーがないことを確認する。手動でdispatch関数を呼ばない。
 切戻し後は従来どおり毎回dispatchするため、Actions消費も戻る。
 
 ## ローカル検証
 
-Dockerは停止中だったため、[PGlite](https://github.com/electric-sql/pglite) 0.5.10（WebAssembly版PostgreSQL）をNode内の一時メモリDBとして使用する。新サービス、認証、DB接続文字列は不要。
+初回はDockerが停止中だったため、[PGlite](https://github.com/electric-sql/pglite) 0.5.10（WebAssembly版PostgreSQL）をNode内の一時メモリDBとして使用した。SQLは実際にPostgreSQLで評価され、JSの条件を再実装した判定ではない。ただし通常のOSプロセスとして動くDBサーバーではなく、複数接続の行ロック競合は評価できなかった。
+追加依頼では通常のPostgreSQL 17.6も使用した。[embedded-postgresのWindowsバイナリ](https://github.com/leinelissen/embedded-postgres) `17.6.0-beta.15` と `pg` `8.23.0` をテスト専用依存に固定。Windowsサービス登録はせず、`127.0.0.1`の空きポートに一時クラスターを起動し、終了時に停止・削除する。新しい永続サービス、既存の認証・権限設定への変更はない。
 Vaultと `net.http_post` はローカルSQL関数のmock。HTTP処理はなく、テスト中の投稿APIも無効化している。fixtureは合成値だけ。
 
 再実行（初回の `npm ci` のみパッケージ取得の通信あり、テスト実行は外部接続なし）：
@@ -72,21 +75,48 @@ Vaultと `net.http_post` はローカルSQL関数のmock。HTTP処理はなく�
 cd tests/dispatch-guard
 npm ci --ignore-scripts --no-audit --no-fund
 npm test
+npm run test:native
 cd ../..
 node --test test-buffer-status.js
 ```
 
+`test:native` はWindowsでは同梱バイナリを使う。他環境は既存のPostgreSQLのbinディレクトリを `SNS_TEST_PG_BIN` で指定できる。本番の接続文字列や環境変数は使用しない。一時DBの接続情報は固定のloopback・合成ユーザーだけで、外部DBを指定する入口はない。
+このPCのWindowsサンドボックス内ではinitdbのWALファイル名変更が拒否された。通常のユーザー実行環境に限定して同じテストを実行すると成功した。管理者サービスや認証設定は変更していない。
+
 - 実装前：空の移行ファイルで22件失敗を確認。未来・候補なし等でも既存関数が送信することをテストで検出した。
-- 実装後：新規56件成功（条件一致検査を含む）。
-- 既存：`node --test test-buffer-status.js` 16件成功。
+- 前回報告の72件の内訳：PGliteの56件＋既存mock回帰16件。56件はSQL静的検査1件、統合テスト親1件、DB小ケース54件というNode test runnerの件数。72個の独立した本番検証という意味ではない。
+- 追加：同じ56件を通常のPostgreSQL 17.6で再評価し、さらに競合4件を追加した60件が成功（0件失敗・0件skip）。PGliteの56件も再成功。既存mock回帰16件は運用コード無変更のため前回の結果が有効。
 - 検証対象：空、未来、due、日時NULL、ready/scheduled、10分の等号/直前、90/181分遅れ、外部ID/空文字、歴史フラグ、Buffer処理中/受付/失敗/不明/最終公開、停止Instagram再確認、ID変更、数値/文字列/配列/不正JSON、重複呼出し、エラー伝播、allow/deny、所有者/OID/ACL/設定保存、冪等な適用と切戻し。
 - 省略時にVaultもHTTPも呼ばれず、投稿行も変わらないことを確認。
-- 重複呼出しは両方dispatch可能なまま。新たな排他・重複dispatch抑止は導入していない。PGliteは1バックエンドなので、実PostgreSQLの複数プロセスによる `SKIP LOCKED` 競合は未検証。既存のGitHub concurrencyとJS claim処理は無変更。
-- 本番DBの現在の関数本文・負荷・RLS実行環境との照合、実cron、実Buffer、実投稿は未検証。本番接続なし。
+- 競合追加1：別々のPostgreSQLバックエンドPIDの2接続から同時にdispatch関数を呼び、両方がmock HTTPへ進むこととclaim未変更を確認。新たな重複dispatch抑止は導入していない。
+- 競合追加2：未変更の `runCronEngine` を独立したNodeプロセスで2本起動。dispatch相当がSELECTの行ロックを保持したまま、schedule相当を実行。後者は `SKIP LOCKED` により候補0で完了し、前者だけmock投稿を1回行う。
+- 競合追加3：登録済みIDを残してclaimを11分前にし、2プロセスを同時再実行。Buffer同期だけ行われ、再送0回。
+- 競合追加4：候補2件・limit 1で2プロセスが行ロックを同時保持し、別々の投稿を取得。各1回のmock投稿・異なる外部ID2件を確認。
+- 既存GitHub concurrencyとJS claim処理は無変更。実GitHubイベントは送らず、DBの同時起動を通常より厳しい並列条件で試した。
+- 後片付け確認：テスト用postgresプロセス0、一時DBディレクトリ0。
+- 実cron、実Buffer、実投稿、本番負荷は未検証。追加依頼に従い本番への接続は以下の読取だけを実施。
+
+## 本番の非秘密・読取確認（2026-10-18 JST）
+
+正規Supabaseコネクタの対象プロジェクトは `dvysbebkzvvqyqtlgqcx`。別のkiridoriプロジェクトは操作していない。
+`pg_proc`・`pg_roles`・`pg_class` 等のメタデータSELECTで確認した。
+
+| 項目 | 結果 |
+|---|---|
+| 関数所有者 / SECURITY DEFINER | `postgres` / true |
+| 言語 / 戻り値 / search_path | plpgsql / bigint / pg_catalog, public |
+| 所有者のBYPASSRLS / SELECT権限 | true / true |
+| sns.postsの所有者 / RLS / FORCE RLS | postgres / true / false |
+| JS接続ロール / SELECT権限 / BYPASSRLS | sns_engine / true / false |
+| 記録済み本文の指紋とのDB内部比較 | `recorded_body_matches = true` |
+
+所有者はRLSを迂回して全行を見られるため、JS側が見られる候補をゲート側だけ取りこぼす懸念はこの時点で解消。JS側より広い範囲を見て余分にdispatchする可能性はあるが、投稿コード自体の参照制限は変更しない。
+本文比較はサーバー内部で `md5(btrim(replace(prosrc, CRLF, LF))) = 既知の指紋` の真偽だけを返した。関数本文・Vault値・鍵・投稿データは取得・出力していない。関数実行・本番書込もなし。
 
 ## レビュー
 
 - Codex：対象条件、外部副作用、権限保存、切戻しを自己レビュー。
+- 追加依頼の通常PostgreSQL起動処理と競合テストはCodexが自己レビュー。運用コード・移行/切戻しSQLには追加変更なし。
 - Claude Code：本人の既存許可の範囲で、変更SQL・合成テスト・関係する既存選択関数だけを読取レビュー実施。秘密・顧客情報・投稿データ・無関係ファイルは送信なし。`--safe-mode --tools '' --strict-mcp-config` と空MCP設定で編集・ツール・既存カスタマイズを無効化し、1ターンで正常完了。
 - 結果：ブロッカーなし。SQL同値性、メタデータ保持、切戻し、エラー伝播に欠陥なしとの評価。本番確認を行った評価ではない。
 - 適用前確認として、関数所有者/RLSの参照範囲、本文指紋の一致、draftだけの回の件数出力省略、停止媒体・10分条件の将来変更時の追従を記録。JSコメント追加の提案はライブコード無変更の範囲を守り、ここでの説明と手動テストで対応。

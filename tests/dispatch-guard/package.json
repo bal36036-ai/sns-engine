@@ -2,9 +2,14 @@
   "name": "sns-dispatch-guard-local-tests",
   "private": true,
   "scripts": {
-    "test": "node --test test-dispatch-guard.cjs"
+    "test": "node --test test-dispatch-guard.cjs",
+    "test:native": "node run-native-tests.cjs"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "0.5.10"
+    "@electric-sql/pglite": "0.5.10",
+    "pg": "8.23.0"
+  },
+  "optionalDependencies": {
+    "@embedded-postgres/windows-x64": "17.6.0-beta.15"
   }
 }

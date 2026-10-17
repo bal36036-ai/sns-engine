@@ -1,6 +1,12 @@
 # SNS運用エンジン 現在地
 
-更新：2026-10-13
+更新：2026-10-18（隔離コピー。以下の節約変更は本番未適用）
+
+- 実装・ローカル検証：投稿候補もBuffer配信同期候補もない回だけ、Vault読取前にdispatchを省略する移行SQLと切戻しSQLを用意。候補条件は既存JSと同じ。
+- 検証：ローカルPostgreSQL 56件と既存Buffer回帰16件が成功。実投稿・実dispatch・本番DB書込・push・Actions実行なし。
+- レビュー：Codex自己レビュー済み。Claude Codeの限定読取レビューでブロッカーなし。本番前の参照権限・本文一致確認は未実施。
+- 未完了：本番適用・pushは別承認待ち。正本の既存差分は要整理のため変更せず、このタスク専用コピーで実装。予備scheduleは無変更で、無料枠内は保証しない。
+- 詳細・次の作業：`stage41-idle-dispatch-gate-20261018.md` の本番前注意を確認して適用可否を判断する。
 
 - 正本：GitHub `bal36036-ai/sns-engine` / `main`（Private）。
 - 実行：既存GitHub ActionsのscheduleとSupabaseからのcron-live。手動実行はdry-run。

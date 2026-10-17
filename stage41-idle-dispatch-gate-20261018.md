@@ -1,0 +1,101 @@
+# 空の定期確認だけ GitHub への合図を省略する変更
+
+状態：実装・ローカル検証用。本番未適用、push なし。
+
+## 目的と承認範囲
+
+本人が委任元で承認した、SNS Actions 無料枠節約の最小修正。
+`sns.dispatch_cron_engine()` は投稿候補も Buffer 配信同期候補もないときだけ、Vault の読取りと HTTP 送信の前に `NULL` を返す。
+候補ありの送信先・本文・鍵の参照先・10秒タイムアウトはそのまま。
+
+- 基準 main：`02e623c8d97e69a92b6ddab3faeb905e1c73b36f`。2026-10-18 JST 作業開始時・引渡し前の `ls-remote` と一致。
+- 正本：`C:\新しいフォルダー\OneDrive\AI作成\SNS集客\エンジン`。
+- 適用指示：`C:\新しいフォルダー\OneDrive\AI作成\AGENTS.md`。SNS集客・エンジン配下に独自 AGENTS.md はない。
+- 正本には既存差分があるため、正本を fetch/pull/編集せず、GitHub からタスク内の専用 sparse clone を作成した。
+- 隔離作業：`C:\Users\sdk_y\Documents\Codex\2026-10-18\task-2\sns-engine-dispatch-guard`、ブランチ `codex/skip-idle-dispatch`。
+- 実装・mock/ローカルDB検証・レビューのみ承認済み。本番適用、push、課金、予備経路変更は未承認。
+- 実投稿・実dispatch・本番DB書込・Issue送信・Actions起動は実施しない。秘密は取得・出力しない。別のキリドリ作業は変更しない。
+
+## 変更ファイル
+
+| ファイル | 内容 |
+|---|---|
+| `supabase/migrations/20261017224441_sns_skip_idle_cron_dispatch.sql` | 既存本文を照合し、先頭に2つの EXISTS 判定を追加 |
+| `supabase/rollbacks/sns_skip_idle_cron_dispatch.sql` | 追加部分だけ除去し、元の無条件送信へ戻す |
+| `tests/dispatch-guard/test-dispatch-guard.cjs` | 既存JavaScriptが発行するSQLとの同値性、ローカルPostgreSQL、権限、切戻しの回帰テスト |
+| `tests/dispatch-guard/package.json` / `package-lock.json` | テスト専用PGliteの固定版。ルートの運用依存は変更しない |
+| `STATUS.md` | 本番未適用の作業状態 |
+| このファイル | 運用説明・検証結果・レビュー記録 |
+
+投稿ライブコード・60/180分の停止条件・Bufferクライアント・認証・権限・所有者・SECURITY DEFINER・15分cron・GitHub予備schedule・コメント通知・日次台帳は変更しない。
+
+## 判定の意味
+
+1. `claimCandidates` と同じ WHERE 条件を使用する。`ready/scheduled`、外部IDなし、日時NULLまたは期限到来、claimなしまたは10分より古い、が条件。
+2. 投稿候補には `is_historical` の条件を追加しない。期限超過、素材不足、公開不可、停止媒体もここでは除外しない。既存の後段で安全に停止・状態更新させるため。
+3. `syncBufferStatuses` と同じ WHERE 条件を使用する。Buffer・外部IDあり・`is_historical = false`、未確定結果や公開URL未取得を含む。
+4. 停止媒体リストは現行 `PAUSED_SNS = ['instagram']` と同じ。停止中の同じ外部IDに付いた `not_found` の再確認待ちだけを除外する。24時間の設定自体は既存JS側に任せる。数値以外の `next_check_after` は既存と同様0として再確認する。
+5. 選択順・LIMIT・行ロックは存在判定には不要。判定では行を変更・確保せず、取得と二重投稿防止は従来のJSに任せる。
+6. 判定エラーを `NULL` に変換する例外処理は追加しない。列欠落・Vault障害・HTTP障害のエラーは呼出し元へ伝わる。
+
+将来 `claimCandidates`、`syncBufferStatuses`、`PAUSED_SNS` を変更するときはSQLも同時に確認する。テストは実コードから抽出した WHERE 条件と移行SQLの文字列一致も検査し、停止媒体や条件の変更を検知する。
+この新規テストは手動実行であり、既存Actionsには追加していない。
+draftしかない回はdispatchしないため、その回の `due_drafts` 件数出力も省略される。候補がある起動では従来どおり出力する。別のコメント通知・日次台帳は変更していない。
+
+## 適用・切戻しの仕組み
+
+既存の記録用SQLは変更しない。新しい移行ファイルはSupabase CLIの `migration new` で作成した。
+`pg_proc.prosrc` と `pg_get_functiondef()` を使い、記録済みの本文と一致するときだけ関数本文を差し替える。照合用MD5は秘密ではなく、改変検知用の指紋。
+CRLFと前後空白を正規化した既存本文の指紋は `c49a3bc4b80c815f4b4911807784172c`。
+
+本文に相違があれば `unexpected dispatch_cron_engine body` で停止する。相違を無視するために指紋だけ更新してはいけない。既存関数本文には秘密が含まれる可能性があるので、本文をログ・チャットへ出力しない。
+既存定義を再利用する `CREATE OR REPLACE` により、OID・所有者・ACL（実行権限）と設定値を維持する。[PostgreSQL公式仕様](https://www.postgresql.org/docs/current/sql-createfunction.html)
+移行と切戻しの再実行は追加・除去を重複させない。未知の本文はどちらもエラーで停止する。
+
+本番適用の承認後に、対象DB・所有者権限・最新main・JS候補条件の不変を確認し、**この移行SQLだけ**を実行する。
+既存の履歴が記録用ファイルなので、検討せず `supabase db push` で一括適用しない。移行SQL自体はdispatch関数を呼ばない。
+移行と切戻しは各1つのDO文で、途中失敗時に変更が一括で戻る。明示的なBEGIN/COMMITは持たせず、移行ツールの外側トランザクションを早期確定しない。切戻しも切戻しSQLだけを実行する。
+
+適用前に、関数所有者から `sns.posts` の候補行がJS接続ロールと同等に見えることを確認する。RLS（行単位の参照制限）やFORCE RLSで関数所有者から行が隠れると、権限エラーにならず候補なしと判定されうる。所有者がスーパーユーザー/BYPASSRLSか、RLSなし/非強制RLSのテーブル所有者かを確認し、そうでなければ両ロールの候補件数を同一時刻で比較する。権限・ポリシーは今回変更しない。この前提が確認できるまで本番適用しない。
+
+適用後の確認は、既存cronの自然実行の範囲で、対象なしの時刻にdispatch由来のActionsが減ること、候補ありの時刻は処理が進むこと、`cron.job_run_details` に判定エラーがないことを確認する。手動でdispatch関数を呼ばない。
+切戻し後は従来どおり毎回dispatchするため、Actions消費も戻る。
+
+## ローカル検証
+
+Dockerは停止中だったため、[PGlite](https://github.com/electric-sql/pglite) 0.5.10（WebAssembly版PostgreSQL）をNode内の一時メモリDBとして使用する。新サービス、認証、DB接続文字列は不要。
+Vaultと `net.http_post` はローカルSQL関数のmock。HTTP処理はなく、テスト中の投稿APIも無効化している。fixtureは合成値だけ。
+
+再実行（初回の `npm ci` のみパッケージ取得の通信あり、テスト実行は外部接続なし）：
+
+```powershell
+cd tests/dispatch-guard
+npm ci --ignore-scripts --no-audit --no-fund
+npm test
+cd ../..
+node --test test-buffer-status.js
+```
+
+- 実装前：空の移行ファイルで22件失敗を確認。未来・候補なし等でも既存関数が送信することをテストで検出した。
+- 実装後：新規56件成功（条件一致検査を含む）。
+- 既存：`node --test test-buffer-status.js` 16件成功。
+- 検証対象：空、未来、due、日時NULL、ready/scheduled、10分の等号/直前、90/181分遅れ、外部ID/空文字、歴史フラグ、Buffer処理中/受付/失敗/不明/最終公開、停止Instagram再確認、ID変更、数値/文字列/配列/不正JSON、重複呼出し、エラー伝播、allow/deny、所有者/OID/ACL/設定保存、冪等な適用と切戻し。
+- 省略時にVaultもHTTPも呼ばれず、投稿行も変わらないことを確認。
+- 重複呼出しは両方dispatch可能なまま。新たな排他・重複dispatch抑止は導入していない。PGliteは1バックエンドなので、実PostgreSQLの複数プロセスによる `SKIP LOCKED` 競合は未検証。既存のGitHub concurrencyとJS claim処理は無変更。
+- 本番DBの現在の関数本文・負荷・RLS実行環境との照合、実cron、実Buffer、実投稿は未検証。本番接続なし。
+
+## レビュー
+
+- Codex：対象条件、外部副作用、権限保存、切戻しを自己レビュー。
+- Claude Code：本人の既存許可の範囲で、変更SQL・合成テスト・関係する既存選択関数だけを読取レビュー実施。秘密・顧客情報・投稿データ・無関係ファイルは送信なし。`--safe-mode --tools '' --strict-mcp-config` と空MCP設定で編集・ツール・既存カスタマイズを無効化し、1ターンで正常完了。
+- 結果：ブロッカーなし。SQL同値性、メタデータ保持、切戻し、エラー伝播に欠陥なしとの評価。本番確認を行った評価ではない。
+- 適用前確認として、関数所有者/RLSの参照範囲、本文指紋の一致、draftだけの回の件数出力省略、停止媒体・10分条件の将来変更時の追従を記録。JSコメント追加の提案はライブコード無変更の範囲を守り、ここでの説明と手動テストで対応。
+- 任意提案の外側BEGIN/COMMIT除去を反映。DO文自体の原子性を使い、外側の移行トランザクションとの干渉を避けた。変更後も新規56件が成功。運用コードを変更していないため、既存16件の成功結果はそのまま有効。
+- 原本レビュー出力と送信した限定bundleは、この隔離コピー外の `..\claude-readonly-review\` に保存。レビュー対象SQLの後続差分はBEGIN/COMMIT除去のみ。
+
+## 本番前の注意
+
+本番適用・pushは別承認が必要。今回の作業で消費分数は減っていない。
+予備のGitHub scheduleは毎15分のままなので、候補なしでもそのscheduleからActionsは起動する。毎日96回のscheduleがすべて実行されると、ジョブ最低1分という委任時の前提では30日で2,880分になる。
+この変更が減らすのは、候補なしのSupabase発dispatch分だけ。予備scheduleの実行頻度・欠落・両経路の重なりにより実削減量は変わる。無料2,000分以内や7〜8割削減は保証しない。予備経路変更・課金は今回の承認範囲外。
+判定直後に候補ができた場合は次の15分確認または既存予備scheduleで拾う。GitHub待機中や他実行が先に処理した場合は空のジョブが残ることもある。
